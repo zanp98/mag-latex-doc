@@ -66,17 +66,17 @@
 % |||||||||||||||||||||| USTREZNO POPRAVI |||||||||||||||||||||||
 % |||||||||||||||||||||| EDIT ACCORDINGLY |||||||||||||||||||||||
 %----------------------------------------------------------------
-\newcommand{\ttitle}{Vzorec zaključnega dela}
-\newcommand{\ttitleEn}{Thesis template}
+\newcommand{\ttitle}{Sistem za zagotavljanje zaupanja v dobavni verigi zdravil z uporabo verige blokov}
+\newcommand{\ttitleEn}{Trust System in Pharmaceutical Supply Chain Using Blockchain}
 \newcommand{\tsubject}{\ttitle}
 \newcommand{\tsubjectEn}{\ttitleEn}
-\newcommand{\tauthor}{Mojster Jaka}
-\newcommand{\temail}{mojster.jaka@gmai.com}
-\newcommand{\myyear}{2016}
-\newcommand{\tkeywords}{računalnik, računalnik, računalnik}
-\newcommand{\tkeywordsEn}{computer, computer, computer}
-\newcommand{\mysupervisor}{doc.~dr.\ Peter Klepec}
-\newcommand{\mycosupervisor}{akad.~prof.~dr.\ Martin Krpan}
+\newcommand{\tauthor}{Žan Pižmoht}
+\newcommand{\temail}{zp6881@student.uni-lj.si}
+\newcommand{\myyear}{2025}
+\newcommand{\tkeywords}{zaupanje, tehnologija veriženja blokov, dobavna veriga zdravil}
+\newcommand{\tkeywordsEn}{trust, blockchain, pharmaceutical supply chain}
+\newcommand{\mysupervisor}{prof.~dr. Vlado Stankovski}
+\newcommand{\mycosupervisor}{doc.~dr.\ Petar Kochovski}
 
 % include formatted front pages
 \input{style/thesis_front_pages}
@@ -93,12 +93,42 @@
 
 \chapter{Pregled literature in ozadje}
 
-\section{Farmacevtske dobavne verige}
-  \subsection{Izzivi sledenja in proti ponarejanju}
-  \subsection{Regulativni okvir}
+\section{Zaupanje}
+
+Pojem zaupanja je temeljni gradnik pri zasnovi našega sistema za farmacevtsko dobavno verigo. Zaupanje je kompleksen, večdimenzionalen in interdisciplinaren koncept, ki ga obravnavajo različne vede. Obravnava se v sociologiji, psihologiji, ekonomiji, računalništvu in še ostalih vedah. Prav zaradi te raznolikosti v literaturi ne obstaja enotna definicija, temveč več pristopov, ki poudarjajo različne vidike \cite{holtmanns2008trust,grandison2000survey}.
+
+\subsection{Definicije zaupanja}
+V družboslovnem kontekstu je zaupanje pogosto opredeljeno kot stanje pozitivnih pričakovanj glede dejanj druge osebe v okoliščinah, kjer obstaja določena stopnja tveganja \cite{boon1991interpersonal}. Gambetta \cite{gambetta1988trust} zaupanje definira kot subjektivno verjetnost, da bo agent opravil določeno dejanje, še preden je to mogoče preveriti. Mayer, Davis in Schoorman \cite{mayer1995integrative} pa ga opredelijo kot pripravljenost ene stranke, da se izpostavi ranljivosti glede na dejanja druge stranke, ob pričakovanju, da bo ta delovala v skladu s pričakovanji.
+
+V digitalnem okolju se koncept zaupanja prenaša iz družbenega v tehnični kontekst. Denning \cite{denning1993trust} trdi, da je zaupanje v sistem lastnost, ki jo je mogoče formalno določiti in jo modelirati. Sistem je torej zaupanja vreden, če mu njegovi uporabniki zaupajo glede na opaženo skladnost z vnaprej določenimi standardi. Grandison in Sloman \cite{grandison2000survey} zaupanje obravnavata kot kvalificirano prepričanje zaupnika o kompetentnosti, integriteti, varnosti in zanesljivosti zaupanja vrednega subjekta.
+
+\subsection{Lastnosti zaupanja}
+
+Zaupanje je po svoji naravi večdimenzionalen pojem, ki ga ni mogoče zajeti z eno samo definicijo. V literaturi se ponavlja, da zaupanje vključuje čustvene in vedenjske komponente, ki se med seboj prepletajo in vplivajo na odločanje posameznika ali sistema \cite{mcknight2001trust, karthik2017ontology}. V družbenem kontekstu gre za pripravljenost posameznika, da se izpostavi tveganju na podlagi prepričanja, da bo druga stran delovala predvidljivo in skladno s pričakovanji. V informacijskih sistemih pa to pomeni sposobnost sistema, da sprejema odločitve o sodelovanju na podlagi preteklih izkušenj in ocenjene zanesljivosti entitet.
+
+Zaupanje obstaja le v razmerju med dvema ali več entitetami, kjer ena zaupa drugi v določeni situaciji ali kontekstu. Takšno razmerje je dinamično, saj se lahko stopnja zaupanja sčasoma povečuje ali zmanjšuje. Poleg tega je zaupanje asimetrično: dejstvo, da entiteta A zaupa entiteti B, še ne pomeni, da bo tudi B zaupala A \cite{mayer1995integrative}.
+
+Ena od osrednjih značilnosti zaupanja je njegova povezanost s tveganjem in negotovostjo. Zaupanje je smiselno le v okoliščinah, kjer obstaja možnost, da drugi akter ne bo ravnal skladno s pričakovanji \cite{boon1991interpersonal}. Če bi imeli popoln nadzor ali popolno informacijo, zaupanje sploh ne bi bilo potrebno. V kontekstu varnostnih in distribucijskih sistemov zaupanje dopolnjuje formalne zaščitne mehanizme, kot so avtentikacija in šifriranje, saj omogoča oceno vedenja akterjev tam, kjer tehnični ukrepi ne zadostujejo \cite{denning1993trust}.
+
+Zaupanje je tudi subjektivno in kontekstualno. Različni akterji lahko enake vedenjske vzorce interpretirajo različno, odvisno od svojih ciljev, izkušenj, regulatornih zahtev, prepričanj itn.
+
+\subsection{Atributi zaupanja}
+Da bi bilo zaupanje uporabno v digitalnem okolju, ga je potrebno izraziti z merljivimi atributi, ki opisujejo lastnosti ali vedenje zaupanja vrednega subjekta. Ti atributi omogočajo, da se konceptualna ideja zaupanja preslika v formalne modele. V literaturi se pojavljajo različne skupine atributov.
+
+Klasični modeli, kot sta Mayer, Davis in Schoorman \cite{mayer1995integrative} ter McKnight in Chervany \cite{mcknight2001trust}, opredeljujejo tri temeljne dimenzije zaupanja: kompetentnost, integriteto in dobrohotnost. Kompetentnost se nanaša na sposobnost entitete, da učinkovito izvede nalogo, integriteta na njeno zavezanost etičnim in profesionalnim načelom, dobrohotnost pa na odsotnost namere povzročiti škodo. Kasneje so bili tem trem dodani še predvidljivost in zanesljivost, ki poudarjata konsistentnost vedenja skozi čas.
+
+V digitalnih in porazdeljenih okoljih so se pojavili dodatni atributi, ki izhajajo iz tehničnih vidikov zaupanja. Grandison in Sloman \cite{grandison2000survey} zaupanje opišeta kot prepričanje o kompetentnosti, varnosti in verodostojnosti drugega subjekta. Denning \cite{denning1993trust} poudarja, da je zaupanja vrednost sistema mogoče ocenjevati tudi z vidika varnosti, skladnosti s pravili ter preverljivosti delovanja. Ti atributi omogočajo formalno ocenjevanje zaupanja med akterji.
+
+V farmacevtski dobavni verigi imajo atributi zaupanja izrazito regulatorno in sledilno komponento. Uddin in sodelavci \cite{uddin2021blockchain} poudarjajo, da so pri zagotavljanju zaupanja ključni kazalniki sledljivost, pristnost in celovitost podatkov. 
+Kayhan in sodelavci \cite{kayhan2022ensuring} izpostavljajo še pomen transparentnosti, nespremenljivosti in izvorne sledljivosti (angl.~\textit{provenance}), ki jih omogoča tehnologija veriženja blokov.
+
+Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, predstavljenem v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti (angl.~\textit{data properties}) v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavnje zaupanja.
+
 \section{Upravljanje zaupanja v razpršenih sistemih}
   \subsection{Modeli zaupanja}
-  \subsection{Zaupanja v IoT in pervasive okolju}
+\section{Farmacevtske dobavne verige}
+  \subsection{Izzivi sledenja in boj proti ponarejanju}
+  \subsection{Regulatorni okvir}
 \section{Tehnologija veriženja blokov v dobavnih verigah}
   \subsection{Javne in dovoljene verige blokov}
   \subsection{Pametne pogodbe za nadzor dostopa in sledljivost}
@@ -106,7 +136,6 @@
   \subsection{RDF, OWL in orodja za ontologijo}
   \subsection{Ontologija zaupanja}
 \section{Analiza vrzeli in prispevek te naloge}
-\section{Zaupanje}
 \section{Ontologija zaupanja}
   \subsection{Koncepti in odnosi}
   \subsection{SWRL pravila}
@@ -211,7 +240,7 @@ Python modul, razvit za potrebe sistema, izvaja naslednje korake:
 \end{enumerate}
 
 \paragraph{Primer ocenjevanja}
-Če ima npr. akter \textit{Pfizer} pravilo, da zaupa le prevoznikom z vsaj 90\,\% točnih dostav in manj kot 5\,\% temperaturnimi nepravilnostmi, bo mehanizem preveril te pogoje za vsakega prevoznika, zapisanega v ontologiji. Rezultat ocenjevanja je binarna odločitev (\texttt{true/false}), ki pove, ali akter izpolnjuje kriterije zaupanja.
+Če ima npr. akter \textit{Pfizer} pravilo, da zaupa le prevoznikom z vsaj 90\,\% točnih dostav in manj kot 5\,\% temperaturnih nepravilnostih, bo mehanizem preveril te pogoje za vsakega prevoznika, zapisanega v ontologiji. Rezultat ocenjevanja je binarna vrednost (\texttt{true/false}), ki pove, ali akter izpolnjuje kriterije zaupanja.
 
 \subsection{Graf zaupanja na verigi blokov (angl. Blockchain Trust Registry)}
 
@@ -246,22 +275,44 @@ V ontologiji so definirani osnovni razredi, ki predstavljajo tipe akterjev. To s
 \subsubsection{Lastnosti zaupanja}
 
 Lastnosti opisujejo merljive kriterije, ki se uporabljajo pri presoji zaupanja. Nekaj primerov:
-- \texttt{hasGMP} opisuje ali je proizvajalec skladen z dobrimi proizvodnimi praksami,
-- \texttt{hasAuditScore} predstavlja oceno presoje kakovosti,
-- \texttt{hasLicense} označuje, ali ima akter veljavno licenco,
-- \texttt{hasDeliveryPunctuality} izraža delež pravočasnih dostav,
-- \texttt{hasTempViolationRate} pove, kolikšen delež transportov je imel temperaturna odstopanja,
-- \texttt{hasPrescriptionComplianceRate} opisuje skladnost lekarne pri izdaji zdravil na recept,
-- \texttt{hasIssuedCertifications} je število certifikatov, ki jih je regulator izdal,
-- \texttt{hasJurisdictionLevel} pa določa raven pristojnosti regulatorja (npr. lokalna, nacionalna, globalna).
+\texttt{hasGMP} opisuje ali je proizvajalec skladen z dobrimi proizvodnimi praksami,
+\texttt{hasAuditScore} predstavlja oceno presoje kakovosti,
+\texttt{hasLicense} označuje, ali ima akter veljavno licenco,
+\texttt{hasDeliveryPunctuality} izraža delež pravočasnih dostav,
+\texttt{hasTempViolationRate} pove, kolikšen delež transportov je imel temperaturna odstopanja,
+\texttt{hasPrescriptionComplianceRate} opisuje skladnost lekarne pri izdaji zdravil na recept,
+\texttt{hasIssuedCertifications} je število certifikatov, ki jih je regulator izdal,
+\texttt{hasJurisdictionLevel} pa določa raven pristojnosti regulatorja (npr. lokalna, nacionalna, globalna).
 
 \subsubsection{Razredi zaupanja}
 
-Za vsak tip akterja so v ontologiji definirani tudi posebni razredi, ki predstavljajo zaupanja vredne entitete. To so na primer \texttt{TrustedManufacturer}, \texttt{TrustedDistributor}, \texttt{TrustedPharmacy}, \texttt{TrustedTransporter} in \texttt{TrustedRegulatoryAuthority}. Ti razredi so definirani z ekvivalenčnimi pogoji, kar pomeni, da reasoner lahko samodejno uvrsti entiteto v določen zaupanja vreden razred, če so pogoji izpolnjeni. Na primer, proizvajalec, ki ima GMP certifikat in dovolj visoko oceno presoje kakovosti, bo klasificiran kot \texttt{TrustedManufacturer}. Podobno velja za druge tipe akterjev.
+Za vsak tip akterja so v ontologiji definirani tudi posebni razredi, ki predstavljajo zaupanja vredne entitete. To so na primer \texttt{TrustedManufacturer}, \texttt{TrustedDistributor}, \texttt{TrustedPharmacy}, itn. Ti razredi so definirani z ekvivalenčnimi pogoji, kar pomeni, da reasoner lahko samodejno uvrsti entiteto v določen zaupanja vreden razred, če so pogoji izpolnjeni. Na primer, proizvajalec, ki ima GMP certifikat in dovolj visoko oceno presoje kakovosti, bo klasificiran kot \texttt{TrustedManufacturer}. Podobno velja za druge tipe akterjev.
 
 \subsubsection{Primerki akterjev}
 
 V ontologijo so dodani tudi konkretni primerki, ki predstavljajo dejanske akterje v sistemu. Tako imamo na primer proizvajalca Pfizer in Novartis, prevoznika DHL, lekarno MediPlus, distributerja EuroLogistics ter regulatorja EMA. Vsak od teh primerkov ima določene lastnosti, kot so na primer ocena presoje, točnost dostave ali število izdanih certifikatov. Te vrednosti se potem uporabijo pri sklepanju o zaupanju.
+
+\subsection{Primer toka podatkov in logike}
+
+Za ponazoritev delovanja si oglejmo primer, kjer proizvajalec Pfizer ocenjuje prevoznika DHL:
+
+\begin{enumerate}
+  \item \textbf{Ontologija (OWL)}: v ontologiji so zabeležene lastnosti prevoznika DHL, npr.\ \texttt{hasDeliveryPunctuality = 0.95} in \texttt{hasTempViolationRate = 0.02}.
+  \item \textbf{Pravila zaupanja}: Pfizerjeva politika zaupanja za razred \textit{Transporter} zahteva \texttt{hasDeliveryPunctuality $\geq$ 0.90} in \texttt{hasTempViolationRate $\leq$ 0.05}.
+  \item \textbf{Sklepanje (Python)}: mehanizem prebere lastnosti DHL iz ontologije in jih primerja s Pfizerjevimi pogoji. Ker sta oba pogoja izpolnjena, rezultat sklepanja je \texttt{true}.
+  \item \textbf{Zapis v verigo blokov}: rezultat (\texttt{Pfizer} zaupa \texttt{DHL}) se zapiše v pametno pogodbo. Funkcija \texttt{isTrusted(Pfizer, DHL)} nato vrne \texttt{true}.
+\end{enumerate}
+
+Na ta način sistem poveže semantične podatke, subjektivna pravila in trajne zapise rezultatov v verigi blokov v enoten potek.
+
+\subsection{Način posodabljanja blockchain registra}
+
+Zapis rezultatov v pametno pogodbo se lahko sproži na tri načine:
+\begin{itemize}
+  \item \textbf{Ročno}: prek CLI ali uporabniškega vmesnika, primerno za prezentacije in testne scenarije.
+  \item \textbf{Dogodkovno}: ob spremembi entitete, pravil ali metrik v ontologiji (npr.\ nova licenca, posodobljen audit).
+  \item \textbf{Periodično}: v rednih intervalih (npr.\ dnevno), pri čemer se zapis izvrši le ob spremembi rezultata glede na prejšnje stanje.
+\end{itemize}
 
 
 \section{Razvoj pametnih pogodb in oraklov}
