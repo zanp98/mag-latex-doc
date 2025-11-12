@@ -122,9 +122,60 @@ V digitalnih in porazdeljenih okoljih so se pojavili dodatni atributi, ki izhaja
 V farmacevtski dobavni verigi imajo atributi zaupanja izrazito regulatorno in sledilno komponento. Uddin in sodelavci \cite{uddin2021blockchain} poudarjajo, da so pri zagotavljanju zaupanja ključni kazalniki sledljivost, pristnost in celovitost podatkov. 
 Kayhan in sodelavci \cite{kayhan2022ensuring} izpostavljajo še pomen transparentnosti, nespremenljivosti in izvorne sledljivosti (angl.~\textit{provenance}), ki jih omogoča tehnologija veriženja blokov.
 
-Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, predstavljenem v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti (angl.~\textit{data properties}) v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavnje zaupanja.
+Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti (angl.~\textit{data properties}) v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavanje zaupanja.
 
 \section{Upravljanje zaupanja v razpršenih sistemih}
+Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, ter dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \texttt{peer-to-peer}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in skladne informacije o zaupanju med akterji v omrežju.
+
+\subsection{Dokazni modeli zaupanja}
+Dokazni modeli temeljijo na preverljivih dokazih, kot so digitalna potrdila, javni ključi ali kriptografski podpisi. 
+Ti pristopi zagotavljajo preverjanje identitete in integritete entitet, ne pa tudi njihove dejanske zanesljivosti. 
+Najpogostejša primera sta hierarhični sistem X.509 \cite{housley1999rfc2459} in decentralizirani sistem PGP \cite{elkins2001mime}, kjer se zaupanje posreduje prek verige certifikatov oziroma prek subjektivnih ocen uporabnikov. 
+Tak model se uporablja predvsem pri inicializaciji zaupanja in zagotavlja osnovno preverjanje pristnosti brez ocenjevanja vedenja.
+
+\subsection{Priporočilni modeli zaupanja}
+Priporočilni modeli gradijo zaupanje na osnovi izkušenj in posredovanih ocen drugih entitet. 
+Vsaka entiteta ocenjuje druge glede na pretekle interakcije, te ocene pa se lahko delijo naprej kot priporočila. 
+Model uporablja pogojno tranzitivnost zaupanja – entiteta A lahko zaupa entiteti C, če A zaupa B kot priporočitelju in lahko ovrednoti njegovo oceno.
+
+Pri tem se uporablja zvezna vrednost zaupanja $tv_T$ med $0$ in $1$, izračunana iz vrednosti priporočil po poti $A \rightarrow B \rightarrow C \rightarrow D$. 
+Za končno vrednost se uporabi zmnožek delnih zaupanj na poti:
+\[
+tv_T = \prod_{i=1}^{n} \frac{rtv(i)}{4} \times tv(T)
+\]
+kjer $rtv(i)$ predstavlja stopnjo zaupanja v posameznega posrednika, $tv(T)$ pa končno vrednost zaupanja v ciljno entiteto.  
+Če obstaja več poti med akterjema, se končna vrednost določi kot povprečje rezultatov posameznih poti.
+
+\subsection{Porazdeljeno ocenjevanje zaupanja}
+
+V omrežjih enakovrednih akterjev (angl. \textit{peer-to-peer}) se zaupanje ocenjuje decentralizirano. 
+Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. 
+Xiong in Liu predlagata metriko, ki temelji na razmerju med pozitivnimi in negativnimi interakcijami:
+\[
+T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t) \, Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}
+\]
+kjer $S(u,v,t)$ označuje zadovoljstvo uporabnika $u$ z $v$ do časa $t$, $Cr(v,t)$ je korekcijski faktor za filtriranje povratnih informacij, $I(u,v,t)$ pa število interakcij med $u$ in $v$. 
+Rezultat $T(u,t)$ je vedno v intervalu $(0,1)$ in predstavlja trenutno stopnjo zaupanja v entiteto. 
+Sistem lahko določi pragove $C_1$ in $C_2$, pri čemer entiteta velja za zaupanja vredno, če velja $I(u,t) > C_1$ in $T(u,t) > C_2$.
+
+Takšni sistemi so učinkoviti pri akumuliranju ocen, vendar občutljivi za napačne ali zlonamerne povratne informacije. 
+Zato številne rešitve uvajajo uteževanje priporočil glede na zanesljivost virov ali časovno starost podatkov.
+
+\subsection{Dinamično posodabljanje zaupanja}
+
+Ker se vedenje akterjev sčasoma spreminja, se mora zaupanje prilagajati novim podatkom. 
+Posodobitev vrednosti se pogosto izvede z amortizacijskimi ali diskontnimi faktorji, ki dajejo večjo težo nedavnim interakcijam. 
+Primer takega mehanizma je izračun nove vrednosti zaupanja po zaključeni interakciji:
+\[
+T_{\text{new}} = \frac{r + N \, T_{\text{old}} \, e^{-\beta \Delta t}}{1 + N \, e^{-\beta \Delta t}}
+\]
+kjer $T_{\text{old}}$ predstavlja prejšnjo vrednost zaupanja, $r$ novo oceno po transakciji, $N$ število izvedenih interakcij, $\beta$ faktor dušenja, $\Delta t$ pa čas od zadnje posodobitve. 
+Na ta način sistem zagotavlja, da nove izkušnje hitreje vplivajo na oceno, stare pa postopoma izgubijo težo.
+
+\subsection{Povezava z našo rešitvijo}
+Predstavljeni modeli zaupanja predstavljajo osnovo za delovanje razvitega sistema. Vsak akter v dobavni verigi lahko uporabi svoj način izračuna zaupanja, ki temelji na dokazih, priporočilih ali dinamičnih metrikah. Sistem ne vsiljuje enotnega algoritma, temveč omogoča, da akter sam oblikuje pravila na podlagi podatkov iz ontologije. Rezultati teh izračunov se shranjujejo v verigo blokov, ki deluje kot skupen in trajen zapis ocen. S tem smo združili različne pristope v enoten sistem, kjer je zaupanje merljivo in preverljivo.
+
+
   \subsection{Modeli zaupanja}
 \section{Farmacevtske dobavne verige}
   \subsection{Izzivi sledenja in boj proti ponarejanju}
