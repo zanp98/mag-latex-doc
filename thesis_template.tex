@@ -303,36 +303,95 @@ V nadaljevanju naloge bomo opisali, kako je tak sistem konkretno implementiran t
 \chapter{Implementacija sistema}
 \label{cht:implementation}
 
+\section{Uporabljene tehnologije}
+
+Pri razvoju sistema smo uporabili različna orodja in platforme, ki skupaj omogočajo obdelavo semantičnih podatkov, izvajanje izračuna zaupanja ter zapis rezultatov v verigo blokov. V tej sekciji podajamo pregled najpomembnejših tehnologij in njihovih vlog v sistemu.
+
+\paragraph{Apache Jena Fuseki}
+Semantični podatki o akterjih in njihovih lastnostih so shranjeni v strežniku Apache Jena Fuseki, ki predstavlja RDF podatkovno bazo z dostopom prek SPARQL vmesnika. Fuseki omogoča centralizirano hrambo ontologije in primerkov ter enoten način pridobivanja podatkov za vse oraklje. Zaradi stabilnosti, enostavne uporabe in dobre združljivosti s standardi RDF je bila izbira naravna. Sistem teče v Docker vsebniku, kar omogoča hitro postavitev in ponovljivost okolja.
+
+\paragraph{Ontologija v OWL/RDF}
+Ontologija farmacevtske dobavne verige je zapisana v jeziku OWL, ki definira razrede, lastnosti in odnose med akterji. Podatki so organizirani v RDF trojkah, kar omogoča interoperabilnost z različnimi orodji semantičnega spleta. Ontologija predstavlja osrednjo plast sistema, saj definira strukturo znanja, ki jo oraklji uporabljajo pri sklepanju. Celoten model je fleksibilen, zato ga je mogoče prilagoditi tudi drugim domenam.
+
+\paragraph{JSON pravila zaupanja}
+Vsak akter lahko svoje kriterije zaupanja definira v JSON obliki. JSON je izbran zaradi enostavne berljivosti in neposredne integracije s Pythonom. Pravila določajo pragove, ki jih mora akter izpolniti, na primer minimalno točnost dostave ali največjo dovoljeno stopnjo temperaturnih odstopanj. Python orakelj ta pravila interpretira in preveri, ali podatki iz ontologije ustrezajo zahtevam ocenjevalca.
+
+\paragraph{Ethereum, Solidity in pametna pogodba}
+Za zapis rezultatov izračunanega zaupanja smo uporabili verigo blokov Ethereum.  
+Pametna pogodba \texttt{TrustGraph}, napisana v jeziku Solidity, hrani relacije zaupanja med akterji.  
+Ethereum je bil izbran zaradi široke podpore za orodja, stabilnega ekosistema in zmožnosti izvajanja pametnih pogodb brez zaupanja v enega posrednika.  
+Razvoj in testiranje sta izvedena s pomočjo orodja Foundry, ki nudi lokalno testno omrežje, kompilator ter hitre skripte za izvajanje transakcij.
+
+Pametna pogodba omogoča zapis rezultatov izračuna, preverjanje stanja zaupanja in beleženje dogodkov. Deluje kot nespremenljiv register, ki je dostopen vsem akterjem sistema.
+
+\paragraph{Decentralizirane identitete in preverljiva dokazila}
+Vsak akter v ontologiji ima dodeljen decentraliziran identifikator (DID).  
+DID služi kot enoličen identifikator, ki povezuje podatke v ontologiji s predstavnikom akterja v decentraliziranem okolju.  
+Poleg tega sistem podpira uporabo preverljivih dokazil (VC), ki jih lahko izdajajo regulatorji, kot je EMA.  
+Ta dokazila vsebujejo metrike, kot so veljavnost licence, GMP skladnost ali rezultati presoje kakovosti.  
+Orakelj lahko, kadar akter to določi v pravilih, med izračunom zaupanja prebere VC in uporabi podatke kot dodatne kriterije.
+
+\paragraph{Python in osnovne knjižnice}
+Jedro mehanizma za izračun zaupanja je razvito v programskem jeziku Python. Uporabljamo ga predvsem zaradi enostavne integracije z ontologijo, preprostega dela z JSON datotekami ter dobre podpore za povezovanje z verigo blokov prek knjižnice \texttt{web3.py} \cite{web3py}.
+
+\paragraph{Pametni oraklji}
+Oraklji predstavljajo most med semantično plastjo in verigo blokov.  
+Vsak orakelj zažene Python modul, ki prebere ontologijo, uporabi lokalna pravila akterja in izračuna vrednosti zaupanja.  
+Nato preko \texttt{web3.py} pošlje transakcijo pametni pogodbi.  
+Oraklji so zasnovani modularno, zato jih lahko organizacije poganjajo samostojno, kar omogoča decentralizirano izvajanje izračuna.
+
+\paragraph{Docker}
+Vse komponente sistema so zajete v vsebnikih Docker. To nam je omogočilo hitro postavitev razvojnega okolja, enostavno upravljanje odvisnosti in ponovljivost testov.  
+Vsak orakelj, strežnik Fuseki, in lokalna Ethereum veriga tečejo v ločenih vsebnikih.
+Docker je uporabljen izključno za potrebe testiranja med razvojem.
+
+
 \section{Arhitektura sistema}
+Arhitektura razvitega sistema temelji na večplastnem pristopu, ki ločuje podatkovni model, mehanizme izračuna in zapis rezultatov zaupanja. Takšna zasnova omogoča jasne meje med posameznimi odgovornostmi, kar olajša razvoj, testiranje in morebitno razširjanje sistema na druge domene. V okviru magistrske naloge smo zasnovali arhitekturo, ki je dovolj splošna, da jo je mogoče uporabiti v različnih razpršenih okoljih, od farmacevtskih dobavnih verig do pametnih mest.
 
-Arhitektura sistema za upravljanje zaupanja v farmacevtski dobavni verigi je sestavljena iz več plasti. Te omogočajo kombinacijo semantičnih podatkov, subjektivne ocene zaupanja in decentraliziranega shranjevanja rezultatov v verigo blokov. Z delitvijo sistema na plasti omogočamo modularnost, večjo preglednost in lažjo implementacijo nadaljnjih razširitev.
+Osnovna ideja arhitekture je bila, da združimo tri ključne tehnologije: semantični splet, pametne oraklje in verigo blokov. Semantični splet omogoča opis akterjev in njihovih lastnosti v ontološkem grafu. Oraklji predstavljajo računsko plast, kjer posamezni akter izvede oceno zaupanja po svojih pravilih. Veriga blokov pa služi kot zanesljiva in nespremenljiva plast, kjer se hranijo rezultati teh ocen.
 
-Arhitekturo razdelimo na tri plasti, katere bodo podrobneje opisane v naslednjih podpoglavjih:
+Sistem se razlikuje od ostalih rešitev, ki se osredotočajo zgolj na sledljivost ali upravljanje podatkov. Omogoča, da vsak akter izrecno definira svoje kriterije zaupanja in jih izvede nad skupnim modelom znanja. Rezultati teh izračunov se zapišejo v decentraliziran register, ki je enak za vse udeležence.
+
+V nadaljevanju poglavja predstavimo zasnovo arhitekture in posamezne plasti, prikažemo njihov medsebojni tok podatkov ter utemeljimo vlogo uporabljenih tehnologij. Tak pristop daje sistemu modularnost, zamenljivost izračunskih enot in razširljivost na druge aplikacijske domene.
+
+\subsection{Pregled večplastne zasnove}
+
+Arhitektura sistema temelji na treh jasno ločenih plasteh, ki skupaj tvorijo celoten potek od zajema podatkov do zapisa rezultatov zaupanja na verigo blokov. Takšna razdelitev omogoča boljše razumevanje posameznih vlog in enostavnejše nadgrajevanje sistema, saj lahko vsako plast obravnavamo neodvisno od drugih.
+
+Na sliki~\ref{fig:context-diagram} je prikazan kontekstni pogled celotnega sistema. Diagram združuje tri glavne sklope: akterje iz dobavne verige na levi, infrastrukturo orakljev in podatkovnih virov na desni ter verigo blokov v sredini. Akterji, kot so regulator, proizvajalec zdravil, prevoznik in lekarna, komunicirajo izključno s pametno pogodbo \texttt{TrustGraph.sol}. Ta beleži rezultate zaupanja in upravlja zahteve za ponovno oceno posameznih entitet. 
+
+Ko regulator ali drug akter sproži zahtevo za izračun zaupanja, pametna pogodba pošlje zahtevo omrežju orakljev. Vsak orakelj nato izvede svoj del naloge: iz ontologije in baze TrustKB pridobi podatke, po potrebi preveri pripadajoča preverljiva dokazila, nato pa izračuna rezultat zaupanja. Oraklji rezultate podpišejo in posredujejo agregatorju, ki pripravi končni konsenzni izračun in ga zapiše nazaj v pametno pogodbo.
+
+V skrajnem desnem delu diagrama je prikazana plast znanja. Ta vključuje ontologijo (TrustKB), kjer so zbrani koncepti, njihove lastnosti in meritve, ter skladišče dokazil VC, ki zajema licence, certifikate in druge verodostojne podatke o akterjih. Oraklji pri izračunu združujejo oba vira: semantične lastnosti iz ontologije in verodostojne podatke iz dokazil.
+
+Sistem tako deluje skozi jasno razmejene sklope, kar je razvidno iz celotnega toka na diagramu – od zahteve, preko izračuna, do zapisa končnega rezultata zaupanja na verigi blokov.
+
+\begin{landscape}
+  \begin{figure}
+    \centering
+    \includegraphics[width=1.45\textwidth]{figures/architecture-context.png}
+    \caption{Kontekstni pogled sistema za upravljanje zaupanja.}
+    \label{fig:context-diagram}
+  \end{figure}
+\end{landscape}
+
+V nadaljevanju so podrobneje opisane tri plasti, ki sestavljajo arhitekturo:
 
 \begin{enumerate}
-  \item \textbf{Plast znanja} \\
-        V tej plasti se nahajajo vse ontološke definicije, primerki akterjev in njihove lastnosti. Sem spada tudi konceptualna zasnova lastnosti zaupanja, kot so licence, temperaturne nepravilnosti, točnost dostave ipd.
+    \item \textbf{Plast znanja (Knowledge Layer)}  
+    V tej plasti se nahaja ontologija dobavne verige in opisne lastnosti akterjev. Ontologija predstavlja skupni referenčni model, ki omogoča enotno interpretacijo podatkov o akterjih. Poleg ontologije se tukaj nahaja tudi skladišče preverljivih dokazil (VC), ki dodaja podatke o licencah, certifikatih in presojah kakovosti.
 
-  \item \textbf{Mehanizem za sklepanje zaupanja} \\
-        Ta plast vključuje sistem za izvajanje ocenjevanja zaupanja. Združuje podatke iz ontologije in pravil zaupanja ter izvede sklepanje za vsak par entitet. Rezultat je preslikava razmerja zaupanja med akterji, ki je pripravljena za zapis v verigo blokov.
+    \item \textbf{Plast izračuna zaupanja (Trust Resolution Layer)}  
+    Oraklji v tej plasti izvajajo izračune zaupanja. Podatke pridobijo iz ontologije in preverljivih dokazil ter jih povežejo s pravili, ki jih določi posamezen akter. Pravila so zapisana v JSON obliki in opisujejo pogoje, ki jih mora ocenjovana entiteta izpolnjevati. Oraklji izvedejo izračun, rezultat podpišejo in ga posredujejo agregatorju.
 
-  \item \textbf{Graf zaupanja na verigi blokov} \\
-        Zadnja plast predstavlja pametno pogodbo, ki beleži razmerja zaupanja med entitetami. Shranjevanje rezultatov v verigo blokov omogoča transparentnost, trajnost in decentralizirano preverljivost zaupanja.
+    \item \textbf{Plast registra zaupanja na verigi blokov (Blockchain Trust Registry Layer)}  
+    Ta plast vključuje pametno pogodbo, ki hrani rezultate ocenjevanja zaupanja. Pogodba deluje kot decentraliziran register, ki omogoča vpogled v trenutna in pretekla razmerja zaupanja med akterji. Vanjo se vpisujejo tako posamezni odgovori orakljev kot konsenzni rezultat evalvacije.
 \end{enumerate}
 
-\noindent
-Na sliki~\ref{fig:architecture-diagram} je prikazan arhitekturni pregled sistema.
+V naslednjih poglavjih so opisane tehnične podrobnosti posamezne plasti ter njihove medsebojne povezave.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{Arhitektura-trust-management.png}
-  \caption{Večplastna arhitektura sistema za upravljanje zaupanja}
-  \label{fig:architecture-diagram}
-\end{figure}
-
-\newpage
-
-\subsection{Plast znanja}
+\subsubsection{Plast znanja}
 Plast znanja (angl. Knowledge Layer) definira semantično strukturo akterjev, njihove značilnosti in nabor pravil za individualno ocenjevanje zaupanja. V osnovi jo sestavljata dve ključni komponenti: ontologija in pravila zaupanja posameznih akterjev.
 
 \paragraph{Ontologija}
