@@ -232,28 +232,28 @@ V modelih, ki temeljijo na verigi blokov, pametne pogodbe služijo tudi kot enot
 V predstavljenem sistemu ima pametna pogodba osrednjo vlogo, saj hrani rezultate ocenjevanja zaupanja in omogoča preverjanje vzpostavljenih razmerij med akterji. Pogodba vsebuje funkcije za zapisovanje rezultatov, njihovo posodabljanje in preverjanje stanja zaupanja. Tako tvori register zaupanja, ki je dostopen vsem udeležencem verige.
 
 \subsection{Orakli v pametnih pogodbah}
-Pametne pogodbe lahko zanesljivo izvajajo le pravila nad podatki, ki so že zapisani na verigi blokov. 
-Ker so verige blokov zasnovane kot zaprt, determinističen sistem, nimajo neposrednega dostopa do zunanjega sveta. 
-Da bi pametne pogodbe lahko reagirale na dogodke iz realnega okolja (cene na trgu, vremenske razmere, meritve senzorjev, podatke informacijskih sistemov), potrebujemo posrednika, ki te podatke pridobi in jih v preverljivi obliki posreduje na verigo. 
+Pametne pogodbe lahko zanesljivo izvajajo le pravila nad podatki, ki so že zapisani na verigi blokov.
+Ker so verige blokov zasnovane kot zaprt, determinističen sistem, nimajo neposrednega dostopa do zunanjega sveta.
+Da bi pametne pogodbe lahko reagirale na dogodke iz realnega okolja (cene na trgu, vremenske razmere, meritve senzorjev, podatke informacijskih sistemov), potrebujemo posrednika, ki te podatke pridobi in jih v preverljivi obliki posreduje na verigo.
 Tak posrednik se imenuje orakelj \cite{caldarelli2020oracleproblem}.
 
-Caldarelli oraklje opiše kot celoten ekosistem, ki povezuje zunanje vire podatkov z decentralizirano aplikacijo \cite{caldarelli2022overview}. 
-Tipično ga sestavljajo trije deli: vir podatkov, komunikacijski kanal in pametna pogodba. 
+Caldarelli oraklje opiše kot celoten ekosistem, ki povezuje zunanje vire podatkov z decentralizirano aplikacijo \cite{caldarelli2022overview}.
+Tipično ga sestavljajo trije deli: vir podatkov, komunikacijski kanal in pametna pogodba.
 Vir podatkov je lahko spletni vmesnik API, podatkovna baza, senzor v internetu stvari ali celo človek, ki potrdi nek dogodek.
 
-Komunikacijski kanal predstavlja vozlišče oziroma niz vozlišč, ki podatke zbrane iz vira prevedejo v obliko transakcije in jih pošljejo pametni pogodbi. 
+Komunikacijski kanal predstavlja vozlišče oziroma niz vozlišč, ki podatke zbrane iz vira prevedejo v obliko transakcije in jih pošljejo pametni pogodbi.
 Pametna pogodba na drugi strani vsebuje pravila, s katerimi sprejme ali zavrne posredovane podatke in na njihovi podlagi sproži ustrezno logiko.
 
-Ker oraklji ponovno uvajajo zaupanje v zunanje subjekte, se je v literaturi uveljavil pojem \emph{problem oraklja} (angl. oracle problem) \cite{caldarelli2020oracleproblem}. 
-Blockchain sam po sebi nudi lastnosti, kot so nespremenljivost, deterministično izvajanje in odpornost proti cenzuri, vendar te lastnosti ne veljajo avtomatično za podatke, ki prihajajo preko oraklja. 
-Če vir podatkov ni zanesljiv ali je komunikacijski kanal centraliziran, lahko napačni podatki povzročijo napačno izvedbo pametne pogodbe, ne da bi to bilo na verigi neposredno razvidno. 
+Ker oraklji ponovno uvajajo zaupanje v zunanje subjekte, se je v literaturi uveljavil pojem \emph{problem oraklja} (angl. oracle problem) \cite{caldarelli2020oracleproblem}.
+Blockchain sam po sebi nudi lastnosti, kot so nespremenljivost, deterministično izvajanje in odpornost proti cenzuri, vendar te lastnosti ne veljajo avtomatično za podatke, ki prihajajo preko oraklja.
+Če vir podatkov ni zanesljiv ali je komunikacijski kanal centraliziran, lahko napačni podatki povzročijo napačno izvedbo pametne pogodbe, ne da bi to bilo na verigi neposredno razvidno.
 Zato je v skupnosti poudarjena potreba po jasnem modelu zaupanja za vsak orakelj. Ta mora opisati, kakšen je motiv oraklja, da deluje pošteno, in kako sistem zazna ali kaznuje odstopanja \cite{caldarelli2020oracleproblem}.
 
-V praksi se pojavlja več arhitektur, ki omogočajo delovanje orakljev. 
-Najpreprostejši so centralizirani oraklji, kjer ena organizacija zbira podatke in jih pošilja pametnim pogodbam. 
+V praksi se pojavlja več arhitektur, ki omogočajo delovanje orakljev.
+Najpreprostejši so centralizirani oraklji, kjer ena organizacija zbira podatke in jih pošilja pametnim pogodbam.
 Tak pristop je enostaven za implementacijo, vendar ponovno uvaja enotno točko zaupanja in napake.
-Sledijo jim porazdeljeni oziroma decentralizirani oraklji, kjer več neodvisnih vozlišč pridobiva in agregira podatke ter tako zmanjšuje tveganje manipulacije. 
-Primer takšne zasnove je sistem ASTRAEA, ki uporabi glasovalno igro z vložki (angl. stake) in ločene vloge udeležencev (oddajatelji trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}. 
+Sledijo jim porazdeljeni oziroma decentralizirani oraklji, kjer več neodvisnih vozlišč pridobiva in agregira podatke ter tako zmanjšuje tveganje manipulacije.
+Primer takšne zasnove je sistem ASTRAEA, ki uporabi glasovalno igro z vložki (angl. stake) in ločene vloge udeležencev (oddajatelji trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}.
 Podobno pristopajo tudi druge rešitve, kjer se omrežja orakljev, kot je Chainlink, uporabljajo za zbiranje podatkov iz več API-jev in senzorjev ter za izračun dodatnih metrik (npr. reputacije) še pred zapisom v verigo blokov \cite{kochovski2019trust}.
 
 V okviru te naloge oraklje obravnavamo kot ločeno plast med semantičnim delom sistema in verigo blokov.
@@ -295,7 +295,7 @@ Prispevek te naloge je predlog sistema, ki te elemente poveže v enoten okvir. O
 
 Tak pristop neposredno naslavlja vrzeli, opisane v tem poglavju. Namesto enotne, vnaprej določene metrike zaupanja omogoča, da vsak akter oblikuje lastno politiko na osnovi skupnega modela podatkov. Rezultati teh različnih politik so kljub temu zbrani v enoten register, ki ga lahko delijo vsi udeleženci verige. S tem sistem podpira različne poglede na zanesljivost partnerjev, hkrati pa ohranja konsistentno predstavitev identitet in podatkovnih lastnosti.
 
-Čeprav je sistem razvit na primeru farmacevtske dobavne verige, je zasnova splošna. Ontologijo in nabor atributov bi bilo mogoče prilagoditi drugim domenam, na primer pametnim mestom ali omrežjem interneta stvari, kjer številni akterji izmenjujejo podatke in storitve. Enak vzorec se ponovi tudi tam: skupni semantični model entitet, subjektivne politike zaupanja, modul za sklepanje in register rezultatov na verigi blokov. 
+Čeprav je sistem razvit na primeru farmacevtske dobavne verige, je zasnova splošna. Ontologijo in nabor atributov bi bilo mogoče prilagoditi drugim domenam, na primer pametnim mestom ali omrežjem interneta stvari, kjer številni akterji izmenjujejo podatke in storitve. Enak vzorec se ponovi tudi tam: skupni semantični model entitet, subjektivne politike zaupanja, modul za sklepanje in register rezultatov na verigi blokov.
 
 V nadaljevanju naloge bomo opisali, kako je tak sistem konkretno implementiran ter kako se obnaša v izbranih scenarijih uporabe.
 
@@ -311,37 +311,57 @@ Pri razvoju sistema smo uporabili različna orodja in platforme, ki skupaj omogo
 Semantični podatki o akterjih in njihovih lastnostih so shranjeni v strežniku Apache Jena Fuseki, ki predstavlja RDF podatkovno bazo z dostopom prek SPARQL vmesnika. Fuseki omogoča centralizirano hrambo ontologije in primerkov ter enoten način pridobivanja podatkov za vse oraklje. Zaradi stabilnosti, enostavne uporabe in dobre združljivosti s standardi RDF je bila izbira naravna. Sistem teče v Docker vsebniku, kar omogoča hitro postavitev in ponovljivost okolja.
 
 \paragraph{Ontologija v OWL/RDF}
-Ontologija farmacevtske dobavne verige je zapisana v jeziku OWL, ki definira razrede, lastnosti in odnose med akterji. Podatki so organizirani v RDF trojkah, kar omogoča interoperabilnost z različnimi orodji semantičnega spleta. Ontologija predstavlja osrednjo plast sistema, saj definira strukturo znanja, ki jo oraklji uporabljajo pri sklepanju. Celoten model je fleksibilen, zato ga je mogoče prilagoditi tudi drugim domenam.
+Ontologija farmacevtske dobavne verige je zapisana v jeziku OWL, ki definira razrede, lastnosti in odnose med akterji. Podatki so organizirani v RDF trojkah, kar omogoča enostavno obdelavo s knjižnico \texttt{rdflib} \cite{rdflib} v programskem jeziku Python. Na ta način lahko sklepanje temelji na aktualnih podatkih, zapisanih v ontološkem grafu, brez potrebe po relacijski bazi ali ročnem povezovanju.
 
 \paragraph{JSON pravila zaupanja}
 Vsak akter lahko svoje kriterije zaupanja definira v JSON obliki. JSON je izbran zaradi enostavne berljivosti in neposredne integracije s Pythonom. Pravila določajo pragove, ki jih mora akter izpolniti, na primer minimalno točnost dostave ali največjo dovoljeno stopnjo temperaturnih odstopanj. Python orakelj ta pravila interpretira in preveri, ali podatki iz ontologije ustrezajo zahtevam ocenjevalca.
 
 \paragraph{Ethereum, Solidity in pametna pogodba}
-Za zapis rezultatov izračunanega zaupanja smo uporabili verigo blokov Ethereum.  
-Pametna pogodba \texttt{TrustGraph}, napisana v jeziku Solidity, hrani relacije zaupanja med akterji.  
-Ethereum je bil izbran zaradi široke podpore za orodja, stabilnega ekosistema in zmožnosti izvajanja pametnih pogodb brez zaupanja v enega posrednika.  
+Za zapis rezultatov izračunanega zaupanja smo uporabili verigo blokov Ethereum.
+Pametna pogodba \texttt{TrustGraph}, napisana v jeziku Solidity, hrani relacije zaupanja med akterji.
+Ethereum je bil izbran zaradi široke podpore za orodja, stabilnega ekosistema in zmožnosti izvajanja pametnih pogodb brez zaupanja v enega posrednika.
 Razvoj in testiranje sta izvedena s pomočjo orodja Foundry, ki nudi lokalno testno omrežje, kompilator ter hitre skripte za izvajanje transakcij.
 
 Pametna pogodba omogoča zapis rezultatov izračuna, preverjanje stanja zaupanja in beleženje dogodkov. Deluje kot nespremenljiv register, ki je dostopen vsem akterjem sistema.
 
 \paragraph{Decentralizirane identitete in preverljiva dokazila}
-Vsak akter v ontologiji ima dodeljen decentraliziran identifikator (DID).  
-DID služi kot enoličen identifikator, ki povezuje podatke v ontologiji s predstavnikom akterja v decentraliziranem okolju.  
-Poleg tega sistem podpira uporabo preverljivih dokazil (VC), ki jih lahko izdajajo regulatorji, kot je EMA.  
-Ta dokazila vsebujejo metrike, kot so veljavnost licence, GMP skladnost ali rezultati presoje kakovosti.  
+Vsak akter v ontologiji ima dodeljen decentraliziran identifikator (DID).
+DID služi kot enoličen identifikator, ki povezuje podatke v ontologiji s predstavnikom akterja v decentraliziranem okolju.
+Poleg tega sistem podpira uporabo preverljivih dokazil (VC), ki jih lahko izdajajo regulatorji, kot je EMA.
+Ta dokazila vsebujejo metrike, kot so veljavnost licence, GMP skladnost ali rezultati presoje kakovosti.
 Orakelj lahko, kadar akter to določi v pravilih, med izračunom zaupanja prebere VC in uporabi podatke kot dodatne kriterije.
 
 \paragraph{Python in osnovne knjižnice}
-Jedro mehanizma za izračun zaupanja je razvito v programskem jeziku Python. Uporabljamo ga predvsem zaradi enostavne integracije z ontologijo, preprostega dela z JSON datotekami ter dobre podpore za povezovanje z verigo blokov prek knjižnice \texttt{web3.py} \cite{web3py}.
+
+
+\begin{itemize}
+
+\item{web3 in eth\_account}
+Knjižnica \texttt{web3.py} omogoča povezavo z omrežjem Ethereum oziroma lokalnim vozliščem Anvil, klicanje funkcij pametne pogodbe in pošiljanje transakcij. Modul \texttt{eth\_account} se uporablja za podpisovanje poročil orakljev in preverjanje podpisov, ki jih agregator prejme.
+
+\item{aiohttp} zagotavlja asinhroni spletni strežnik in odjemalca, ki ju uporabljata agregator in oraklji. Prek njega oraklji prejemajo zahteve za izračun zaupanja, berejo podatke iz Fusekija in pošiljajo poročila nazaj agregatorju.
+
+\item{rdflib in SPARQLWrapper} -
+\texttt{rdflib} omogoča delo z RDF grafi, razčlenjevanje OWL datotek in manipulacijo ontologije. \texttt{SPARQLWrapper} omogoča pošiljanje SPARQL poizvedb strežniku Apache Jena Fuseki in s tem branje lastnosti akterjev iz ontologije.
+
+\item{requests} se uporablja pri pomožnih sinhronih HTTP klicih, kjer asinhrona izvedba ni potrebna ali bi otežila implementacijo.
+
+\item{click} se uporablja pri implementaciji ukaznih orodij, kot je \texttt{trustkb}, ki omogoča delo z ontologijo, uvoz podatkov in izvajanje SPARQL poizvedb iz ukazne vrstice.
+
+\item{pytest} - enotsko testiranje ključnih modulov sistema je uporabljen \texttt{pytest}, ki omogoča enostavno pisanje testov ter avtomatizirano preverjanje logike orakljev in agregatorja.
+
+\item{didkit} - v primerih, kjer se digitalna dokazila (VC) izdaja ali preverja neposredno iz Python okolja, se uporablja \texttt{didkit}. Omogoča delo z DID metodami in verifikacijo podpisov, skladno s standardi W3C DID in VC.
+
+\end{itemize}
 
 \paragraph{Pametni oraklji}
-Oraklji predstavljajo most med semantično plastjo in verigo blokov.  
-Vsak orakelj zažene Python modul, ki prebere ontologijo, uporabi lokalna pravila akterja in izračuna vrednosti zaupanja.  
-Nato preko \texttt{web3.py} pošlje transakcijo pametni pogodbi.  
+Oraklji predstavljajo most med semantično plastjo in verigo blokov.
+Vsak orakelj zažene Python modul, ki prebere ontologijo, uporabi lokalna pravila akterja in izračuna vrednosti zaupanja.
+Nato preko \texttt{web3.py} pošlje transakcijo pametni pogodbi.
 Oraklji so zasnovani modularno, zato jih lahko organizacije poganjajo samostojno, kar omogoča decentralizirano izvajanje izračuna.
 
 \paragraph{Docker}
-Vse komponente sistema so zajete v vsebnikih Docker. To nam je omogočilo hitro postavitev razvojnega okolja, enostavno upravljanje odvisnosti in ponovljivost testov.  
+Vse komponente sistema so zajete v vsebnikih Docker. To nam je omogočilo hitro postavitev razvojnega okolja, enostavno upravljanje odvisnosti in ponovljivost testov.
 Vsak orakelj, strežnik Fuseki, in lokalna Ethereum veriga tečejo v ločenih vsebnikih.
 Docker je uporabljen izključno za potrebe testiranja med razvojem.
 
@@ -359,7 +379,7 @@ V nadaljevanju poglavja predstavimo zasnovo arhitekture in posamezne plasti, pri
 
 Arhitektura sistema temelji na treh jasno ločenih plasteh, ki skupaj tvorijo celoten potek od zajema podatkov do zapisa rezultatov zaupanja na verigo blokov. Takšna razdelitev omogoča boljše razumevanje posameznih vlog in enostavnejše nadgrajevanje sistema, saj lahko vsako plast obravnavamo neodvisno od drugih.
 
-Na sliki~\ref{fig:context-diagram} je prikazan kontekstni pogled celotnega sistema. Diagram združuje tri glavne sklope: akterje iz dobavne verige na levi, infrastrukturo orakljev in podatkovnih virov na desni ter verigo blokov v sredini. Akterji, kot so regulator, proizvajalec zdravil, prevoznik in lekarna, komunicirajo izključno s pametno pogodbo \texttt{TrustGraph.sol}. Ta beleži rezultate zaupanja in upravlja zahteve za ponovno oceno posameznih entitet. 
+Na sliki~\ref{fig:context-diagram} je prikazan kontekstni pogled celotnega sistema. Diagram združuje tri glavne sklope: akterje iz dobavne verige na levi, infrastrukturo orakljev in podatkovnih virov na desni ter verigo blokov v sredini. Akterji, kot so regulator, proizvajalec zdravil, prevoznik in lekarna, komunicirajo izključno s pametno pogodbo \texttt{TrustGraph.sol}. Ta beleži rezultate zaupanja in upravlja zahteve za ponovno oceno posameznih entitet.
 
 Ko regulator ali drug akter sproži zahtevo za izračun zaupanja, pametna pogodba pošlje zahtevo omrežju orakljev. Vsak orakelj nato izvede svoj del naloge: iz ontologije in baze TrustKB pridobi podatke, po potrebi preveri pripadajoča preverljiva dokazila, nato pa izračuna rezultat zaupanja. Oraklji rezultate podpišejo in posredujejo agregatorju, ki pripravi končni konsenzni izračun in ga zapiše nazaj v pametno pogodbo.
 
@@ -379,158 +399,91 @@ Sistem tako deluje skozi jasno razmejene sklope, kar je razvidno iz celotnega to
 V nadaljevanju so podrobneje opisane tri plasti, ki sestavljajo arhitekturo:
 
 \begin{enumerate}
-    \item \textbf{Plast znanja (Knowledge Layer)}  
-    V tej plasti se nahaja ontologija dobavne verige in opisne lastnosti akterjev. Ontologija predstavlja skupni referenčni model, ki omogoča enotno interpretacijo podatkov o akterjih. Poleg ontologije se tukaj nahaja tudi skladišče preverljivih dokazil (VC), ki dodaja podatke o licencah, certifikatih in presojah kakovosti.
+  \item \textbf{Plast znanja (Knowledge Layer)}
+        V tej plasti se nahaja ontologija dobavne verige in opisne lastnosti akterjev. Ontologija predstavlja skupni referenčni model, ki omogoča enotno interpretacijo podatkov o akterjih. Poleg ontologije se tukaj nahaja tudi skladišče preverljivih dokazil (VC), ki dodaja podatke o licencah, certifikatih in presojah kakovosti.
 
-    \item \textbf{Plast izračuna zaupanja (Trust Resolution Layer)}  
-    Oraklji v tej plasti izvajajo izračune zaupanja. Podatke pridobijo iz ontologije in preverljivih dokazil ter jih povežejo s pravili, ki jih določi posamezen akter. Pravila so zapisana v JSON obliki in opisujejo pogoje, ki jih mora ocenjovana entiteta izpolnjevati. Oraklji izvedejo izračun, rezultat podpišejo in ga posredujejo agregatorju.
+  \item \textbf{Plast izračuna zaupanja (Trust Resolution Layer)}
+        Oraklji v tej plasti izvajajo izračune zaupanja. Podatke pridobijo iz ontologije in preverljivih dokazil ter jih povežejo s pravili, ki jih določi posamezen akter. Pravila so zapisana v JSON obliki in opisujejo pogoje, ki jih mora ocenjovana entiteta izpolnjevati. Oraklji izvedejo izračun, rezultat podpišejo in ga posredujejo agregatorju.
 
-    \item \textbf{Plast registra zaupanja na verigi blokov (Blockchain Trust Registry Layer)}  
-    Ta plast vključuje pametno pogodbo, ki hrani rezultate ocenjevanja zaupanja. Pogodba deluje kot decentraliziran register, ki omogoča vpogled v trenutna in pretekla razmerja zaupanja med akterji. Vanjo se vpisujejo tako posamezni odgovori orakljev kot konsenzni rezultat evalvacije.
+  \item \textbf{Plast registra zaupanja na verigi blokov (Blockchain Trust Registry Layer)}
+        Ta plast vključuje pametno pogodbo, ki hrani rezultate ocenjevanja zaupanja. Pogodba deluje kot decentraliziran register, ki omogoča vpogled v trenutna in pretekla razmerja zaupanja med akterji. Vanjo se vpisujejo tako posamezni odgovori orakljev kot konsenzni rezultat evalvacije.
 \end{enumerate}
 
 V naslednjih poglavjih so opisane tehnične podrobnosti posamezne plasti ter njihove medsebojne povezave.
 
 \subsubsection{Plast znanja}
-Plast znanja (angl. Knowledge Layer) definira semantično strukturo akterjev, njihove značilnosti in nabor pravil za individualno ocenjevanje zaupanja. V osnovi jo sestavljata dve ključni komponenti: ontologija in pravila zaupanja posameznih akterjev.
 
-\paragraph{Ontologija}
-Ontologija v jeziku OWL predstavlja formalno definiran model, ki vključuje vse vrste entitet, ki sodelujejo v farmacevtski dobavni verigi (npr. \textit{Proizvajalec}, \textit{Lekarna}, \textit{Prevoznik}, \textit{Regulator}). Vsaka vrsta entitete ima lahko specifične lastnosti, ki jih sistem uporablja pri sklepanju o zaupanju, kot so na primer:
+Plast znanja predstavlja osnovni vir informacij, na katerem poteka izračun zaupanja. Vsebuje semantični model dobavne verige zdravil, podatke o posameznih akterjih ter dodatna preverljiva dokazila, ki opisujejo regulatorne lastnosti ali skladnost z zahtevami. V tej plasti se združujejo podatki iz dveh virov: ontologije, ki opisuje akterje in njihove lastnosti, ter preverljivih dokazil (VC), ki dopolnjujejo semantični model z digitalno podpisanimi trditvami. Oraklji te podatke uporabljajo pri izračunu zaupanja v nadaljnjih plasteh sistema.
+
+
+\paragraph{Ontologija (OWL/RDF)}
+
+Ontologija farmacevtske dobavne verige je zgrajena v jeziku OWL in zapisana v formatu RDF. Vsebuje razrede, ki predstavljajo posamezne tipe akterjev, kot so \textit{Proizvajalec}, \textit{Prevoznik}, \textit{Lekarna} in \textit{Regulator}. Tem razredom so pripisane lastnosti, ki opisujejo njihovo vedenje ali skladnost s standardi, na primer:
 
 \begin{itemize}
-  \item \texttt{hasDeliveryPunctuality} - točnost dostave,
-  \item \texttt{hasTempViolationRate} - stopnja temperaturnih odstopanj,
-  \item \texttt{hasLicense} - podatek o veljavni licenci,
-  \item \texttt{hasGMP} - skladnost s proizvodnimi standardi GMP \cite{nally2016good},
-  \item \texttt{hasAuditScore} - rezultat presoje kakovosti.
+  \item \texttt{hasDeliveryPunctuality} – delež pravočasnih dostav,
+  \item \texttt{hasTempViolationRate} – delež temperaturnih odstopanj pri transportu,
+  \item \texttt{hasLicense} – veljavnost poslovne licence,
+  \item \texttt{hasGMP} – skladnost s standardi GMP \cite{nally2016good},
+  \item \texttt{hasAuditScore} – rezultat presoje kakovosti.
 \end{itemize}
 
-Ontologija je zapisana v formatu RDF \cite{w3crdfconcepts} zasnovan na označevalnem jeziku XML \cite{w3crdfxml}, ki omogoča enostavno obdelavo s knjižnico \texttt{rdflib} \cite{rdflib} v programskem jeziku Python. Na ta način lahko sklepanje temelji na aktualnih podatkih, zapisanih v ontološkem grafu, brez potrebe po relacijski bazi ali ročnem povezovanju.
+Ontologija vsebuje tudi posamezne primerke akterjev, na primer \textit{Pfizer}, \textit{DHL} in \textit{MediPlus}, ki imajo pripisane konkretne vrednosti lastnosti. Spodaj je prikazan primer zapisa prevoznika v RDF/Turtle obliki:
 
-Na sliki \ref{fig:ontology-export} vidimo vse akterje v ontologiji predstavljene v programu Protege.
+\begin{lstlisting}
+ex:DHL a ex:Transporter ;
+  ex:hasDeliveryPunctuality "0.94"^^xsd:decimal ;
+  ex:hasTempViolationRate "0.02"^^xsd:decimal ;
+  ex:hasLicense "true"^^xsd:boolean .
+\end{lstlisting}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{figures/export-pharma-trust.png}
-  \caption{Akterji ontologije v programu Protege}
-  \label{fig:ontology-export}
-\end{figure}
+Ontologija je shranjena v strežniku Apache Jena Fuseki, ki omogoča izvajanje SPARQL 1.1 poizvedb preko spletnega vmesnika. Oraklji tako dostopajo do podatkov z neposrednimi poizvedbami, kot je na primer:
 
-V ontologiji so definirani tudi posamezni primerki entitet (npr. \textit{Pfizer}, \textit{DHL}, \textit{MediPlus}), skupaj z njihovimi lastnostmi. To omogoča sistemu, da na podlagi resničnih podatkov izvede evalvacijo zaupanja.
+\begin{lstlisting}
+PREFIX ex: <http://example.org/trust#>
 
-\paragraph{Pravila zaupanja posameznih akterjev}
+SELECT ?punctuality ?tempRate ?license
+WHERE {
+  ex:DHL ex:hasDeliveryPunctuality ?punctuality .
+  ex:DHL ex:hasTempViolationRate ?tempRate .
+  ex:DHL ex:hasLicense ?license .
+}
+\end{lstlisting}
 
-Vsaka entiteta v sistemu lahko definira svoja lastna pravila zaupanja, ki opisujejo pogoje, pod katerimi določena entiteta zaupa drugi. Ta pravila so zapisana v berljivi in strukturirani obliki JSON, kar omogoča enostavno vključevanje v mehanizem sklepanja.
+Ker je ontologija zgrajena v OWL, omogoča tudi uporabo razumevalnika (angl. reasoner). Razumevalnik lahko samodejno razvrsti akterje v razrede (npr. \texttt{TrustedTransporter}), zazna nedoslednosti in izpelje lastnosti, ki niso zapisane neposredno. Vsak orakelj lahko razumevalnik po potrebi zažene lokalno in s tem pridobi izpeljane podatke.
 
-Primer politike pravil zaupanja za entiteto \textit{Pfizer} je prikazan v spodnjem zapisu v formatu JSON:
 
-\begin{verbatim}
+\paragraph{Preverljiva dokazila (VC)}
+
+Poleg podatkov iz ontologije sistem uporablja še preverljiva dokazila (VC), ki jih izdajajo regulatorji ali druge zaupanja vredne organizacije. Ta dokazila vsebujejo trditve o akterjih, kot so veljavnost licence, GMP skladnost ali datum zadnje presoje kakovosti. Dokazila so zapisana v formatu JSON-LD in digitalno podpisana.
+
+Primer dokazila, ki ga izda regulator:
+
+\begin{lstlisting}
 {
-  "actor": "http://example.org/trust#Pfizer",
-  "trusts": {
-    "Transporter": {
-      "hasDeliveryPunctuality": { "gte": 0.9 },
-      "hasTempViolationRate": { "lte": 0.05 }
-    }
+  "id": "vc-gmp-pfizer-001",
+  "type": ["VerifiableCredential", "GMPCertificate"],
+  "issuer": "did:example:ema",
+  "credentialSubject": {
+    "id": "did:example:pfizer",
+    "hasGMP": true
+  },
+  "proof": {
+    "type": "Ed25519Signature2018",
+    "signatureValue": "3f9ac..."
   }
 }
-\end{verbatim}
+\end{lstlisting}
 
-Zapis pove, da entiteta \textit{Pfizer} zaupa samo tistim prevoznikom, ki dosegajo vsaj 90\,\% pravočasnih dostav (\texttt{hasDeliveryPunctuality~$\geq$~0.9}) in katerih delež temperaturnih odstopanj pri transportu zdravil ne presega 5\,\% (\texttt{hasTempViolationRate~$\leq$~0.05}). Na ta način se pravila zaupanja natančno preslikajo v merljive pogoje, ki temeljijo na lastnostih, definiranih v ontologiji.
+Preverljiva dokazila so shranjena v ločeni podatkovni bazi. Ob izračunu zaupanja orakelj preveri kriptografski podpis izdajatelja, iz podatkov izlušči relevantne lastnosti in jih združi z informacijami iz ontologije. Tako sestavi popoln nabor kriterijev, ki jih akter uporabi pri ocenjevanju zaupanja.
 
-Mehanizem sklepanja nato uporabi ta pravila za vsako entiteto, s katero obravnavani akter vzpostavi zaupanje ter preveri, ali so pogoji izpolnjeni.
+Plast znanja združuje semantične opise akterjev in njihove lastnosti z regulatorno potrjenimi podatki iz preverljivih dokazil. Oraklji pri izračunu zaupanja dostopajo do obeh virov: iz Fusekija pridobijo opisne metrike, iz VC-jev pa dodatne podatke, ki jih ontologija ne vsebuje. S tem plast znanja omogoča enoten, strukturen in preverljiv nabor podatkov, na katerem temelji celoten izračun zaupanja.
 
-Ker so pravila zapisana v JSON obliki, je možno preprosto razviti uporabniški vmesnik, kjer lahko predstavnik podjetja (npr. administrator lekarne ali regulatorja) preko obrazca določil svoje kriterije za zaupanje. Vmesnik bi generiral JSON strukturo na podlagi definiranih lastnosti v ontologiji. To nam omogoča visoko stopnjo prilagodljivosti in enostavne uporabe brez tehničnega predznanja.
 
-JSON pravila služijo kot most med semantičnim modelom in subjektivno presojo vsakega akterja. Tako omogočamo personalizirano ocenjevanje zaupanja.
 
 \subsection{Mehanizem za sklepanje zaupanja (angl. Trust Resolution Engine)}
 
-Mehanizem za sklepanje zaupanja predstavlja osrednjo logično plast sistema, kjer se združujejo podatki iz ontologije in pravila zaupanja posameznih akterjev. Tukaj se izvede proces ocenjevanja, ki določi, ali določena entiteta zaupa drugi glede na pogoje, zapisane v pravilih zaupanja posameznega akterja.
 
-\paragraph{Delovanje mehanizma}
-Python modul, razvit za potrebe sistema, izvaja naslednje korake:
-\begin{enumerate}
-  \item Naloži ontologijo (OWL/RDF) in iz nje izlušči podatke o vseh akterjih ter njihovih lastnostih.
-  \item Prebere pravila zaupanja vsakega akterja, ki so zapisana v JSON formatu.
-  \item Za vsak par (ocenjevalec in tisti, ki je ocenjen) preveri, ali vrednosti atributov ocenjenega akterja ustrezajo pravilom ocenjevalca.
-  \item Rezultate ocenjevanja shrani v zbirko rezultatov (CSV datoteka) in jih pripravi za zapis v verigo blokov.
-\end{enumerate}
-
-\paragraph{Primer ocenjevanja}
-Če ima npr. akter \textit{Pfizer} pravilo, da zaupa le prevoznikom z vsaj 90\,\% točnih dostav in manj kot 5\,\% temperaturnih nepravilnostih, bo mehanizem preveril te pogoje za vsakega prevoznika, zapisanega v ontologiji. Rezultat ocenjevanja je binarna vrednost (\texttt{true/false}), ki pove, ali akter izpolnjuje kriterije zaupanja.
-
-\subsection{Graf zaupanja na verigi blokov (angl. Blockchain Trust Registry)}
-
-Zadnja plast arhitekture je namenjena trajnemu in preverljivemu beleženju rezultatov ocenjevanja zaupanja. To dosežemo z uporabo pametne pogodbe na verigi blokov, ki deluje kot decentraliziran register zaupanja (angl. \textit{trust registry}).
-
-\paragraph{Struktura pametne pogodbe}
-Pametna pogodba vsebuje podatkovno strukturo, ki beleži relacije zaupanja med akterji v obliki:
-\[
-  (akter1, akter2) \mapsto status\_zaupanja
-\]
-kjer je \texttt{status\_zaupanja} logična vrednost (\texttt{true/false}), ki označuje, ali akter 1 zaupa akterju 2.
-
-\paragraph{Funkcionalnosti}
-Pametna pogodba omogoča naslednje osnovne funkcije:
-\begin{itemize}
-  \item \texttt{setTrustStatus()} --- zapis oziroma posodobitev rezultata zaupanja na verigi blokov.
-  \item \texttt{isTrusted()} --- preverjanje, ali določen akter zaupa drugemu.
-  \item \texttt{event TrustUpdated} --- beleženje dogodkov o spremembi zaupanja za transparentnost in enostavno spremljanje.
-\end{itemize}
-
-\section{Orodja in razvojno okolje}
-\section{Ontologija in orodja za sklepanje}
-
-\subsection{Ontologija zaupanja}
-
-Ontologija zaupanja je osnovni gradnik sistema, saj omogoča formaliziran opis vseh akterjev v farmacevtski dobavni verigi ter njihovih lastnosti. Zasnovana je v jeziku OWL. Glavni namen ontologije je, da lahko vse akterje opišemo na enoten način in jih obogatimo s podatki, ki so pomembni za ocenjevanje zaupanja.
-
-\subsubsection{Razredi akterjev}
-
-V ontologiji so definirani osnovni razredi, ki predstavljajo tipe akterjev. To so proizvajalec, distributer, lekarna, prevoznik in regulator. Vsi ti razredi so podrazredi splošnega razreda \texttt{Actor}, kar pomeni, da jih lahko obravnavamo skupaj, ko govorimo o celotni verigi. Vsak tip akterja ima svoje značilne lastnosti. Na primer, proizvajalci imajo lastnost \texttt{hasGMP}, ki pove, ali imajo veljavno GMP skladnost, prevozniki imajo lastnosti \texttt{hasDeliveryPunctuality} in \texttt{hasTempViolationRate}, lekarne pa lastnost \texttt{hasPrescriptionComplianceRate}.
-
-\subsubsection{Lastnosti zaupanja}
-
-Lastnosti opisujejo merljive kriterije, ki se uporabljajo pri presoji zaupanja. Nekaj primerov:
-\texttt{hasGMP} opisuje ali je proizvajalec skladen z dobrimi proizvodnimi praksami,
-\texttt{hasAuditScore} predstavlja oceno presoje kakovosti,
-\texttt{hasLicense} označuje, ali ima akter veljavno licenco,
-\texttt{hasDeliveryPunctuality} izraža delež pravočasnih dostav,
-\texttt{hasTempViolationRate} pove, kolikšen delež transportov je imel temperaturna odstopanja,
-\texttt{hasPrescriptionComplianceRate} opisuje skladnost lekarne pri izdaji zdravil na recept,
-\texttt{hasIssuedCertifications} je število certifikatov, ki jih je regulator izdal,
-\texttt{hasJurisdictionLevel} pa določa raven pristojnosti regulatorja (npr. lokalna, nacionalna, globalna).
-
-\subsubsection{Razredi zaupanja}
-
-Za vsak tip akterja so v ontologiji definirani tudi posebni razredi, ki predstavljajo zaupanja vredne entitete. To so na primer \texttt{TrustedManufacturer}, \texttt{TrustedDistributor}, \texttt{TrustedPharmacy}, itn. Ti razredi so definirani z ekvivalenčnimi pogoji, kar pomeni, da reasoner lahko samodejno uvrsti entiteto v določen zaupanja vreden razred, če so pogoji izpolnjeni. Na primer, proizvajalec, ki ima GMP certifikat in dovolj visoko oceno presoje kakovosti, bo klasificiran kot \texttt{TrustedManufacturer}. Podobno velja za druge tipe akterjev.
-
-\subsubsection{Primerki akterjev}
-
-V ontologijo so dodani tudi konkretni primerki, ki predstavljajo dejanske akterje v sistemu. Tako imamo na primer proizvajalca Pfizer in Novartis, prevoznika DHL, lekarno MediPlus, distributerja EuroLogistics ter regulatorja EMA. Vsak od teh primerkov ima določene lastnosti, kot so na primer ocena presoje, točnost dostave ali število izdanih certifikatov. Te vrednosti se potem uporabijo pri sklepanju o zaupanju.
-
-\subsection{Primer toka podatkov in logike}
-
-Za ponazoritev delovanja si oglejmo primer, kjer proizvajalec Pfizer ocenjuje prevoznika DHL:
-
-\begin{enumerate}
-  \item \textbf{Ontologija (OWL)}: v ontologiji so zabeležene lastnosti prevoznika DHL, npr.\ \texttt{hasDeliveryPunctuality = 0.95} in \texttt{hasTempViolationRate = 0.02}.
-  \item \textbf{Pravila zaupanja}: Pfizerjeva politika zaupanja za razred \textit{Transporter} zahteva \texttt{hasDeliveryPunctuality $\geq$ 0.90} in \texttt{hasTempViolationRate $\leq$ 0.05}.
-  \item \textbf{Sklepanje (Python)}: mehanizem prebere lastnosti DHL iz ontologije in jih primerja s Pfizerjevimi pogoji. Ker sta oba pogoja izpolnjena, rezultat sklepanja je \texttt{true}.
-  \item \textbf{Zapis v verigo blokov}: rezultat (\texttt{Pfizer} zaupa \texttt{DHL}) se zapiše v pametno pogodbo. Funkcija \texttt{isTrusted(Pfizer, DHL)} nato vrne \texttt{true}.
-\end{enumerate}
-
-Na ta način sistem poveže semantične podatke, subjektivna pravila in trajne zapise rezultatov v verigi blokov v enoten potek.
-
-\subsection{Način posodabljanja blockchain registra}
-
-Zapis rezultatov v pametno pogodbo se lahko sproži na tri načine:
-\begin{itemize}
-  \item \textbf{Ročno}: prek CLI ali uporabniškega vmesnika, primerno za prezentacije in testne scenarije.
-  \item \textbf{Dogodkovno}: ob spremembi entitete, pravil ali metrik v ontologiji (npr.\ nova licenca, posodobljen audit).
-  \item \textbf{Periodično}: v rednih intervalih (npr.\ dnevno), pri čemer se zapis izvrši le ob spremembi rezultata glede na prejšnje stanje.
-\end{itemize}
 
 
 \section{Razvoj pametnih pogodb in oraklov}
