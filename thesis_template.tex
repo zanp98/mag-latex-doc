@@ -332,25 +332,25 @@ Ta dokazila vsebujejo metrike, kot so veljavnost licence, GMP skladnost ali rezu
 Orakelj lahko, kadar akter to določi v pravilih, med izračunom zaupanja prebere VC in uporabi podatke kot dodatne kriterije.
 
 \paragraph{Python in osnovne knjižnice}
-
+Del logike sistema je implementiran v programskem jeziku Python, kjer tečejo oraklji, agregator ter orodja za upravljanje ontologije. Python je bil izbran zaradi že razvitih uporabnih knjižnic za obdelavo podatkov, delo z RDF in integracijo z verigami blokov. Spodaj so povzete ključne knjižnice, ki jih sistem uporablja:
 
 \begin{itemize}
 
-\item{web3 in eth\_account}
-Knjižnica \texttt{web3.py} omogoča povezavo z omrežjem Ethereum oziroma lokalnim vozliščem Anvil, klicanje funkcij pametne pogodbe in pošiljanje transakcij. Modul \texttt{eth\_account} se uporablja za podpisovanje poročil orakljev in preverjanje podpisov, ki jih agregator prejme.
+\item{\texttt{web3} in \texttt{eth\_account}} -- knjižnica \texttt{web3} omogoča povezavo z omrežjem Ethereum oziroma lokalnim vozliščem Anvil, klicanje funkcij pametne pogodbe in pošiljanje transakcij. Modul \texttt{eth\_account} se uporablja za podpisovanje poročil orakljev in preverjanje podpisov, ki jih agregator prejme.
 
-\item{aiohttp} zagotavlja asinhroni spletni strežnik in odjemalca, ki ju uporabljata agregator in oraklji. Prek njega oraklji prejemajo zahteve za izračun zaupanja, berejo podatke iz Fusekija in pošiljajo poročila nazaj agregatorju.
+\item{\texttt{aiohttp}} zagotavlja asinhroni spletni strežnik in odjemalca, ki ju uporabljata agregator in oraklji. Prek njega oraklji prejemajo zahteve za izračun zaupanja, berejo podatke iz Fusekija in pošiljajo poročila nazaj agregatorju.
 
-\item{rdflib in SPARQLWrapper} -
-\texttt{rdflib} omogoča delo z RDF grafi, razčlenjevanje OWL datotek in manipulacijo ontologije. \texttt{SPARQLWrapper} omogoča pošiljanje SPARQL poizvedb strežniku Apache Jena Fuseki in s tem branje lastnosti akterjev iz ontologije.
+\item{\texttt{rdflib}} omogoča delo z RDF grafi, razčlenjevanje OWL datotek in manipulacijo ontologije.
 
-\item{requests} se uporablja pri pomožnih sinhronih HTTP klicih, kjer asinhrona izvedba ni potrebna ali bi otežila implementacijo.
+\item{\texttt{SPARQLWrapper}} omogoča pošiljanje SPARQL poizvedb strežniku Apache Jena Fuseki in s tem branje lastnosti akterjev iz ontologije
 
-\item{click} se uporablja pri implementaciji ukaznih orodij, kot je \texttt{trustkb}, ki omogoča delo z ontologijo, uvoz podatkov in izvajanje SPARQL poizvedb iz ukazne vrstice.
+\item{\texttt{requests}} se uporablja pri pomožnih sinhronih HTTP klicih, kjer asinhrona izvedba ni potrebna ali bi otežila implementacijo.
 
-\item{pytest} - enotsko testiranje ključnih modulov sistema je uporabljen \texttt{pytest}, ki omogoča enostavno pisanje testov ter avtomatizirano preverjanje logike orakljev in agregatorja.
+\item{\texttt{click}} se uporablja pri implementaciji ukaznih orodij, kot je \texttt{trustkb}, ki omogoča delo z ontologijo, uvoz podatkov in izvajanje SPARQL poizvedb iz ukazne vrstice.
 
-\item{didkit} - v primerih, kjer se digitalna dokazila (VC) izdaja ali preverja neposredno iz Python okolja, se uporablja \texttt{didkit}. Omogoča delo z DID metodami in verifikacijo podpisov, skladno s standardi W3C DID in VC.
+\item{\texttt{pytest}} knjižnica je bila uporabljena za enotsko testiranje ključnih modulov sistema, saj omogoča enostavno pisanje testov ter avtomatizirano preverjanje logike orakljev in agregatorja.
+
+\item{\texttt{didkit}} -- knjižnica se uporablja v primerih, kjer se digitalna dokazila (VC) izdaja ali preverja neposredno iz Python okolja. Omogoča delo z DID metodami in verifikacijo podpisov, skladno s standardi W3C DID in VC.
 
 \end{itemize}
 
@@ -479,23 +479,54 @@ Preverljiva dokazila so shranjena v ločeni podatkovni bazi. Ob izračunu zaupan
 
 Plast znanja združuje semantične opise akterjev in njihove lastnosti z regulatorno potrjenimi podatki iz preverljivih dokazil. Oraklji pri izračunu zaupanja dostopajo do obeh virov: iz Fusekija pridobijo opisne metrike, iz VC-jev pa dodatne podatke, ki jih ontologija ne vsebuje. S tem plast znanja omogoča enoten, strukturen in preverljiv nabor podatkov, na katerem temelji celoten izračun zaupanja.
 
+\subsubsection{Plast izračuna zaupanja}
+Plast izračuna zaupanja predstavlja osrednjo procesno komponento arhitekture. Njena naloga je, da podatke iz plasti znanja pretvori v konkretne odločitve o zaupanju in jih posreduje verigi blokov. V tej plasti se nahaja omrežje orakljev in agregator, ki skupaj tvorita neodvisen mehanizem sklepanja. Oraklji izvajajo izračune, agregator pa skrbi za preverjanje rezultatov in zapis končnega stanja v pametno pogodbo.
 
+\paragraph{Oraklji}
+Ko sistem prejme zahtevo za izračun zaupanja, pametna pogodba sproži dogodek, ki služi kot signal orakljem, da morajo izvesti novo oceno. Oraklji ne delujejo kot pasivni odjemalci, temveč aktivno spremljajo verigo blokov in zaznavajo zahteve, ki jih je treba obdelati. Za podani subjekt nato pridobijo vse podatke iz plasti znanja: opisne lastnosti iz ontologije ter pripadajoča preverljiva dokazila iz baze poverilnic VC. Na ta način je izračun zaupanja vedno vezan na najnovejše in preverljive podatke.
 
-\subsection{Mehanizem za sklepanje zaupanja (angl. Trust Resolution Engine)}
+Pridobljene podatke orakelj združi s pravili ocenjevalca. Pravila določajo, katere lastnosti mora ocenjevan akter izpolnjevati in pod kakšnimi pogoji. Orakelj izvede ocenjevanje in pripravi strukturirano poročilo, ki vsebuje identifikator subjekta, končno odločitev, numerično oceno, kriptografske povzetke uporabljenih dokazil ter čas izračuna. Poročilo je serializirano v JSON obliki in digitalno podpisano z zasebnim ključem oraklja. S tem postane rezultat preverljiv in vezan na točno določen orakelj.
 
+\paragraph{Agregator}
+Podpisano poročilo orakelj pošlje agregatorju, ki deluje kot zbirni člen med oraklji in pametno pogodbo. Agregator preveri digitalni podpis, preveri, ali je poročilo prišlo od dovoljenega oraklja, ter ga zapiše na verigo kot posamično oddajo. Ko prejme zadostno število poročil, izvede konsenz nad prejetimi odločitvami in oceno zaupanja ter prek transakcije posreduje končni rezultat v pametno pogodbo \texttt{TrustGraph}.
 
+Na visoki ravni potek izračuna poteka v naslednjih korakih:
+\begin{enumerate}
+  \item pametna pogodba na verigi blokov prejme zahtevo za nov izračun zaupanja in sproži dogodek,
+  \item oraklji poslušajo te dogodke, za podanega akterja preberejo podatke iz ontologije in pripadajočih preverljivih dokazil,
+  \item podatke združijo s pravili ocenjevalca in izvedejo izračun zaupanja,
+  \item rezultat pretvorijo v strukturirano poročilo, ga digitalno podpišejo in pošljejo agregatorju,
+  \item agregator preveri prejeta poročila, izračuna konsenz in prek transakcij zapiše posamezne oddaje ter končni rezultat v pametno pogodbo.
+\end{enumerate}
 
+Na ta način plast izračuna zaupanja povezuje semantične podatke z decentraliziranim zapisom rezultatov. Oraklji omogočajo neodvisno izvajanje izračunov, agregator pa poskrbi za preverjanje in enoten zapis v register zaupanja na verigi blokov. Plast tako tvorimo most med modelom znanja in verigo blokov ter predstavlja ključen element celotne arhitekture.
 
-\section{Razvoj pametnih pogodb in oraklov}
-\section{Uporabniški vmesnik in API-ji}
+\subsubsection{Plast registra zaupanja na verigi blokov}
+
+Plast registra zaupanja predstavlja končni sloj arhitekture, kjer se rezultati izračuna zaupanja trajno zapišejo. Njena vloga je zagotoviti podatkovno plast, ki ni odvisna od posamezne organizacije in ki omogoča preverljiv, dosleden ter nespremenljiv zapis vseh odločitev o zaupanju. V tej plasti se nahaja pametna pogodba \texttt{TrustGraph}, ki deluje kot decentraliziran register razmerij zaupanja med akterji.
+
+Pametna pogodba je zasnovana tako, da sprejema rezultate evalvacij orakljev in jih zapisuje v podatkovne strukture na verigi. Podpisi orakljev, konsenz agregatorja in mehanizmi preverjanja identitet poskrbijo, da v register pridejo le preverjene in verodostojne informacije. Vsak zapis je povezan z identifikatorjem akterja, časom vnosa in dodatnimi metapodatki, kar omogoča transparenten zgodovinski vpogled v spremembe zaupanja skozi čas.
+
+Ko agregator prejme dovolj veljavnih poročil orakljev, izvede postopek združevanja in prek transakcije pokliče funkcijo v pametni pogodbi, ki zapiše tako posamične oddaje kot končni konsenzni rezultat. Pogodba sproži dogodke, ki služijo kot signal akterjem ali nadrejenim sistemom, da je za določen subjekt na voljo nova ocena zaupanja. Vsaka sprememba je trajno zapisana v verigo blokov, zato je mogoče rezultate neodvisno preveriti tudi za nazaj.
+
+Register zaupanja hrani dve vrsti podatkov. Prva vrsta so posamične oddaje orakljev, ki predstavljajo neobdelane rezultate izračuna. Druga vrsta so konsenzni rezultati, ki jih agregator izračuna na podlagi več oddaj in jih pogodba obravnava kot veljavno končno stanje zaupanja za posameznega akterja. Na ta način lahko sistem ohranja celovito sliko o tem, kako so se rezultati spreminjali in kako je bila sprejeta končna odločitev.
+
+Zapis v register omogoča tudi poizvedovanje nad trenutnim ali zgodovinskim stanjem zaupanja. Akterji v dobavni verigi lahko kadar koli preverijo, ali je določen partner trenutno ocenjen kot zaupanja vreden ali ne. Ker podatki niso shranjeni v centraliziranem sistemu, temveč v porazdeljeni verigi blokov, se vnosov ne da naknadno spreminjati ali brisati. To daje sistemu lastnost dolgoročne preverljivosti, kar je ključno v okoljih, kjer se sprejemajo odločitve z regulatornimi posledicami.
+
+Plast registra zaupanja tako predstavlja stičišče celotnega sistema: prejme rezultate iz računske plasti, jih trajno zapiše in omogoča zanesljiv vpogled v relacije zaupanja v vsakem trenutku. V nadaljevanju bomo opisali funkcije pametne pogodbe \texttt{TrustGraph}, podatkovne strukture, dogodke ter način, kako zunanji akterji dostopajo do registra.
+
+\section{Tok podatkov v sistemu}
+
+\subsection{Zahteva za ponovno oceno zaupanja}
+\subsection{Agregiranje rezultatov}
+\subsection{Branje rezultatov}
 
 \chapter{Evalvacija}
+\section{Predstavitev scenarijev delovanja}
 \section{Varnostna analiza}
 \section{Zmogljivost in razširljivost}
-\section{Natančnost ocene zaupanja}
 \section{Prednosti in omejitve}
 \section{Primerjava z obstoječimi rešitvami}
-\section{Pridobljena spoznanja}
 
 \chapter{Zaključek in nadaljnje delo}
 \section{Povzetek prispevkov}
