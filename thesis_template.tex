@@ -517,8 +517,80 @@ Plast registra zaupanja tako predstavlja stičišče celotnega sistema: prejme r
 
 \section{Tok podatkov v sistemu}
 
-\subsection{Zahteva za ponovno oceno zaupanja}
-\subsection{Agregiranje rezultatov}
+
+\subsection{Celoten potek izračuna zaupanja}
+
+Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračuna zaupanja, ki vključuje vse komponente sistema: aplikacijo, pametno pogodbo \texttt{TrustGraph.sol}, decentralizirano omrežje orakljev, strežnik Fuseki ter bazo preverljivih dokazil VC. V nadaljevanju se osredotočimo na funkcije uporabljene v procesu. Pri vsakem koraku so navedene ključne funkcije.
+
+\begin{landscape}
+  \begin{figure}
+    \centering
+    \includegraphics[width=1.44\textwidth]{figures/seq-diagram-recalculation.png}
+    \caption{Diagram poteka ob izračunu zaupanja za subjekt.}
+    \label{fig:seq-diagram-recalculation}
+  \end{figure}
+\end{landscape}
+
+\begin{enumerate}
+  \item \textbf{Aplikacija ali uporabnik ustvari zahtevo}\newline
+    Uporabnik preko aplikacije ali klica API sproži postopek za izračun zaupanja za želenega akterja. Akterjev DID pred klicem funkcije pretvorimo v binarno vrednost \texttt{bytes32} s pomočjo zgoščevalne funkcije Keccak-256, ki je značilna za Ethereumov ekosistem. Aplikacija preko odjemalca RPC pokliče funkcijo na pametni pogodbi:
+    \begin{quote}\texttt{requestTrustReport(subject, ttl)}\end{quote}
+
+    \item \textbf{Pametna pogodba obdela zahtevo in izda signal za izračun}\newline
+    Po klicu funkcije \texttt{requestTrustReport(subject, ttl)} pametna pogodba preveri, ali je za izbranega akterja že aktivna zahteva ter ali ima klicatelj ustrezna dovoljenja (če je seznam dovoljenih nastavljen). Ko so pogoji izpolnjeni, pogodba ustvari nov identifikator zahteve \texttt{requestId}.  
+    Identifikator temelji na zgoščeni kombinaciji DID akterja, časovnega žiga, naslova pošiljatelja in zaporedne številke zahteve. Pogodba shrani rok za oddajo (\texttt{deadline}) in nato sproži dogodek:
+    \begin{quote}\texttt{TrustOracleRequested(requestId, subject)}\end{quote}
+    Ta dogodek služi kot edini mehanizem obveščanja decentraliziranega omrežja orakljev, da je treba izvesti nov izračun zaupanja. Obenem funkcija klicatelju tudi vrne \texttt{requestId}, na podlagi katerega lahko spremlja stanje in kasneje pridobi končni rezultat.
+
+  \item \textbf{Orakelj zazna novo zahtevo in začne proces izračuna}\newline
+    Vsak orakelj neprestano posluša za nove dogodke, zapisane v verigi blokov (angl.\ \textit{event logs}). Ko zazna dogodek \texttt{TrustOracleRequested}, preveri, ali mora obdelati podani \texttt{requestId}.  
+    Če je orakelj nastavljen za tovrstne izračune, začne postopek ocenjevanja. Najprej pridobi vse potrebne podatke iz plasti znanja: semantične lastnosti akterja preko SPARQL poizvedb strežniku Fuseki ter pripadajoča preverljiva dokazila iz baze VC. Orakelj tako zagotovi, da bo izračun temeljil na najnovejših, verodostojnih in digitalno podpisanih podatkih.
+    Šele ko so vsi podatki zbrani in preverjeni, orakelj preide na sam izračun zaupanja, kjer uporabi pravila ocenjevalca.
+
+  \item \textbf{Orakelj osveži podatke v plasti znanja}\newline
+    Pred izračunom zaupanja mora orakelj pridobiti najnovejše podatke iz dveh ločenih virov:
+    \begin{itemize}
+      \item semantične lastnosti akterja iz ontologije prek SPARQL poizvedb strežniku Fuseki,
+      \item veljavna preverljiva dokazila (VC), ki jih orakelj prebere iz lokalne baze dokazil.
+    \end{itemize}
+    Pridobivanje ontoloških podatkov poteka prek SPARQL končne točke, ki vrne lastnosti subjekta (npr.\ točnost dostav, licenčne statuse, GMP skladnost). Preverljiva dokazila se preverijo z validacijo digitalnega podpisa izdaje. S tem orakelj zagotovi, da izračun temelji na najnovejših in verodostojnih podatkih.
+
+  \item \textbf{Izvedba izračuna glede na pravila ocenjevalca}\newline
+    Ko ima orakelj na voljo vse relevantne podatke, izvede izračun zaupanja. Pri tem uporabi pravila, ki si jih bomo v nadaljevanju pogledali na testnih scenarijih. Rezultat tega koraka je numerična ocena in binarna odločitev, ali akter izpolnjuje zahtevane pogoje. Poleg tega orakelj pripravi tudi metapodatke, kot so:
+    \begin{itemize}
+      \item čas izračuna (\texttt{asOf}),
+      \item zgoščena vrednost pravil (\texttt{policyHash}),
+      \item zgoščena vrednost uporabljenega VC (\texttt{credentialHash}).
+    \end{itemize}
+
+  \item \textbf{Orakelj ustvari poročilo in ga podpiše}\newline
+    Orakelj pripravi končno poročilo v JSON obliki, ki vsebuje ključne informacije o izračunu zaupanja: identifikator subjekta, odločitev, oceno, zastavice in pripadajoče povzetke. Preden ga pošlje agregatorju, mora orakelj poročilo kriptografsko podpisati. Podpis se izvede z uporabo metode \texttt{sign\_message}, ki je del knjižnice web3.py. Ta temelji na Ethereumovi shemi EIP-191. Najprej se pripravi deterministična kanonična oblika JSON zapisa, ta pa se nato podpiše z zasebnim ključem oraklja. Podpis omogoča agregatorju, da preveri, ali je poročilo prišlo od zaupanja vrednega oraklja.
+
+  \item \textbf{Agregator sprejme poročila in izvede preverjanje}\newline
+    Agregator deluje kot zbirno vozlišče, ki prejema poročila posameznih orakljev prek HTTP vmesnika. Pred prejemom poročila izvede naslednja preverjanja:
+    \begin{itemize}
+      \item ali podpis pripada dovoljenemu oraklju,
+      \item ali poročilo ni podvojeno,
+      \item ali se zgoščene vrednosti pravil in dokazil ujemajo z lokalnimi podatki.
+    \end{itemize}
+    Vsako veljavno poročilo agregator takoj zapiše v pametno pogodbo z uporabo funkcije:
+    \begin{quote}\texttt{recordOracleSubmission(requestId, evaluatorHash, report, credentialHash)}\end{quote}
+    Na ta način je posamezna ocena oraklja shranjena na verigi blokov, neodvisno od končnega konsenza.
+
+  \item \textbf{Agregator izvede konsenz in zapiše končni rezultat}\newline
+    Ko agregator prejme dovolj veljavnih poročil (dosežen kvorum), izvede konsenz nad rezultati. Pri tem kombinira odločitev, oceno in dodatne zastavice, nato pa pripravi končno poročilo. Končni rezultat se zapiše v pametno pogodbo z uporabo funkcije:
+    \begin{quote}\texttt{fulfillTrustReport(requestId, report)}\end{quote}
+    Pametna pogodba preveri, ali je agregator pooblaščen, ali je \texttt{requestId} veljaven in ali zahteva ni pretekla. Če so vsi pogoji izpolnjeni, pogodba zapiše konsenzni rezultat v verigo blokov  in sproži dogodek \texttt{TrustOracleFulfilled}.
+    Pogodba preveri identiteto klica, ujemanje ID in neiztek roka, preden zapiše končni rezultat v:
+    \begin{quote}
+    \texttt{subjectMetrics[subject]}
+    \end{quote}
+    in sprožen je dogodek \texttt{TrustOracleFulfilled}, ki zaključi postopek.
+\end{enumerate}
+
+Ker je celoten postopek sestavljen iz več medsebojno odvisnih korakov, se v naslednjih podpoglavjih osredotočimo na bolj podroben pregled posameznih delov. Najprej pogledamo notranje delovanje omrežja orakljev in agregacije rezultatov, nato pa še na branje podatkov iz registra zaupanja.
+
+
 \subsection{Branje rezultatov}
 
 \chapter{Evalvacija}
