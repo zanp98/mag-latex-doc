@@ -581,17 +581,163 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
     Ko agregator prejme dovolj veljavnih poročil (dosežen kvorum), izvede konsenz nad rezultati. Pri tem kombinira odločitev, oceno in dodatne zastavice, nato pa pripravi končno poročilo. Končni rezultat se zapiše v pametno pogodbo z uporabo funkcije:
     \begin{quote}\texttt{fulfillTrustReport(requestId, report)}\end{quote}
     Pametna pogodba preveri, ali je agregator pooblaščen, ali je \texttt{requestId} veljaven in ali zahteva ni pretekla. Če so vsi pogoji izpolnjeni, pogodba zapiše konsenzni rezultat v verigo blokov  in sproži dogodek \texttt{TrustOracleFulfilled}.
-    Pogodba preveri identiteto klica, ujemanje ID in neiztek roka, preden zapiše končni rezultat v:
-    \begin{quote}
-    \texttt{subjectMetrics[subject]}
-    \end{quote}
+    Pogodba preveri identiteto klica, ujemanje ID in iztek roka, preden zapiše končni rezultat v:
+    \begin{quote} \texttt{subjectMetrics[subject]} \end{quote}
     in sprožen je dogodek \texttt{TrustOracleFulfilled}, ki zaključi postopek.
 \end{enumerate}
 
 Ker je celoten postopek sestavljen iz več medsebojno odvisnih korakov, se v naslednjih podpoglavjih osredotočimo na bolj podroben pregled posameznih delov. Najprej pogledamo notranje delovanje omrežja orakljev in agregacije rezultatov, nato pa še na branje podatkov iz registra zaupanja.
 
+\subsection{Agregiranje rezultatov v omrežju orakljev}
 
-\subsection{Branje rezultatov}
+Na sliki~\ref{fig:seq-diagram-aggregation} je prikazan podroben potek obdelave poročil znotraj decentraliziranega omrežja orakljev (DON). Diagram prikazuje fazo po tem, ko oraklji prejmejo zahtevo za izračun zaupanja, in se osredotoča na izvajanje izračuna, podpisovanje poročil ter postopek agregacije v agregatorju. Ta proces je ključen za zagotavljanje verodostojnih rezultatov, saj združi poročila več neodvisnih orakljev v en sam, konsenzni izračun.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/seq-diagram-aggregation.png}
+  \caption{Potek agregiranja rezultatov v decentraliziranem omrežju orakljev}
+  \label{fig:seq-diagram-aggregation}
+\end{figure}
+
+V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
+
+\begin{enumerate}
+
+  \item \textbf{Zajem podatkov iz plasti znanja}\newline
+    Orakelj pred izvedbo izračuna pridobi aktualne podatke iz dveh virov:
+    \begin{itemize}
+      \item ontološki podatki prek strežnika Fuseki (SPARQL poizvedbe ali lokalni OWL),
+      \item preverljiva dokazila (VC), ki jih orakelj preveri glede veljavnosti in morebitnega preklica.
+    \end{itemize}
+    Ti podatki predstavljajo vhodne metrike, ki se uporabijo pri izračunu zaupanja.
+
+  \item \textbf{Izvedba lokalnega izračuna zaupanja}\newline
+    Orakelj izvede hibridni algoritem ocenjevanja, ki združuje preverjanje pravil ter statistične metrike.  
+    V tej fazi orakelj pripravi tudi oba ključna povzetka:
+    \begin{itemize}
+      \item \texttt{policy\_hash}, ki predstavlja zgoščeno vrednost pravil akterja,
+      \item \texttt{credential\_hash}, ki označuje VC dokazilo uporabljeno pri izračunu.
+    \end{itemize}
+
+  \item \textbf{Pošiljanje podpisanega poročila agregatorju}\newline
+    Orakelj oblikuje strukturirano poročilo, ga serializira v kanonični JSON zapis in digitalno podpiše z metodo \texttt{sign\_message} (EIP-191).  
+    Podpisano poročilo nato pošlje agregatorju prek zahteve HTTP (\texttt{POST /reports}), skupaj z identifikatorjem zahteve.
+    Da agregator poročilo sprejme, mora orakelj poslati podatke v standardizirani obliki \texttt{SignedOracleReport}.  
+    Ta vsebuje dva dela:
+    \begin{itemize}
+      \item \texttt{OracleReport} – dejanski rezultat izračuna,
+      \item \texttt{node\_id} in \texttt{signature} – identiteto oraklja in kriptografski podpis poročila.
+    \end{itemize}
+
+    Struktura \texttt{OracleReport} mora vsebovati naslednja polja:
+    \begin{itemize}
+      \item \texttt{subject} – 32-bajtni identifikator subjekta (zgoščena vrednost DID),
+      \item \texttt{decision} – končna odločitev (bool),
+      \item \texttt{score} – številčna ocena zaupanja v odstotkih,
+      \item \texttt{flags} – bitna opozorilna polja,
+      \item \texttt{as\_of} – čas izračuna.
+    \end{itemize}
+
+    Pred podpisom se poročilo pretvori v kanonično JSON obliko s stabilnim urejanjem ključev.  
+    Podpis se izvede z metodo \texttt{sign\_message} (EIP-191) iz knjižnice \texttt{web3.py}.  
+    Agregator poročilo sprejme le, če je podpis veljaven, naslov \texttt{node\_id} pripada dovoljenemu oraklju, poročilo ni podvojeno in \texttt{policy\_hash} ter \texttt{credential\_hash} se ujemata z lokalnimi podatki agregatorja.
+    Standardizirana struktura omogoča, da lahko vsako poročilo neodvisno preverimo in da se rezultati več orakljev združijo v konsenzni izračun, ki se zapiše v pametno pogodbo.
+
+  \item \textbf{Preverjanje podpisov in veljavnosti poročil}\newline
+    Agregator ob prejemu poročila preveri:
+    \begin{itemize}
+      \item ali podpis pripada dovoljenemu oraklju,
+      \item ali je poročilo unikatno glede na kombinacijo \texttt{request\_id} in \texttt{node\_id},
+      \item ali se zgoščene vrednosti pravil in dokazil ujemajo z njegovimi lokalnimi podatki.
+    \end{itemize}
+    Veljavna poročila agregator takoj zapiše v pametno pogodbo s funkcijo \texttt{recordOracleSubmission}.
+
+  \item \textbf{Doseganje kvoruma poročil}\newline
+    Agregator hrani prejeta poročila in spremlja, ali je dosežen kvorum (minimalno število poročil, potrebnih za izvedbo konsenza).
+    Če kvorum ni dosežen, agregator čaka in nadaljuje zbiranje poročil dokler le ta ni dosežen ali do izteka časa čakanja (\texttt{ttl}).
+
+  \item \textbf{Agregacija rezultatov znotraj DON}\newline
+    Ko je kvorum dosežen, agregator izvede agregacijo. Poleg odločitve in ocene agregator združi tudi \texttt{flags}, ki predstavljajo bitna opozorilna polja. Vsak bit ima posebej določen pomen, ki označuje posebne okoliščine ali tveganja, ki so se pojavila med izračunom:
+    \begin{itemize}
+      \item {FLAG\_NO\_DATA (bit 0)} – orakelj ni našel nobenih vhodnih podatkov za subjekt (npr. subjekt v ontologiji ne obstaja ali nima nobenih lastnosti).
+      \item {FLAG\_LOW\_SCORE (bit 1)} – verjetnostna ocena zaupanja je padla pod minimalni prag.
+      \item {FLAG\_DISAGREEMENT (bit 2)} – različni deli orakljevega notranjega izračuna so podali neskladne odločitve.
+      \item {FLAG\_VC\_REVOKED (bit 3)} – preverljivo dokazilo (VC), uporabljeno pri izračunu, je označeno kot preklicano.
+    \end{itemize}
+
+    Ti biti se lahko nastavijo v orakljih funkcijah za izračun. Agregator pri združevanju uporabi \emph{bitno večino}: vsak bit v končnem rezultatu je nastavljen, če ga ima vsaj polovica oddanih poročil. Zastavice tako predstavljajo povzetek opozoril, ki jih je zaznalo celotno omrežje orakljev.
+
+
+  \item \textbf{Zapis konsenznega rezultata v pametno pogodbo}\newline
+    Končni agregirani rezultat se v verigo blokov zapiše s funkcijo:
+    \begin{quote}\texttt{fulfillTrustReport(requestId, report)}\end{quote}
+    Pametna pogodba preveri identiteto klicatelja, veljavnost identifikatorja zahteve in rok izvedbe.  
+    Ob uspešnem zapisu sproži dogodek \texttt{TrustOracleFulfilled}, ki drugim komponentam signalizira, da je nova ocena na voljo.
+
+\end{enumerate}
+
+Agregator povezuje izračune več orakljev v enoten rezultat, pametna pogodba pa poskrbi, da je končni izračun trajno in preverljivo zapisan v verigi blokov. V naslednjem podpoglavju si bomo ogledali, kako akterji v sistemu pridobijo te rezultate in kako poteka branje podatkov iz registra zaupanja.
+
+\subsection{Branje rezultatov zaupanja}
+Po zaključenem izračunu in zapisu rezultatov v pametno pogodbo lahko akterji iz sistema pridobijo podatke o zaupanju na dva načina: (i) kot posamezne oddaje orakljev in (ii) kot agregiran, konsenzni rezultat omrežja orakljev (DON). 
+
+\subsubsection{Branje posamičnih izračunov orakljev}
+
+Pametna pogodba \texttt{TrustGraph.sol} hrani posamične rezultate vsakega oraklja v podatkovni strukturi \texttt{oracleSubmissions\-[evaluator]\-[subject]}. Ti podatki predstavljajo neagregirane rezultate, ki jih je posamezen orakelj izračunal za dani subjekt.
+Slika~\ref{fig:seq-diagram-read-single} prikazuje potek branja posamičnih oddaj.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/seq-diagram-read-single.png}
+\caption{Branje posamične oddaje oraklja iz registra zaupanja}
+\label{fig:seq-diagram-read-single}
+\end{figure}
+
+Branje posamičnih oddaj je koristno za različne namene. Če je potrebno preveriti, kako je določen orakelj ocenil subjekt, ali pa analizirati morebitna neskladja med oraklji, lahko akterji neposredno dostopajo do teh podatkov. Do teh podatkov dostopamo z direktnim klicem funkcije za branje iz javnega slovarja:
+\begin{quote}
+\texttt{oracleSubmissions(evaluatorHash, subject)} 
+\end{quote}
+
+Rezultat vključuje:
+\begin{itemize}
+  \item binarno odločitev,
+  \item numerično oceno,
+  \item zastavice (flags),
+  \item čas izračuna,
+  \item zgoščene vrednosti pravil in dokazil,
+  \item ETH naslov oraklja.
+\end{itemize}
+
+\subsubsection{Branje agregiranega (konsenznega) rezultata}
+Konsenzni rezultat, ki ga zapiše agregator, predstavlja končno in uradno odločitev omrežja orakljev. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/seq-diagram-read-consensus.png}
+\caption{Branje konsenznega rezultata ocenjevanja iz pametne pogodbe}
+\label{fig:seq-diagram-read-consensus}
+\end{figure}
+
+Ta rezultat je v pametni pogodbi zapisan v strukturi:
+\begin{quote}
+\texttt{subjectMetrics[subject]}
+\end{quote}
+
+Kot vidimo na \ref{fig:seq-diagram-read-consensus}, lahko do rezultatov dostopamo prek javne funkcije:
+\begin{quote}
+\texttt{getTrustMetrics(subject)}
+\end{quote}
+
+Ta funkcija vrne:
+\begin{itemize}
+  \item \textbf{odločitev} (\texttt{decision}) – končni izračun zaupanja,
+  \item \textbf{oceno} (\texttt{score\_bps}) – numerična vrednost v osnovnih točkah,
+  \item \textbf{zastavice} (\texttt{flags}) – bitna opozorila, ki so bila prisotna v večini oddaj,
+  \item \textbf{čas} (\texttt{asOf}) – čas izračuna konsenza.
+\end{itemize}
+
+Konsenzni rezultat je tisti, ki ga uporabi večina akterjev v sistemu, saj predstavlja stabilen in preverjen izračun celotnega omrežja orakljev.
+
 
 \chapter{Evalvacija}
 \section{Predstavitev scenarijev delovanja}
