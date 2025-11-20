@@ -127,6 +127,7 @@ Kayhan in sodelavci \cite{kayhan2022ensuring} izpostavljajo še pomen transparen
 Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti (angl.~\textit{data properties}) v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavanje zaupanja.
 
 \section{Upravljanje zaupanja v razpršenih sistemih}
+\label{sec:trust-management-distributed-systems}
 Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, ter dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \texttt{peer-to-peer}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in skladne informacije o zaupanju med akterji v omrežju.
 
 \subsection{Dokazni modeli zaupanja}
@@ -738,9 +739,265 @@ Ta funkcija vrne:
 
 Konsenzni rezultat je tisti, ki ga uporabi večina akterjev v sistemu, saj predstavlja stabilen in preverjen izračun celotnega omrežja orakljev.
 
+% -----------------------------------------
+% 6 Evalvacija sistema in varnostna analiza
+% -----------------------------------------
 
 \chapter{Evalvacija}
 \section{Predstavitev scenarijev delovanja}
+\label{sec:scenariji-delovanja}
+
+\subsection{Eksperimentalno okolje in konfiguracija sistema}
+\label{subsec:eksperimentalno-okolje}
+
+Preden predstavimo konkretne scenarije uporabe, najprej opišemo, kako je postavljen eksperimentalni sistem. Vse komponente zaganjamo z orodjem \texttt{Docker}, kar nam zagotavlja ponovljivo okolje in jasno ločitev med posameznimi storitvami. S tem zmanjšamo odvisnost od lokalne konfiguracije in omogočimo, da sistem testiramo kakor, da bi bile vse komponente že nameščene v oblaku.
+
+\subsubsection{Vsebniki in omrežje}
+Sistem sestavlja več vsebnikov Docker, ki so povezani v skupno virtualno omrežje in delujejo z orodjem \texttt{Docker Compose}. V nadaljevanju so opisani posamezni vsebniki in njihove vloge.
+
+\paragraph{Veriga blokov} Prvi vsebnik vsebuje testno Ethereum omrežje s pomočjo orodja Anvil. Na njem namestimo  pametno pogodbo \texttt{TrustGraph.sol}. Na omrežju takoj dobimo tudi 10 prednastavljenih računov z velikimi količinami testnih ETH kovancev, ki jih oraklji in agregator uporabljajo za plačevanje transakcijskih stroškov. Zato prve račune dodelimo agregatorju in orakljem. Potrebujemo tudi en račun za namestitev pametne pogodbe dodelimo le tega regulatorju EMA, kateri bo imel potem tudi pravico do sprožanja novih izračunov zaupanja.
+
+\paragraph{Baza znanja} V vsebniku Fuseki je naložena domenska ontologija. Ta je dostopna preko SPARQL končne točke, ki jo oraklji uporabljajo za pridobivanje semantičnih lastnosti akterjev. V eksperimentalnem okolju uporabljamo ontologijo, ki ga vsi oraklji delijo. Ontologija je predstavljena v prilogi \ref{app:trust-ontology}.
+
+\paragraph{Oraklji} Za evalvacijo smo pripravili tri neodvisne oraklje, ki izvajajo različne politike izračuna zaupanja. Vsak orakelj teče v svojem vsebniku Docker in je konfiguriran z ločeno datoteko, ki določa pravila ocenjevalca, nabor vhodnih podatkov ter težo posameznih kriterijev. Oraklji so implementirani v Pythonu in uporabljajo knjižnice za dostop do verige blokov (web3.py), baze znanja (rdflib, SPARQLWrapper) ter za kriptografske operacije.
+
+\paragraph{Agregator}, ki zbira poročila posameznih orakljev, preverja njihove podpise in objavi končno odločitev v pametni pogodbi na verigi.
+
+\paragraph{Odjemalska aplikacija}, ki v našem primeru nastopa kot ukazna vrstica oziroma skripta, s katero sprožimo zahtevo za izračun zaupanja in kasneje preberemo rezultat z verige. V realnem primeru bi bil to lahko npr. spletni vmesnik ali integracija v obstoječi ERP sistem akterja.
+
+Kontejnerji si delijo notranje Docker omrežje, zato med seboj komunicirajo preko stabilnih DNS imen (npr.\ \texttt{fuseki:3030}, \texttt{ethereum-node:8545}).
+
+\paragraph{Konfiguracija orakljev}
+Vsi oraklji uporabljajo isti paket knjižnic za dostop do baze znanja, verige blokov in za kriptografske operacije, razlikujejo pa se v konfiguraciji in politikah izračuna zaupanja. Vsak orakelj ima svojo konfiguracijsko datoteko, v kateri so zapisani:
+\begin{itemize}
+    \item referenca na \emph{skupno bazo znanja} (isti Fuseki dataset),
+    \item nabor \emph{poverilnic in dokazov} (VC), ki jih pri izračunu obravnava kot vhod,
+    \item \emph{pravila in uteži} za posamezne kriterije zaupanja.
+\end{itemize}
+
+S tem modeliramo, da v omrežju sodelujejo neodvisni evalvatorji, ki uporabljajo različne poglede na iste podatke. Na primer, v tipični konfiguraciji:
+\begin{itemize}
+    \item prvi orakelj poudarja regulatorni vidik in daje večjo težo veljavnim certifikatom in regulatornim odločbam,
+    \item drugi orakelj se osredotoča na operativno zanesljivost, kjer imajo večjo težo incidenti pri transportu, temperaturna odstopanja in zanesljivost IoT senzorjev,
+    \item tretji orakelj kombinira zgodovino sodelovanja med akterji in pretekle odločitve o zaupanju ter tako deluje bolj reputacijsko usmerjeno.
+\end{itemize}
+
+Agregator pri združevanju rezultatov ne pozna podrobnosti posameznih politik. Vsako poročilo obravnava kot podpisano izjavo oraklja, ki vsebuje identifikator subjekta, numerično oceno zaupanja, diskretno odločitev (npr.\ \emph{zaupanja vreden} ali \emph{nezaupanja vreden}) ter morebitne zastavice. Na osnovi konfiguriranega praga in števila prejetih poročil izračuna končno odločitev, ki jo zapiše v pametno pogodbo.
+
+\paragraph{Povzetek konfiguracije.}
+Tabela~\ref{tab:eksperimentalna-konfiguracija} povzema ključne parametre eksperimentalne postavitve, ki jih v nadaljevanju uporabljamo v obeh scenarijih.
+
+\begin{table}[H]
+    \centering
+    \caption{Povzetek eksperimentalne konfiguracije sistema.}
+    \label{tab:eksperimentalna-konfiguracija}
+    \begin{tabular}{ll}
+        \hline
+        Parameter & Vrednost \\
+        \hline
+        Okolje verige blokov & lokalni testnet (Docker kontejner) \\
+        Naslov pametne pogodbe \texttt{TrustGraph.sol} & \texttt{0x\ldots{}} (primer v prilogi) \\
+        Baza znanja & Apache Jena Fuseki, en dataset \\
+        Število orakljev & 3 (različne politike zaupanja) \\
+        Agregacija poročil & prag soglasja (npr.\ večina) \\
+        Odjemalski vmesnik & Python skripta / ukazna vrstica \\
+        \hline
+    \end{tabular}
+\end{table}
+\subsection{Algoritmi izračuna zaupanja v orakljih}
+\label{subsec:algoritmi-orakljev}
+
+V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili različne pristope k upravljanju zaupanja v razpršenih sistemih: dokazne modele, priporočilne modele, porazdeljeno ocenjevanje ter dinamično posodabljanje zaupanja. Ti koncepti tvorijo teoretično podlago za zasnovo naših orakljev. V nadaljevanju pokažemo, kako vsak orakelj uteleša drugačen pogled na zaupanje:
+\begin{itemize}
+    \item Pfizerjev orakelj uporablja hibridni pristop, ki kombinira dokazne elemente (licence, certifikati) z dinamično metriko, podobno priporočilnim in porazdeljenim modelom.
+    \item Orakelj Moderna je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi verifiable credentials, podobno kot hierarhični in PGP-sistemi iz podpoglavja o dokaznih modelih.
+    \item Orakelj DHL je \emph{telemetrijsko usmerjen} in se osredotoča na dinamično posodabljanje zaupanja preko operativnih metrik, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
+\end{itemize}
+
+\subsubsection*{Skupna struktura izračuna}
+
+Ne glede na specifičen pogled vsak orakelj za dani subjekt izračuna:
+\begin{enumerate}
+    \item deterministični del (pravila iz politik),
+    \item probabilistični del (številčna ocena),
+    \item kombinirano odločitev.
+\end{enumerate}
+
+\paragraph{Deterministični del}
+Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih datotekah (\texttt{policy.json}). V njih so za posamezne tipe subjektov (proizvajalec, distributer, transporter) definirani kriteriji in pragovi, npr.\:
+\begin{itemize}
+    \item \texttt{hasDeliveryPunctuality} $\geq 0{,}99$,
+    \item \texttt{hasTempViolationRate} $\leq 0{,}05$,
+    \item \texttt{hasAuditScore} $\geq 0{,}90$,
+    \item \texttt{hasGDPVC} $=$ \texttt{true}.
+\end{itemize}
+Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najbližje \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in trdih pragov.
+
+\paragraph{Probabilistični del}
+Probabilistični del pretvori iste kriterije v numerični score v intervalu $[0,1]$, ki ga orakelj kasneje pretvori v basis points (0--10000). Za vsak kriterij se vodi Beta posterior, ki se posodablja po principu eksponentno uteženega drsečega povprečja (EWMA). S tem približamo obnašanje modelom iz podpoglavij o priporočilnih modelih in dinamičnem posodabljanju zaupanja.
+
+Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve Beta sta:
+\[
+    \alpha = 1 + s_0 \cdot \textit{obs\_scale}, \qquad
+    \beta = 1 + (1 - s_0) \cdot \textit{obs\_scale},
+\]
+kjer je v implementaciji uporabljena lestvica $\textit{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost Beta porazdelitve $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko, a ne absolutno zaupanje.
+
+Ob novih opazovanjih se posterior posodablja z EWMA faktorjem $\gamma \approx 0{,}2$, kar zagotavlja, da nove informacije hitreje vplivajo na score, stare pa postopoma izgubijo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
+
+\paragraph{Kombinirana odločitev}
+Za posamezen subjekt se probabilistični score izračuna kot uteženo povprečje srednjih vrednosti Beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
+\[
+    \sum_i w_i = 1, \qquad w_i \geq 0.
+\]
+
+Vsak orakelj uporablja svoj prag \textit{prob\_threshold}, ki ga izražamo na lestvici 0--1 (v implementaciji pa v basis points). Kombinirana odločitev ima obliko:
+\[
+    \textit{combined} = \textit{deterministic} \;\text{OR}\; \left(\textit{prob\_score} \geq \textit{prob\_threshold}\right),
+\]
+kjer je \textit{deterministic} deterministična odločitev (\emph{PASS}/\emph{FAIL}), \textit{prob\_score} pa izračunani probabilistični score. Na ta način se trda pragovna pravila (dokazni pogled) kombinirajo z mehko, numerično oceno, ki je bližje priporočilnim in porazdeljenim modelom zaupanja.
+
+V nadaljevanju opišemo konkretne konfiguracije in primere za tri oraklje, ki utelešajo različne pristope iz poglavja~\ref{sec:trust-management-distributed-systems}.
+
+\subsubsection*{Pfizer orakelj (hibridni pogled)}
+
+Pfizerjev orakelj uporablja hibridni pogled, ki združuje regulatorne kriterije, kakovost delovanja in informacije iz verifiable credentials. S tem v praksi kombinira dokazni model (digitalna dokazila, licence) z dinamičnim ocenjevanjem in uteženjem kriterijev preko Beta posteriorjev. Njegov prag za probabilistični score je nastavljen na:
+\[
+    \textit{prob\_threshold}^{(\text{Pfizer})} = 0{,}75.
+\]
+
+\paragraph{Kriteriji in uteži.}
+Za posamezne tipe subjektov uporablja naslednje kriterije in uteži:
+\begin{itemize}
+    \item \textbf{Transporter:}
+    \begin{itemize}
+        \item \texttt{hasDeliveryPunctuality} $\geq 0{,}99$ (utež $0{,}7$),
+        \item \texttt{hasTempViolationRate} $\leq 0{,}05$ (utež $0{,}3$).
+    \end{itemize}
+    \item \textbf{Distributor:}
+    \begin{itemize}
+        \item \texttt{hasLicense} $=$ \texttt{true} (utež $0{,}4$),
+        \item \texttt{hasGDPVC} $=$ \texttt{true} (utež $0{,}5$).
+    \end{itemize}
+    \item \textbf{Manufacturer:}
+    \begin{itemize}
+        \item \texttt{hasAuditScore} $\geq 0{,}90$ (utež $0{,}6$).
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Primer: MedLogix (distributer).}
+Za distributerja MedLogix v trenutni ontologiji velja \texttt{license=true} in \texttt{GDPVC=true}. Deterministični del zato vrne \emph{PASS}. Oba kriterija imata visoko zaželenost, zato se Beta posteriorja inicializirata z mean $\approx 0{,}91$. Po normalizaciji uteži (približno $0{,}44$ in $0{,}56$) dobimo probabilistični score:
+\[
+    \textit{prob\_score} \approx 0{,}91 \geq 0{,}75.
+\]
+Kombinirana odločitev je:
+\[
+    \textit{combined}^{(\text{Pfizer}, \text{MedLogix})} = \textit{PASS}.
+\]
+
+\paragraph{Primer: SkyFreight (transporter).}
+Za transporterja SkyFreight sta zabeleženi vrednosti \texttt{punctuality} $= 0{,}90$ in \texttt{tempViolationRate} $= 0{,}08$. Deterministični pogoji niso izpolnjeni, ker $0{,}90 < 0{,}99$ in $0{,}08 > 0{,}05$, zato deterministični del vrne \emph{FAIL}. Tudi normalizirana zaželenost $s_0$ za oba kriterija je nizka, kar vodi v nizek Beta mean in probabilistični score $\textit{prob\_score} < 0{,}75$. Končna odločitev oraklja je:
+\[
+    \textit{combined}^{(\text{Pfizer}, \text{SkyFreight})} = \textit{FAIL}.
+\]
+
+\subsubsection*{Moderna orakelj (VC-centričen pogled)}
+
+Modernin orakelj je zasnovan tako, da v ospredje postavlja verifiable credentials. Konceptualno je najbližje dokaznim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer imata veriga potrdil in kriptografska dokazila ključno vlogo pri inicializaciji zaupanja. Njegov prag za probabilistični score je strožji:
+\[
+    \textit{prob\_threshold}^{(\text{Moderna})} = 0{,}8.
+\]
+
+\paragraph{Kriteriji in uteži.}
+Glavne kombinacije kriterijev so:
+\begin{itemize}
+    \item \textbf{Distributor:}
+    \begin{itemize}
+        \item \texttt{hasGDPVC} $=$ \texttt{true} (utež $0{,}6$),
+        \item \texttt{hasLicense} $=$ \texttt{true} (utež $0{,}3$),
+    \end{itemize}
+    kar po normalizaciji daje približno $0{,}67$ in $0{,}33$.
+    \item \textbf{Manufacturer:}
+    \begin{itemize}
+        \item \texttt{hasAuditScore} $\geq 0{,}92$ (utež $0{,}4$).
+    \end{itemize}
+    \item \textbf{Transporter:}
+    \begin{itemize}
+        \item \texttt{hasRecallRate} $\leq 0{,}02$ (utež $0{,}5$).
+    \end{itemize}
+\end{itemize}
+
+Ključna značilnost je, da brez ustreznih VC odločitev nagiba k \emph{FAIL}, tudi če so druge operativne metrike razmeroma dobre, kar odraža močan poudarek na formalnih dokazih in skladnosti.
+
+\paragraph{Primer: MedLogix (distributer).}
+Ker ima MedLogix veljavne VC in licenco, deterministični del vrne \emph{PASS}. Za oba kriterija dobimo Beta mean $\approx 0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
+\[
+    \textit{prob\_score} \approx 0{,}91 \geq 0{,}8,
+\]
+in kombinirana odločitev ostane:
+\[
+    \textit{combined}^{(\text{Moderna}, \text{MedLogix})} = \textit{PASS}.
+\]
+
+\paragraph{Primer: HealthChain (transporter).}
+Za transporterja HealthChain je v bazi znanja zabeležen \texttt{recallRate} $= 0{,}015$, kar deterministično zadošča pogoju \texttt{hasRecallRate} $\leq 0{,}02$ in daje \emph{PASS}. Pri probabilističnem delu pa je zaželenost pri vrednosti blizu zgornje meje nizka (npr.\ $s_0 \approx 0{,}25$), kar vodi v Beta mean približno $0{,}30$ in:
+\[
+    \textit{prob\_score} \approx 0{,}30 < 0{,}8.
+\]
+Kombinirana odločitev je zato:
+\[
+    \textit{combined}^{(\text{Moderna}, \text{HealthChain})} = \textit{FAIL},
+\]
+kar ilustrira strožji, VC-centričen pristop: deterministični \emph{PASS} sam po sebi ni zadosten brez visoke probabilistične ocene.
+
+\subsubsection*{DHL orakelj (telemetrija-prvi pogled)}
+
+DHL-jev orakelj uporablja telemetrijo transporta (časovne serije, agregirane metrike) kot primarni vir informacij. Konceptualno se približa porazdeljenim in dinamičnim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer se zaupanje gradi na osnovi kumulativnih izkušenj in se sproti prilagaja novim dogodkom. Njegov prag za probabilistični score je:
+\[
+    \textit{prob\_threshold}^{(\text{DHL})} = 0{,}7.
+\]
+
+\paragraph{Kriteriji in uteži.}
+Za proizvajalce in distributerje uporablja naslednje kriterije:
+\begin{itemize}
+    \item \textbf{Manufacturer:}
+    \begin{itemize}
+        \item \texttt{hasTempDeviationScore} $\leq 0{,}10$ (utež $0{,}5$),
+        \item \texttt{hasGDPVC} $=$ \texttt{true} (utež $0{,}4$).
+    \end{itemize}
+    \item \textbf{Distributor:}
+    \begin{itemize}
+        \item \texttt{hasDeliveryPunctuality} $\geq 0{,}95$ (utež $0{,}5$).
+    \end{itemize}
+\end{itemize}
+
+Pri transporterjih ta orakelj v trenutni konfiguraciji ne izračunava ocene, saj zanje ni definiranih kriterijev; v takem primeru subjekt v tem pogledu ni ocenjen.
+
+\paragraph{Primer: BioPharm (proizvajalec).}
+Za proizvajalca BioPharm sta zabeležena \texttt{tempDev} $= 0{,}08$ in \texttt{GDPVC=true}. Oba pogoja sta deterministično izpolnjena (\emph{PASS}), zaželenost je visoka in oba kriterija dobita Beta mean $\approx 0{,}91$. Probabilistični score je zato:
+\[
+    \textit{prob\_score} \approx 0{,}91 \geq 0{,}7,
+\]
+kombinirana odločitev pa:
+\[
+    \textit{combined}^{(\text{DHL}, \text{BioPharm})} = \textit{PASS}.
+\]
+
+\paragraph{Primer: CanaryLabs (proizvajalec).}
+Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \texttt{GDPVC=false}. Deterministični del zato vrne \emph{FAIL}. Ker sta temperaturna odstopanja prevelika in ni VC o skladnosti, je tudi probabilistični score nizek ($\textit{prob\_score} \ll 0{,}7$). Kombinirana odločitev je:
+\[
+    \textit{combined}^{(\text{DHL}, \text{CanaryLabs})} = \textit{FAIL}.
+\]
+
+\medskip
+
+Takšna predstavitev treh orakljev neposredno gradi na modelih iz poglavja~\ref{sec:trust-management-distributed-systems}: Pfizerjev orakelj uteleša hibridni, semantično in dinamično podprt pristop, Moderna orakelj predstavlja strogo dokazno-kripto\-grafski pogled, DHL orakelj pa dinamično, na meritvah temelječe ocenjevanje. V scenarijih, ki sledijo, bomo za izbranega subjekta pokazali, kako različni algoritmi privedejo do različnih, a razložljivih odločitev o zaupanju.
+
+\subsection{Scenarij 1: Ocena zaupanja akterja}
+
+V prvem scenariju si bomo pogledali, kako v sistemu pridobimo nove vrednosti zaupanja za določenega akterja. Predpostavimo, da želimo posodobiti oceno zaupanja za transportno podjetje \texttt{DHL}, ki sodeluje v naši dobavni verigi.
+
+
 \section{Varnostna analiza}
 \section{Zmogljivost in razširljivost}
 \section{Prednosti in omejitve}
@@ -751,7 +1008,15 @@ Konsenzni rezultat je tisti, ki ga uporabi večina akterjev v sistemu, saj preds
 \section{Nadaljnje raziskave}
 
 \appendix
-\chapter{Shema ontologije in SWRL pravila}
+\chapter{OWL ontologija dobavne verige}
+\label{app:trust-ontology}
+\lstinputlisting[
+  language=XML,
+  caption={OWL ontologija za model zaupanja v farmacevtski verigi},
+  breaklines=true,
+  label={lst:trust-ontology}
+]{ontologies/pharma-trust.owl}
+
 \chapter{Izvlečki kode pametnih pogodb}
 
 %----------------------------------------------------------------
