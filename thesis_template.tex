@@ -753,88 +753,87 @@ Konsenzni rezultat je tisti, ki ga uporabi večina akterjev v sistemu, saj preds
 Preden predstavimo konkretne scenarije uporabe, najprej opišemo, kako je postavljen eksperimentalni sistem. Vse komponente zaganjamo z orodjem \texttt{Docker}, kar nam zagotavlja ponovljivo okolje in jasno ločitev med posameznimi storitvami. S tem zmanjšamo odvisnost od lokalne konfiguracije in omogočimo, da sistem testiramo kakor, da bi bile vse komponente že nameščene v oblaku.
 
 \subsubsection{Vsebniki in omrežje}
-Sistem sestavlja več vsebnikov Docker, ki so povezani v skupno virtualno omrežje in delujejo z orodjem \texttt{Docker Compose}. V nadaljevanju so opisani posamezni vsebniki in njihove vloge.
+Sistem sestavlja več vsebnikov Docker, ki so povezani v skupno virtualno omrežje in delujejo z orodjem \texttt{Docker Compose}. V sekciji \ref{subsec:algoritmi-orakljev} so opisani posamezni vsebniki in načini ocenjevanja zaupanja za vsak orakelj.
 
 \paragraph{Veriga blokov} Prvi vsebnik vsebuje testno Ethereum omrežje s pomočjo orodja Anvil. Na njem namestimo  pametno pogodbo \texttt{TrustGraph.sol}. Na omrežju takoj dobimo tudi 10 prednastavljenih računov z velikimi količinami testnih ETH kovancev, ki jih oraklji in agregator uporabljajo za plačevanje transakcijskih stroškov. Zato prve račune dodelimo agregatorju in orakljem. Potrebujemo tudi en račun za namestitev pametne pogodbe dodelimo le tega regulatorju EMA, kateri bo imel potem tudi pravico do sprožanja novih izračunov zaupanja.
 
-\paragraph{Baza znanja} V vsebniku Fuseki je naložena domenska ontologija. Ta je dostopna preko SPARQL končne točke, ki jo oraklji uporabljajo za pridobivanje semantičnih lastnosti akterjev. V eksperimentalnem okolju uporabljamo ontologijo, ki ga vsi oraklji delijo. Ontologija je predstavljena v prilogi \ref{app:trust-ontology}.
+\paragraph{Baza znanja} V vsebniku Fuseki je naložena domenska ontologija. Ta je dostopna preko SPARQL končne točke, ki jo oraklji uporabljajo za pridobivanje semantičnih lastnosti akterjev. V eksperimentalnem okolju uporabljamo ontologijo, ki ga vsi oraklji delijo. Celotna ontologija, uporabljena za scenarije, je na voljo v prilogi \ref{app:trust-ontology}.
 
-\paragraph{Oraklji} Za evalvacijo smo pripravili tri neodvisne oraklje, ki izvajajo različne politike izračuna zaupanja. Vsak orakelj teče v svojem vsebniku Docker in je konfiguriran z ločeno datoteko, ki določa pravila ocenjevalca, nabor vhodnih podatkov ter težo posameznih kriterijev. Oraklji so implementirani v Pythonu in uporabljajo knjižnice za dostop do verige blokov (web3.py), baze znanja (rdflib, SPARQLWrapper) ter za kriptografske operacije.
+\paragraph{Oraklji} Za evalvacijo smo pripravili tri neodvisne oraklje, ki izvajajo svoje politike izračuna zaupanja. Vsak orakelj teče v svojem vsebniku Docker in je konfiguriran z ločeno datoteko, ki določa pravila ocenjevalca, nabor vhodnih podatkov ter težo posameznih kriterijev. Oraklji so implementirani v Pythonu in uporabljajo knjižnice za dostop do verige blokov (web3.py), baze znanja (rdflib, SPARQLWrapper) ter za kriptografske operacije. V sekciji \ref{subsec:algoritmi-orakljev} so podrobneje predstavljeni algoritmi izračuna zaupanja za vsak orakelj.
 
-\paragraph{Agregator}, ki zbira poročila posameznih orakljev, preverja njihove podpise in objavi končno odločitev v pametni pogodbi na verigi.
+\paragraph{Agregator} Zbiranje poročil posameznih orakljev teče v vsebniku agregatorja. Ta preverja njihove podpise in objavi končno odločitev v pametni pogodbi na verigi. Tudi agregator je implementiran v Pythonu in uporablja podobne knjižnice kot oraklji.
 
 \paragraph{Odjemalska aplikacija}, ki v našem primeru nastopa kot ukazna vrstica oziroma skripta, s katero sprožimo zahtevo za izračun zaupanja in kasneje preberemo rezultat z verige. V realnem primeru bi bil to lahko npr. spletni vmesnik ali integracija v obstoječi ERP sistem akterja.
 
-Kontejnerji si delijo notranje Docker omrežje, zato med seboj komunicirajo preko stabilnih DNS imen (npr.\ \texttt{fuseki:3030}, \texttt{ethereum-node:8545}).
-
-\paragraph{Konfiguracija orakljev}
-Vsi oraklji uporabljajo isti paket knjižnic za dostop do baze znanja, verige blokov in za kriptografske operacije, razlikujejo pa se v konfiguraciji in politikah izračuna zaupanja. Vsak orakelj ima svojo konfiguracijsko datoteko, v kateri so zapisani:
-\begin{itemize}
-    \item referenca na \emph{skupno bazo znanja} (isti Fuseki dataset),
-    \item nabor \emph{poverilnic in dokazov} (VC), ki jih pri izračunu obravnava kot vhod,
-    \item \emph{pravila in uteži} za posamezne kriterije zaupanja.
-\end{itemize}
-
-S tem modeliramo, da v omrežju sodelujejo neodvisni evalvatorji, ki uporabljajo različne poglede na iste podatke. Na primer, v tipični konfiguraciji:
-\begin{itemize}
-    \item prvi orakelj poudarja regulatorni vidik in daje večjo težo veljavnim certifikatom in regulatornim odločbam,
-    \item drugi orakelj se osredotoča na operativno zanesljivost, kjer imajo večjo težo incidenti pri transportu, temperaturna odstopanja in zanesljivost IoT senzorjev,
-    \item tretji orakelj kombinira zgodovino sodelovanja med akterji in pretekle odločitve o zaupanju ter tako deluje bolj reputacijsko usmerjeno.
-\end{itemize}
+Kontejnerji si delijo notranje Docker omrežje, zato med seboj komunicirajo preko domen DNS (\texttt{fuseki:3030}, \texttt{ethereum-node:8545}).
 
 Agregator pri združevanju rezultatov ne pozna podrobnosti posameznih politik. Vsako poročilo obravnava kot podpisano izjavo oraklja, ki vsebuje identifikator subjekta, numerično oceno zaupanja, diskretno odločitev (npr.\ \emph{zaupanja vreden} ali \emph{nezaupanja vreden}) ter morebitne zastavice. Na osnovi konfiguriranega praga in števila prejetih poročil izračuna končno odločitev, ki jo zapiše v pametno pogodbo.
 
-\paragraph{Povzetek konfiguracije.}
-Tabela~\ref{tab:eksperimentalna-konfiguracija} povzema ključne parametre eksperimentalne postavitve, ki jih v nadaljevanju uporabljamo v obeh scenarijih.
+\paragraph{Telemetrijski podatki}
+Poleg ontologije in preverljivih poverilnic sistem uporablja tudi agregirane
+telemetrijske metrike za izbrane transporterje. V eksperimentalnem okolju so
+te metrike zapisane v JSON datoteki \texttt{state/telemetry\_metrics.json}:
 
-\begin{table}[H]
-    \centering
-    \caption{Povzetek eksperimentalne konfiguracije sistema.}
-    \label{tab:eksperimentalna-konfiguracija}
-    \begin{tabular}{ll}
-        \hline
-        Parameter & Vrednost \\
-        \hline
-        Okolje verige blokov & lokalni testnet (Docker kontejner) \\
-        Naslov pametne pogodbe \texttt{TrustGraph.sol} & \texttt{0x\ldots{}} (primer v prilogi) \\
-        Baza znanja & Apache Jena Fuseki, en dataset \\
-        Število orakljev & 3 (različne politike zaupanja) \\
-        Agregacija poročil & prag soglasja (npr.\ večina) \\
-        Odjemalski vmesnik & Python skripta / ukazna vrstica \\
-        \hline
-    \end{tabular}
-\end{table}
+\begin{verbatim}
+{
+  "http://example.org/trust#DHL": {
+    "tempDeviation": 0.02,
+    "lateDeliveries": 0.01,
+    "alerts": 0
+  },
+  "http://example.org/trust#MedLogix": {
+    "tempDeviation": 0.03,
+    "lateDeliveries": 0.02,
+    "alerts": 0
+  },
+  "http://example.org/trust#UPS": {
+    "tempDeviation": 0.04,
+    "lateDeliveries": 0.03,
+    "alerts": 1
+  },
+  "http://example.org/trust#AcmeTransport": {
+    "tempDeviation": 0.08,
+    "lateDeliveries": 0.05,
+    "alerts": 3
+  }
+}
+\end{verbatim}
+
+V prototipu so vrednosti zapisane statično in služijo kot simulacija. V realnem okolju bi enak format predstavljal projekcijo podatkov iz zunanjih sistemov (npr.\ transportnega informacijskega sistema, IoT senzorjev povezanih na verigo, itn.), ki bi jih oraklji periodično brali prek API-jev ali sporočilnih vodil in na njihovi podlagi sproti posodabljali oceno zaupanja.
+
 \subsection{Algoritmi izračuna zaupanja v orakljih}
 \label{subsec:algoritmi-orakljev}
 
 V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili različne pristope k upravljanju zaupanja v razpršenih sistemih: dokazne modele, priporočilne modele, porazdeljeno ocenjevanje ter dinamično posodabljanje zaupanja. Ti koncepti tvorijo teoretično podlago za zasnovo naših orakljev. V nadaljevanju pokažemo, kako vsak orakelj uteleša drugačen pogled na zaupanje:
 \begin{itemize}
-    \item Pfizerjev orakelj uporablja hibridni pristop, ki kombinira dokazne elemente (licence, certifikati) z dinamično metriko, podobno priporočilnim in porazdeljenim modelom.
-    \item Orakelj Moderna je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi verifiable credentials, podobno kot hierarhični in PGP-sistemi iz podpoglavja o dokaznih modelih.
-    \item Orakelj DHL je \emph{telemetrijsko usmerjen} in se osredotoča na dinamično posodabljanje zaupanja preko operativnih metrik, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
+    \item \textbf{Orakelj A} uporablja hibridni pristop, ki kombinira dokazne elemente (licence, certifikati) z dinamično metriko, podobno priporočilnim in porazdeljenim modelom.
+    \item \textbf{Orakelj B} je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi preverljivih poverilnic, podobno kot hierarhični in PGP-sistemi iz podpoglavja o dokaznih modelih.
+    \item \textbf{Orakelj C} je \emph{telemetrijsko usmerjen} in se naslanja na dinamično posodabljanje zaupanja preko operativnih metrik, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
 \end{itemize}
+
+Čeprav so v prototipu algoritmi implementirani v isti kodni bazi, jih v nadaljevanju obravnavamo kot tri samostojne oraklje, od katerih ima vsak svoj lastni algoritem izračuna zaupanja.
 
 \subsubsection*{Skupna struktura izračuna}
 
 Ne glede na specifičen pogled vsak orakelj za dani subjekt izračuna:
 \begin{enumerate}
     \item deterministični del (pravila iz politik),
-    \item probabilistični del (številčna ocena),
+    \item verjetnostni del (številska verjetnostna ocena),
     \item kombinirano odločitev.
 \end{enumerate}
 
-\paragraph{Deterministični del}
-Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih datotekah (\texttt{policy.json}). V njih so za posamezne tipe subjektov (proizvajalec, distributer, transporter) definirani kriteriji in pragovi, npr.\:
+\paragraph{Deterministični del.}
+Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih datotekah (\texttt{policy.json}). V njih so za posamezne tipe subjektov (proizvajalec, distributer, transporter) definirani kriteriji in pragovi, na primer:
 \begin{itemize}
     \item \texttt{hasDeliveryPunctuality} $\geq 0{,}99$,
     \item \texttt{hasTempViolationRate} $\leq 0{,}05$,
     \item \texttt{hasAuditScore} $\geq 0{,}90$,
     \item \texttt{hasGDPVC} $=$ \texttt{true}.
 \end{itemize}
-Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najbližje \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in trdih pragov.
+Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najbližje \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
 
-\paragraph{Probabilistični del}
-Probabilistični del pretvori iste kriterije v numerični score v intervalu $[0,1]$, ki ga orakelj kasneje pretvori v basis points (0--10000). Za vsak kriterij se vodi Beta posterior, ki se posodablja po principu eksponentno uteženega drsečega povprečja (EWMA). S tem približamo obnašanje modelom iz podpoglavij o priporočilnih modelih in dinamičnem posodabljanju zaupanja.
+\paragraph{Verjetnostni del.}
+Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke (angl.\ \emph{basis points}, 0--10000). Za vsak kriterij se vodi Beta posterior, ki se posodablja po principu eksponentno uteženega drsečega povprečja (EWMA). S tem se približamo obnašanju modelov iz podpoglavij o priporočilnih modelih in dinamičnem posodabljanju zaupanja.
 
 Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve Beta sta:
 \[
@@ -843,27 +842,27 @@ Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednost
 \]
 kjer je v implementaciji uporabljena lestvica $\textit{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost Beta porazdelitve $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko, a ne absolutno zaupanje.
 
-Ob novih opazovanjih se posterior posodablja z EWMA faktorjem $\gamma \approx 0{,}2$, kar zagotavlja, da nove informacije hitreje vplivajo na score, stare pa postopoma izgubijo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
+Pri novih opazovanjih posterior posodobimo z uporabo EWMA faktorja $\gamma \approx 0{,}2$, tako da nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
 
-\paragraph{Kombinirana odločitev}
-Za posamezen subjekt se probabilistični score izračuna kot uteženo povprečje srednjih vrednosti Beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
+\paragraph{Kombinirana odločitev.}
+Za posamezen subjekt se verjetnostna ocena izračuna kot uteženo povprečje srednjih vrednosti Beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
 \[
     \sum_i w_i = 1, \qquad w_i \geq 0.
 \]
 
-Vsak orakelj uporablja svoj prag \textit{prob\_threshold}, ki ga izražamo na lestvici 0--1 (v implementaciji pa v basis points). Kombinirana odločitev ima obliko:
+Vsak orakelj uporablja svoj prag \textit{verjetnostne ocene}, $\textit{prob\_threshold}$, ki ga izražamo na lestvici 0--1 (v implementaciji pa v osnovnih točkah). Kombinirana odločitev ima obliko:
 \[
     \textit{combined} = \textit{deterministic} \;\text{OR}\; \left(\textit{prob\_score} \geq \textit{prob\_threshold}\right),
 \]
-kjer je \textit{deterministic} deterministična odločitev (\emph{PASS}/\emph{FAIL}), \textit{prob\_score} pa izračunani probabilistični score. Na ta način se trda pragovna pravila (dokazni pogled) kombinirajo z mehko, numerično oceno, ki je bližje priporočilnim in porazdeljenim modelom zaupanja.
+kjer je \textit{deterministic} deterministična odločitev (\emph{PASS}/\emph{FAIL}), \textit{prob\_score} pa izračunana verjetnostna ocena. Na ta način se trda pragovna pravila (dokazni pogled) kombinirajo z mehko, številsko oceno, ki je bližje priporočilnim in porazdeljenim modelom zaupanja.
 
 V nadaljevanju opišemo konkretne konfiguracije in primere za tri oraklje, ki utelešajo različne pristope iz poglavja~\ref{sec:trust-management-distributed-systems}.
 
-\subsubsection*{Pfizer orakelj (hibridni pogled)}
+\subsubsection*{Orakelj A (hibridni pogled)}
 
-Pfizerjev orakelj uporablja hibridni pogled, ki združuje regulatorne kriterije, kakovost delovanja in informacije iz verifiable credentials. S tem v praksi kombinira dokazni model (digitalna dokazila, licence) z dinamičnim ocenjevanjem in uteženjem kriterijev preko Beta posteriorjev. Njegov prag za probabilistični score je nastavljen na:
+Orakelj A uporablja hibridni pogled, ki združuje regulatorne kriterije, kakovost delovanja in informacije iz preverljivih poverilnic. S tem v praksi kombinira dokazni model (digitalna dokazila, licence) z dinamičnim ocenjevanjem in uteženjem kriterijev preko Beta posteriorjev. Njegov prag za verjetnostno oceno je nastavljen na:
 \[
-    \textit{prob\_threshold}^{(\text{Pfizer})} = 0{,}75.
+    \textit{prob\_threshold}^{(\text{A})} = 0{,}75.
 \]
 
 \paragraph{Kriteriji in uteži.}
@@ -886,26 +885,26 @@ Za posamezne tipe subjektov uporablja naslednje kriterije in uteži:
 \end{itemize}
 
 \paragraph{Primer: MedLogix (distributer).}
-Za distributerja MedLogix v trenutni ontologiji velja \texttt{license=true} in \texttt{GDPVC=true}. Deterministični del zato vrne \emph{PASS}. Oba kriterija imata visoko zaželenost, zato se Beta posteriorja inicializirata z mean $\approx 0{,}91$. Po normalizaciji uteži (približno $0{,}44$ in $0{,}56$) dobimo probabilistični score:
+Za distributerja MedLogix v trenutni ontologiji velja \texttt{license=true} in \texttt{GDPVC=true}. Deterministični del zato vrne \emph{PASS}. Oba kriterija imata visoko zaželenost, zato se Beta posteriorja inicializirata s srednjo vrednostjo približno $0{,}91$. Po normalizaciji uteži (približno $0{,}44$ in $0{,}56$) dobimo verjetnostno oceno:
 \[
     \textit{prob\_score} \approx 0{,}91 \geq 0{,}75.
 \]
 Kombinirana odločitev je:
 \[
-    \textit{combined}^{(\text{Pfizer}, \text{MedLogix})} = \textit{PASS}.
+    \textit{combined}^{(\text{A}, \text{MedLogix})} = \textit{PASS}.
 \]
 
 \paragraph{Primer: SkyFreight (transporter).}
-Za transporterja SkyFreight sta zabeleženi vrednosti \texttt{punctuality} $= 0{,}90$ in \texttt{tempViolationRate} $= 0{,}08$. Deterministični pogoji niso izpolnjeni, ker $0{,}90 < 0{,}99$ in $0{,}08 > 0{,}05$, zato deterministični del vrne \emph{FAIL}. Tudi normalizirana zaželenost $s_0$ za oba kriterija je nizka, kar vodi v nizek Beta mean in probabilistični score $\textit{prob\_score} < 0{,}75$. Končna odločitev oraklja je:
+Za transporterja SkyFreight sta zabeleženi vrednosti \texttt{punctuality} $= 0{,}90$ in \texttt{tempViolationRate} $= 0{,}08$. Deterministični pogoji niso izpolnjeni, ker $0{,}90 < 0{,}99$ in $0{,}08 > 0{,}05$, zato deterministični del vrne \emph{FAIL}. Tudi normalizirana zaželenost $s_0$ za oba kriterija je nizka, kar vodi v nizko srednjo vrednost Beta posteriorja in verjetnostno oceno $\textit{prob\_score} < 0{,}75$. Končna odločitev oraklja je:
 \[
-    \textit{combined}^{(\text{Pfizer}, \text{SkyFreight})} = \textit{FAIL}.
+    \textit{combined}^{(\text{A}, \text{SkyFreight})} = \textit{FAIL}.
 \]
 
-\subsubsection*{Moderna orakelj (VC-centričen pogled)}
+\subsubsection*{Orakelj B (dokazni, VC-centričen pogled)}
 
-Modernin orakelj je zasnovan tako, da v ospredje postavlja verifiable credentials. Konceptualno je najbližje dokaznim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer imata veriga potrdil in kriptografska dokazila ključno vlogo pri inicializaciji zaupanja. Njegov prag za probabilistični score je strožji:
+Orakelj B je zasnovan tako, da v ospredje postavlja preverljive poverilnice. Konceptualno je najbližje dokaznim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer imata veriga potrdil in kriptografska dokazila ključno vlogo pri inicializaciji zaupanja. Njegov prag za verjetnostno oceno je strožji:
 \[
-    \textit{prob\_threshold}^{(\text{Moderna})} = 0{,}8.
+    \textit{prob\_threshold}^{(\text{B})} = 0{,}8.
 \]
 
 \paragraph{Kriteriji in uteži.}
@@ -927,34 +926,34 @@ Glavne kombinacije kriterijev so:
     \end{itemize}
 \end{itemize}
 
-Ključna značilnost je, da brez ustreznih VC odločitev nagiba k \emph{FAIL}, tudi če so druge operativne metrike razmeroma dobre, kar odraža močan poudarek na formalnih dokazih in skladnosti.
+Ključna značilnost je, da brez ustreznih preverljivih poverilnic odločitev nagiba k \emph{FAIL}, tudi če so druge operativne metrike razmeroma dobre, kar odraža močan poudarek na formalnih dokazih in skladnosti.
 
 \paragraph{Primer: MedLogix (distributer).}
-Ker ima MedLogix veljavne VC in licenco, deterministični del vrne \emph{PASS}. Za oba kriterija dobimo Beta mean $\approx 0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
+Ker ima MedLogix veljavne poverilnice in licenco, deterministični del vrne \emph{PASS}. Za oba kriterija dobimo srednjo vrednost Beta posteriorja približno $0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
 \[
     \textit{prob\_score} \approx 0{,}91 \geq 0{,}8,
 \]
 in kombinirana odločitev ostane:
 \[
-    \textit{combined}^{(\text{Moderna}, \text{MedLogix})} = \textit{PASS}.
+    \textit{combined}^{(\text{B}, \text{MedLogix})} = \textit{PASS}.
 \]
 
 \paragraph{Primer: HealthChain (transporter).}
-Za transporterja HealthChain je v bazi znanja zabeležen \texttt{recallRate} $= 0{,}015$, kar deterministično zadošča pogoju \texttt{hasRecallRate} $\leq 0{,}02$ in daje \emph{PASS}. Pri probabilističnem delu pa je zaželenost pri vrednosti blizu zgornje meje nizka (npr.\ $s_0 \approx 0{,}25$), kar vodi v Beta mean približno $0{,}30$ in:
+Za transporterja HealthChain je v bazi znanja zabeležen \texttt{recallRate} $= 0{,}015$, kar deterministično zadošča pogoju \texttt{hasRecallRate} $\leq 0{,}02$ in daje \emph{PASS}. Pri verjetnostnem delu pa je zaželenost pri vrednosti blizu zgornje meje nizka (npr.\ $s_0 \approx 0{,}25$), kar vodi v srednjo vrednost Beta posteriorja približno $0{,}30$ in:
 \[
     \textit{prob\_score} \approx 0{,}30 < 0{,}8.
 \]
 Kombinirana odločitev je zato:
 \[
-    \textit{combined}^{(\text{Moderna}, \text{HealthChain})} = \textit{FAIL},
+    \textit{combined}^{(\text{B}, \text{HealthChain})} = \textit{FAIL},
 \]
-kar ilustrira strožji, VC-centričen pristop: deterministični \emph{PASS} sam po sebi ni zadosten brez visoke probabilistične ocene.
+kar ilustrira strožji, dokazni pristop: deterministični \emph{PASS} sam po sebi ni zadosten brez visoke verjetnostne ocene.
 
-\subsubsection*{DHL orakelj (telemetrija-prvi pogled)}
+\subsubsection*{Orakelj C (telemetrija-prvi pogled)}
 
-DHL-jev orakelj uporablja telemetrijo transporta (časovne serije, agregirane metrike) kot primarni vir informacij. Konceptualno se približa porazdeljenim in dinamičnim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer se zaupanje gradi na osnovi kumulativnih izkušenj in se sproti prilagaja novim dogodkom. Njegov prag za probabilistični score je:
+Orakelj C uporablja telemetrijo transporta (časovne serije, agregirane metrike) kot primarni vir informacij. Konceptualno se približa porazdeljenim in dinamičnim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer se zaupanje gradi na osnovi kumulativnih izkušenj in se sproti prilagaja novim dogodkom. Njegov prag za verjetnostno oceno je:
 \[
-    \textit{prob\_threshold}^{(\text{DHL})} = 0{,}7.
+    \textit{prob\_threshold}^{(\text{C})} = 0{,}7.
 \]
 
 \paragraph{Kriteriji in uteži.}
@@ -974,28 +973,384 @@ Za proizvajalce in distributerje uporablja naslednje kriterije:
 Pri transporterjih ta orakelj v trenutni konfiguraciji ne izračunava ocene, saj zanje ni definiranih kriterijev; v takem primeru subjekt v tem pogledu ni ocenjen.
 
 \paragraph{Primer: BioPharm (proizvajalec).}
-Za proizvajalca BioPharm sta zabeležena \texttt{tempDev} $= 0{,}08$ in \texttt{GDPVC=true}. Oba pogoja sta deterministično izpolnjena (\emph{PASS}), zaželenost je visoka in oba kriterija dobita Beta mean $\approx 0{,}91$. Probabilistični score je zato:
+Za proizvajalca BioPharm sta zabeležena \texttt{tempDev} $= 0{,}08$ in \texttt{GDPVC=true}. Oba pogoja sta deterministično izpolnjena (\emph{PASS}), zaželenost je visoka in oba kriterija dobita srednjo vrednost Beta posteriorja približno $0{,}91$. Verjetnostna ocena je zato:
 \[
     \textit{prob\_score} \approx 0{,}91 \geq 0{,}7,
 \]
 kombinirana odločitev pa:
 \[
-    \textit{combined}^{(\text{DHL}, \text{BioPharm})} = \textit{PASS}.
+    \textit{combined}^{(\text{C}, \text{BioPharm})} = \textit{PASS}.
 \]
 
 \paragraph{Primer: CanaryLabs (proizvajalec).}
-Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \texttt{GDPVC=false}. Deterministični del zato vrne \emph{FAIL}. Ker sta temperaturna odstopanja prevelika in ni VC o skladnosti, je tudi probabilistični score nizek ($\textit{prob\_score} \ll 0{,}7$). Kombinirana odločitev je:
+Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \texttt{GDPVC=false}. Deterministični del zato vrne \emph{FAIL}. Ker sta temperaturna odstopanja prevelika in ni poverilnice o skladnosti, je tudi verjetnostna ocena nizka ($\textit{prob\_score} \ll 0{,}7$). Kombinirana odločitev je:
 \[
-    \textit{combined}^{(\text{DHL}, \text{CanaryLabs})} = \textit{FAIL}.
+    \textit{combined}^{(\text{C}, \text{CanaryLabs})} = \textit{FAIL}.
 \]
 
 \medskip
 
-Takšna predstavitev treh orakljev neposredno gradi na modelih iz poglavja~\ref{sec:trust-management-distributed-systems}: Pfizerjev orakelj uteleša hibridni, semantično in dinamično podprt pristop, Moderna orakelj predstavlja strogo dokazno-kripto\-grafski pogled, DHL orakelj pa dinamično, na meritvah temelječe ocenjevanje. V scenarijih, ki sledijo, bomo za izbranega subjekta pokazali, kako različni algoritmi privedejo do različnih, a razložljivih odločitev o zaupanju.
+Takšna predstavitev treh orakljev neposredno gradi na modelih iz poglavja~\ref{sec:trust-management-distributed-systems}: Orakelj A predstavlja hibridni semantičen in dinamično podprt pristop, Orakelj B predstavlja strogo dokazno-kriptografski pogled, Orakelj C pa dinamično, na meritvah temeljeno ocenjevanje. V scenarijih, ki sledijo, bomo za izbranega subjekta pokazali, kako različni algoritmi privedejo do različnih, a razložljivih odločitev o zaupanju.
 
-\subsection{Scenarij 1: Ocena zaupanja akterja}
+\subsection{Agregacija poročil orakljev}
+\label{subsec:agregator-scenariji}
 
-V prvem scenariju si bomo pogledali, kako v sistemu pridobimo nove vrednosti zaupanja za določenega akterja. Predpostavimo, da želimo posodobiti oceno zaupanja za transportno podjetje \texttt{DHL}, ki sodeluje v naši dobavni verigi.
+V scenarijih, predstavljenih v nadaljevanju, vedno nastopi enak vzorec: za določenega akterja (npr.\ transportno podjetje ali distributerja) pametna pogodba \texttt{TrustGraph.sol} sproži zahtevo po poročilu o zaupanju, oraklji A, B in C izračunajo lastne ocene in jih pošljejo agregatorju, ta pa iz treh poročil izpelje enotno odločitev, ki jo zapiše v verigo blokov.
+
+V opisu scenarijev bomo tabelarično pokazali, kako so posamezne ocene orakljev A, B in C videti pred agregacijo, ter kako je iz njih izpeljana enotna odločitev, ki je na voljo ostalim akterjem v dobavni verigi.
+
+\subsubsection*{Pravila agregacije}
+
+Za dane tri (ali več) veljavnih poročil agregator uporabi preprosta deterministična pravila:
+
+\paragraph{Skupni subjekt in politika}
+Najprej preveri, da:
+\begin{itemize}
+  \item vsa poročila veljajo za istega subjekta (isti zgoščeni identifikator),
+  \item vsa poročila uporabljajo enak povzetek politike (\texttt{policy\_hash}),
+  \item povzetek poverilnic (\texttt{credential\_hash}) ni v nasprotju z
+        lokalno shrambo poverilnic (če ta obstaja).
+\end{itemize}
+Če katero od teh preverjanj pade, agregator poročil ne združi in zahteva v
+scenariju velja za neuspešno.
+
+\paragraph{Diskretna odločitev (da/ne)}
+Vsak orakelj poda diskretno odločitev, ali je subjekt zaupanja vreden ali ne.
+Agregator uporabi preprosto večinsko pravilo:
+\[
+  \text{odločitev} =
+  \begin{cases}
+    \text{true}, & \text{če vsaj dva od treh orakljev poročata \emph{true}},\\
+    \text{false}, & \text{sicer}.
+  \end{cases}
+\]
+V scenarijih to pomeni, da bo subjekt označen kot zaupanja vreden, če se vsaj dva od treh pogledov (hibridni, dokazni, telemetrijski) strinjata, da so pogoji izpolnjeni.
+
+\paragraph{Številčna ocena zaupanja}
+Vsako poročilo vsebuje številčno oceno zaupanja v razponu [0, 10000]. Agregator v trenutni verziji uporablja kar povprečje ocen vseh orakljev.
+
+Povprečje je končna številčna ocena zaupanja, ki se zapiše v pametno
+pogodbo in jo v scenarijih prikazujemo kot \emph{agregirano} vrednost.
+
+\paragraph{Zastavice (flags)}
+Oraklji z zastavicami označijo posebna stanja, npr.\ pomanjkanje podatkov, nizko oceno ali uporabo preklicanih poverilnic. Agregator za vsak posamezen bit zastavice preveri, ali ga nastavi vsaj polovica orakljev. Če je tako, je ta bit nastavljen tudi v skupnem rezultatu. V scenarijih to pomeni, da se opozorila, na katera opozori večina orakljev, prenesejo tudi v končno oceno, opozorila posameznega “osamelca” pa lahko ostanejo samo v njegovem individualnem poročilu.
+
+\subsubsection*{Zapis agregirane odločitve na verigo}
+
+Ko je agregacija uspešna, agregator za dani \texttt{request\_id} izvede klic
+\texttt{fulfillTrustReport} v pametni pogodbi \texttt{TrustGraph.sol}. V
+verigo blokov se zapiše:
+\begin{itemize}
+  \item identifikator subjekta (zgoščena identiteta),
+  \item agregirana diskretna odločitev (zaupanja vreden da/ne),
+  \item agregirana številčna ocena zaupanja,
+  \item agregirane zastavice (večinska opozorila),
+  \item časovni žig in povzetek politike.
+\end{itemize}
+
+V scenarijih, ki sledijo, bomo zato vedno prikazali dva nivoja:
+\begin{enumerate}
+  \item \emph{posamična poročila} orakljev A, B in C (njihove odločitve,
+        ocene in zastavice),
+  \item \emph{agregirano odločitev}, ki jo agregator zapiše na verigo in jo
+        ostali akterji uporabljajo kot referenčno oceno zaupanja za danega
+        subjekta.
+\end{enumerate}
+Tako je jasno razvidno, kako se različni algoritmi (hibridni, dokazni,
+telemetrijski) zlivajo v eno, soglašano oceno, ki je dosegljiva vsem
+udeležencem dobavne verige.
+
+\subsection{Scenarij 1: Ocena zaupanja transporterja DHL}
+\label{subsec:scenarij-1}
+
+V prvem scenariju prikažemo celoten potek ocene zaupanja za konkretnega
+akterja v dobavni verigi: transportno podjetje \texttt{DHL}, ki skrbi za
+prevoz zdravil med proizvajalci, distributerji in lekarnami. Namen scenarija
+je pokazati, kako trije različni pogledi (Orakelj A, B in C) vodijo do
+deloma različnih rezultatov in kako agregator iz njih izpelje enotno, na
+verigi zapisano odločitev.
+
+\subsubsection*{Opis izhodišča}
+
+Za subjekt \texttt{DHL} v trenutni konfiguraciji veljajo naslednja dejstva:
+\begin{itemize}
+  \item v ontologiji je označen kot \emph{transporter},
+  \item za njega obstaja veljavna preverljiva poverilnica skladnosti (VC), kar
+        je razvidno iz neničelnega povzetka poverilnic
+        (\texttt{credential\_hash}),
+  \item poverilnica je shranjena v skupnem repozitoriju VC na strežniku, do
+        katerega imajo dostop vsi oraklji,
+  \item telemetrijske metrike kažejo visoko pravočasnost dostav in sprejemljiva
+        temperaturna odstopanja v hladni verigi.
+\end{itemize}
+
+Na tej osnovi:
+\begin{itemize}
+  \item Orakelj A (hibridni model) kombinira ontologijo, politike in VC ter
+        pri \texttt{DHL} zazna nekaj slabših kazalnikov (zato vrne precej
+        nižjo številčno oceno kot preostala oraklja, odločitev pa ostane negativna).
+  \item Orakelj B (dokazni, VC model) se nasloni skoraj izključno
+        na prisotnost veljavne poverilnice (ki je dostopna vsem orakljem) in
+        \texttt{DHL} oceni zelo visoko.
+  \item Orakelj C (telemetrija) uporablja predvsem telemetrijo in
+        kombinacijo kazalnikov točnosti ter temperature in vrne pozitivno
+        odločitev z visoko, a nekoliko nižjo oceno kot Orakelj B.
+\end{itemize}
+
+\subsubsection*{Potek izvedbe scenarija}
+
+Scenarij se izvede v naslednjih korakih:
+
+\begin{enumerate}
+  \item \textbf{Sprožitev zahteve za poročilo.}
+        Regulator ali drug pooblaščen akter za transporterja \texttt{DHL}
+        sproži zahtevo za poročilo o zaupanju. V prototipu to izvedemo z
+        ukazom, ki prek skripte pošlje transakcijo
+        \texttt{requestTrustReport} pametni pogodbi \texttt{TrustGraph.sol}.
+        Pogodba pri tem ustvari nov identifikator zahteve
+        \texttt{request\_id} in izda dogodek \texttt{Trust\-Oracle\-Requested}.
+  \item \textbf{Izračun poročil v orakljih.}
+        Oraklji A, B in C spremljajo dogodke pametne pogodbe. Ko prejmejo
+        dogodek za nov \texttt{request\_id} in subjekt \texttt{DHL}, osvežijo
+        ontologijo, naložijo VC iz skupnega repozitorija in telemetrijo ter
+        izvedejo svoje algoritme:
+        \begin{itemize}
+          \item Orakelj A (hibridni) uporabi politike in semantične podatke ter
+                za \texttt{DHL} izračuna negativno odločitev z nizko oceno.
+          \item Orakelj B (VC-centričen) preveri veljavnost poverilnice in
+                subjekt oceni zelo visoko, brez opozoril.
+          \item Orakelj C (telemetrija-prvi) na podlagi telemetrijskih metrik
+                izračuna pozitivno odločitev in visoko oceno, ki odraža
+                dobro operativno delovanje.
+        \end{itemize}
+        Vsak orakelj pripravi podpisano poročilo \texttt{SignedOracleReport}.
+  \item \textbf{Pošiljanje poročil agregatorju.}
+        Oraklji pošljejo svoja podpisana poročila agregatorju preko HTTP
+        vmesnika \texttt{/reports}. Agregator preveri podpise in identitete
+        vozlišč ter poročila začasno shrani pod isti \texttt{request\_id}.
+  \item \textbf{Agregacija rezultatov.}
+        Ko agregator za dani \texttt{request\_id} prejme poročila vseh treh
+        orakljev, uporabi pravila agregacije iz
+        podpoglavja~\ref{subsec:agregator-scenariji}: večinsko glasovanje
+        za diskretno odločitev, povprečje za številčno oceno ter večinsko
+        pravilo za zastavice.
+  \item \textbf{Zapis končne odločitve na verigo.}
+        Agregator pokliče funkcijo \texttt{fulfillTrustReport} v pametni
+        pogodbi in za \texttt{DHL} zapiše končno odločitev in številčno
+        oceno zaupanja, ki sta od takrat naprej vidni vsem udeležencem
+        sistema.
+\end{enumerate}
+
+\subsubsection*{Dejanski rezultati orakljev in agregatorja}
+
+Tabela~\ref{tab:scenarij1-dhl} prikazuje dejanske rezultate poročil orakljev
+A, B in C ter agregatorja za subjekt \texttt{DHL}. Vrednosti so izražene v
+osnovnih točkah (0--10000).
+
+\begin{table}[ht]
+  \centering
+  \caption{Rezultati orakljev A, B in C ter agregatorja za scenarij 1 (transporter DHL).}
+  \label{tab:scenarij1-dhl}
+  \begin{tabularx}{\textwidth}{l X c c c}
+    \hline
+    Vir & Tip algoritma & Odločitev & Številčna ocena & Zastavice \\
+    \hline
+    Orakelj A & hibridni      & \emph{FAIL} & 2382 & 0x00 \\
+    Orakelj B & dokazni (VC)  & \emph{PASS} & 9500 & 0x00 \\
+    Orakelj C & telemetrija   & \emph{PASS} & 8879 & 0x00 \\
+    Agregator & agregirano    & \emph{PASS} & 6920 & 0x00 \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+Interpretacija posameznih poročil:
+
+\begin{itemize}
+  \item \textbf{Orakelj A} vrne negativno odločitev (\emph{FAIL}) z nizko
+        oceno $2382$ in brez zastavic (\texttt{0x00}). Hibridni pogled na
+        podlagi politik in semantičnih podatkov subjekt ocenjuje previdno,
+        vendar iz same vrednosti ne izpelje dodatnega opozorila.
+  \item \textbf{Orakelj B} vrne pozitivno odločitev (\emph{PASS}) z zelo
+        visoko oceno $9500$ in brez zastavic (\texttt{0x00}). Ker ima
+        \texttt{DHL} veljavno preverljivo poverilnico v skupnem repozitoriju
+        VC, VC-centričen algoritem oceni, da so formalni pogoji za zaupanje
+        izpolnjeni.
+  \item \textbf{Orakelj C} vrne pozitivno odločitev (\emph{PASS}) z visoko
+        oceno $8879$ in brez zastavic. Telemetrijske metrike (pravočasne
+        dostave, stabilna temperatura) kažejo dobro operativno delovanje, zato
+        telemetrijsko usmerjen pogled subjekt oceni kot zaupanja vreden.
+\end{itemize}
+
+Agregator iz teh treh poročil izvede:
+
+\begin{itemize}
+  \item \textbf{Diskretna odločitev.} Dva od treh orakljev (B in C) poročata
+        \emph{PASS}, eden (A) poroča \emph{FAIL}. Po večinskem pravilu je
+        končna odločitev \emph{PASS} – subjekt \texttt{DHL} je v agregiranem
+        pogledu ocenjen kot zaupanja vreden.
+  \item \textbf{Številčna ocena.} Ocene treh orakljev so $2382$, $8879$ in
+        $9500$. Aritmetična sredina teh treh vrednosti je približno $6920$,
+        zato agregator zapiše končno oceno zaupanja $6920/10000$.
+  \item \textbf{Zastavice.} Noben orakelj ne nastavi opozorilnih zastavic,
+        zato agregator po večinskem pravilu ohrani vrednost \texttt{0x00}.
+        V tem scenariju končni rezultat ne vsebuje globalnih opozoril in
+        predstavlja “čist” pozitiven zapis.
+  \item \textbf{Politike in poverilnice.} Vsa tri poročila uporabljajo
+        enak \texttt{credential\_hash}, kar pomeni, da se sklicujejo na isto
+        preverljivo poverilnico iz skupnega repozitorija VC. Agregator pri tem
+        preveri, da poverilnica v lokalni shrambi ni označena kot preklicana.
+\end{itemize}
+
+Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
+poizvedbi nad \texttt{TrustGraph.sol} za subjekt \texttt{DHL} dobijo informacijo,
+da je transporter trenutno označen kot zaupanja vreden (\emph{PASS}) z
+agregirano številčno oceno zaupanja približno $6920/10000$ in brez globalnih
+opozoril. Če želijo razumeti razloge za razhajanje med pogledi, lahko pregledajo
+posamične on-chain zapise orakljev A, B in C in vidijo, da hibridni pogled
+Oraklja A subjekt ocenjuje previdneje, medtem ko dokazni in telemetrijski
+pogled ocenjujeta, da je transporter glede na preverljive poverilnice in
+operativne kazalnike dovolj zaupanja vreden.
+\subsection{Scenarij 2: Poslabšanje zaupanja po incidentih transporterja DHL}
+\label{subsec:scenarij-2}
+
+V drugem scenariju nadaljujemo primer transporterja \texttt{DHL} iz
+scenarija~\ref{subsec:scenarij-1}, vendar predpostavimo, da se v naslednjem
+obdobju zgodi več incidentov v dostavni verigi. Namen scenarija je pokazati,
+kako sistem dinamično prilagodi oceno zaupanja na podlagi novih podatkov in
+kako semantični ter telemetrijski signali lahko pretehtajo formalna dokazila
+(VC). Pri tem posebej poudarimo, da bi v realnem okolju ti podatki prihajali
+iz zunanjih sistemov, do katerih ima vsak orakelj svoj, ne nujno enak dostop.
+
+\subsubsection*{Spremembe v telemetriji in zunanjih virih}
+
+Simuliramo, da se je v opazovanem obdobju povečalo število poznih dostav in odstopanj v senzorskih meritvah. V prototipu to predstavimo kot spremembo zapisa v datoteki z metrikami telemetrije:
+
+\begin{verbatim}
+"http://example.org/trust#DHL": {
+  "tempDeviation": 0.12,
+  "lateDeliveries": 0.12,
+  "alerts": 2
+},
+\end{verbatim}
+
+V ontologiji in repozitoriju VC subjekt \texttt{DHL} ostane enak kot v
+scenariju 1: še vedno ima veljavno preverljivo poverilnico skladnosti in
+status transporterja. Spremeni se torej le operativni del – telemetrija.
+
+V realnem sistemu tak zapis ne bi bil lokalna JSON datoteka, temveč
+projekcija zunanjih podatkov:
+\begin{itemize}
+  \item meritve iz IoT senzorjev (temperature, šok, vlaga) v hladni verigi,
+  \item zapisi iz transportnega informacijskega sistema (TMS) o zamudah,
+  \item alarmi iz nadzornih sistemov ali sistemov za kakovost.
+\end{itemize}
+Vsak orakelj bi bil konfiguriran z lastnimi adapterji do takih virov (npr.\
+API-ji, sporočilni sistemi, podatkovna jezera). Nekaterim orakljem (npr.\
+telemetrijskemu) so ti podatki ključni, drugi (npr.\ VC-centrični) jih
+namerno ignorirajo ali jim dajejo zelo majhno težo. V prototipu te
+razlike modeliramo z različnimi algoritmi orakljev A, B in C nad istim
+simuliranim telemetrijskim virom.
+
+\subsubsection*{Novi izračuni orakljev}
+
+Na podlagi spremenjenih podatkov oraklji ponovno izvedejo svoje algoritme
+in pripravijo nova podpisana poročila. Rezultati so:
+
+\begin{table}[ht]
+  \centering
+  \caption{Rezultati orakljev A, B in C ter agregatorja za scenarij 2 (transporter DHL).}
+  \label{tab:scenarij2-dhl}
+  \begin{tabularx}{\textwidth}{l X c c c}
+    \hline
+    Vir & Tip algoritma & Odločitev & Številčna ocena & Zastavice \\
+    \hline
+    Orakelj A & hibridni      & \emph{FAIL} & 2382 & 0x02 \\
+    Orakelj B & dokazni (VC)  & \emph{PASS} & 9500 & 0x00 \\
+    Orakelj C & telemetrija   & \emph{FAIL} & 6920 & 0x02 \\
+    Agregator & agregirano    & \emph{FAIL} & 6267 & 0x02 \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+Interpretacija posameznih poročil:
+
+\begin{itemize}
+  \item \textbf{Orakelj A} (hibridni model) ostane negativen (\emph{FAIL}) z
+        nizko oceno $2382$. Zastavica \texttt{0x02} označuje, da je ocena
+        pod notranjim pragom (\emph{nizka ocena}). V realnem okolju bi ta
+        orakelj poleg ontologije in VC bral tudi izbran nabor zunanjih
+        podatkov (npr.\ regulatorne incidente, povzetke revizij, agregirane
+        metrike kakovosti) in jih semantično povezal v končno oceno.
+  \item \textbf{Orakelj B} (dokazni, VC model) se opira predvsem na
+        preverljivo poverilnico, ki je še vedno veljavna. Odločitev ostane
+        pozitivna (\emph{PASS}) z zelo visoko oceno $9500$ in brez
+        zastavic (\texttt{0x00}). V realnem scenariju bi ta orakelj tipično
+        bral samo iz infrastrukture za digitalna dokazila (npr.\ veriga
+        blokov z VC, revokacijski registri) in ne bi bil neposredno
+        povezan z operativno telemetrijo.
+  \item \textbf{Orakelj C} (telemetrija) neposredno zazna poslabšanje
+        operativnih metrik. Pri novih vrednostih
+        \texttt{lateDeliveries} $= 0{,}12$ in \texttt{tempDeviation} $= 0{,}12$
+        so \emph{točnost} in \emph{temperaturna stabilnost} le še približno
+        $0{,}88$, število alarmov pa se poveča na $2$. Po vgrajeni formuli
+        za oceno
+        \[
+          \text{base\_score} =
+           0{,}6 \cdot 0{,}88 + 0{,}3 \cdot 0{,}88 - 0{,}05 \cdot 2 \approx 0{,}692,
+        \]
+        kar daje številčno oceno $6920/10000$. Ker je ocena
+        pod pragom in je število alarmov $\geq 2$, orakelj C spremeni
+        odločitev v \emph{FAIL} in nastavi zastavico \texttt{0x02}
+        (nizka ocena). V realnem sistemu bi ta orakelj poslušal neposredno tokove telemetrije in iz njih sproti gradil
+        oceno zaupanja.
+\end{itemize}
+
+\subsubsection*{Agregirana odločitev po incidentih}
+
+Agregator v tem scenariju združi poročila tako kot v
+scenariju~\ref{subsec:scenarij-1}: uporabi večinsko glasovanje za diskretno
+odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
+
+\begin{itemize}
+  \item \textbf{Diskretna odločitev.} Orakelj A in C poročata
+        \emph{FAIL}, Orakelj B poroča \emph{PASS}. Dva od treh orakljev sta
+        negativna, zato je agregirana odločitev \emph{FAIL}. Z vidika
+        sistema je \texttt{DHL} po incidentih označen kot nezaupanja vreden.
+  \item \textbf{Številčna ocena.} Ocene treh orakljev so $2382$, $9500$ in
+        $6920$. Aritmetična sredina je približno $6267$, kar je nova
+        agregirana številčna ocena zaupanja:
+        \[
+          \frac{2382 + 9500 + 6920}{3} \approx 6267.
+        \]
+        Ocena je bistveno nižja kot v prvem scenariju (kjer je znašala
+        približno $6920$), kar odraža vpliv poslabšanih operativnih metrik.
+  \item \textbf{Zastavice} Oraklja A in C nastavljata zastavico
+        \texttt{0x02} (\emph{nizka ocena}), Orakelj B pa zastavic ne
+        nastavlja. Ker ima ta bit nastavljena večina orakljev, agregator
+        v končnem rezultatu prav tako nastavi \texttt{0x02}. Agregirani
+        zapis tako ne le označi subjekt kot nezaupanja vreden, temveč
+        tudi razloži razlog: nizka številčna ocena, pod pragom sprejemljive
+        ravni.
+  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo
+        enak \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo
+        na isto veljavno preverljivo poverilnico. Agregator pri tem preveri,
+        da poverilnica v lokalni shrambi ni označena kot preklicana. To
+        pomeni, da je sprememba ocene iz \emph{PASS} (scenarij 1) v
+        \emph{FAIL} (scenarij 2) posledica izključno poslabšanja
+        operativnih metrik in zunanjih podatkov, ne pa spremembe
+        formalnih dokazil.
+\end{itemize}
+
+Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
+poizvedbi nad \texttt{TrustGraph.sol} za subjekt \texttt{DHL} dobijo informacijo,
+da je transporter po novih incidentih označen kot nezaupanja vreden
+(\emph{FAIL}) z agregirano številčno oceno zaupanja približno
+$6267/10000$ in z zastavico \texttt{0x02}, ki označuje nizko oceno.
+Primerjava scenarijev~\ref{subsec:scenarij-1} in~\ref{subsec:scenarij-2}
+jasno pokaže, da sistem ni statičen: isti subjekt se ob poslabšanju
+telemetrije in drugih zunanjih podatkov premakne iz zaupanja vrednega v
+nezaupanja vreden, kljub temu da njegovo preverljivo digitalno potrdilo
+ostane nespremenjeno.
 
 
 \section{Varnostna analiza}
