@@ -368,6 +368,7 @@ Docker je uporabljen izključno za potrebe testiranja med razvojem.
 
 
 \section{Arhitektura sistema}
+\label{sec:arhitektura-sistema}
 Arhitektura razvitega sistema temelji na večplastnem pristopu, ki ločuje podatkovni model, mehanizme izračuna in zapis rezultatov zaupanja. Takšna zasnova omogoča jasne meje med posameznimi odgovornostmi, kar olajša razvoj, testiranje in morebitno razširjanje sistema na druge domene. V okviru magistrske naloge smo zasnovali arhitekturo, ki je dovolj splošna, da jo je mogoče uporabiti v različnih razpršenih okoljih, od farmacevtskih dobavnih verig do pametnih mest.
 
 Osnovna ideja arhitekture je bila, da združimo tri ključne tehnologije: semantični splet, pametne oraklje in verigo blokov. Semantični splet omogoča opis akterjev in njihovih lastnosti v ontološkem grafu. Oraklji predstavljajo računsko plast, kjer posamezni akter izvede oceno zaupanja po svojih pravilih. Veriga blokov pa služi kot zanesljiva in nespremenljiva plast, kjer se hranijo rezultati teh ocen.
@@ -772,7 +773,7 @@ Agregator pri združevanju rezultatov ne pozna podrobnosti posameznih politik. V
 \paragraph{Telemetrijski podatki}
 Poleg ontologije in preverljivih poverilnic sistem uporablja tudi agregirane
 telemetrijske metrike za izbrane transporterje. V eksperimentalnem okolju so
-te metrike zapisane v JSON datoteki \texttt{state/telemetry\_metrics.json}:
+te metrike zapisane v JSON datoteki v naslednji obliki:
 
 \begin{verbatim}
 {
@@ -804,7 +805,7 @@ V prototipu so vrednosti zapisane statično in služijo kot simulacija. V realne
 \subsection{Algoritmi izračuna zaupanja v orakljih}
 \label{subsec:algoritmi-orakljev}
 
-V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili različne pristope k upravljanju zaupanja v razpršenih sistemih: dokazne modele, priporočilne modele, porazdeljeno ocenjevanje ter dinamično posodabljanje zaupanja. Ti koncepti tvorijo teoretično podlago za zasnovo naših orakljev. V nadaljevanju pokažemo, kako vsak orakelj uteleša drugačen pogled na zaupanje:
+V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili različne pristope k upravljanju zaupanja v razpršenih sistemih: dokazne modele, priporočilne modele, porazdeljeno ocenjevanje ter dinamično posodabljanje zaupanja. Ti koncepti tvorijo teoretično podlago za zasnovo naših orakljev. V nadaljevanju pokažemo, kako vsak orakelj uporabi drugačen pogled na zaupanje.
 \begin{itemize}
     \item \textbf{Orakelj A} uporablja hibridni pristop, ki kombinira dokazne elemente (licence, certifikati) z dinamično metriko, podobno priporočilnim in porazdeljenim modelom.
     \item \textbf{Orakelj B} je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi preverljivih poverilnic, podobno kot hierarhični in PGP-sistemi iz podpoglavja o dokaznih modelih.
@@ -822,7 +823,7 @@ Ne glede na specifičen pogled vsak orakelj za dani subjekt izračuna:
     \item kombinirano odločitev.
 \end{enumerate}
 
-\paragraph{Deterministični del.}
+\paragraph{Deterministični del}
 Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih datotekah (\texttt{policy.json}). V njih so za posamezne tipe subjektov (proizvajalec, distributer, transporter) definirani kriteriji in pragovi, na primer:
 \begin{itemize}
     \item \texttt{hasDeliveryPunctuality} $\geq 0{,}99$,
@@ -832,7 +833,7 @@ Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih dat
 \end{itemize}
 Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najbližje \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
 
-\paragraph{Verjetnostni del.}
+\paragraph{Verjetnostni del}
 Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke (angl.\ \emph{basis points}, 0--10000). Za vsak kriterij se vodi Beta posterior, ki se posodablja po principu eksponentno uteženega drsečega povprečja (EWMA). S tem se približamo obnašanju modelov iz podpoglavij o priporočilnih modelih in dinamičnem posodabljanju zaupanja.
 
 Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve Beta sta:
@@ -844,7 +845,7 @@ kjer je v implementaciji uporabljena lestvica $\textit{obs\_scale} = 9$. Za »po
 
 Pri novih opazovanjih posterior posodobimo z uporabo EWMA faktorja $\gamma \approx 0{,}2$, tako da nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
 
-\paragraph{Kombinirana odločitev.}
+\paragraph{Kombinirana odločitev}
 Za posamezen subjekt se verjetnostna ocena izračuna kot uteženo povprečje srednjih vrednosti Beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
 \[
     \sum_i w_i = 1, \qquad w_i \geq 0.
@@ -865,7 +866,7 @@ Orakelj A uporablja hibridni pogled, ki združuje regulatorne kriterije, kakovos
     \textit{prob\_threshold}^{(\text{A})} = 0{,}75.
 \]
 
-\paragraph{Kriteriji in uteži.}
+\paragraph{Kriteriji in uteži}
 Za posamezne tipe subjektov uporablja naslednje kriterije in uteži:
 \begin{itemize}
     \item \textbf{Transporter:}
@@ -884,7 +885,7 @@ Za posamezne tipe subjektov uporablja naslednje kriterije in uteži:
     \end{itemize}
 \end{itemize}
 
-\paragraph{Primer: MedLogix (distributer).}
+\paragraph{Primer: MedLogix (distributer)}
 Za distributerja MedLogix v trenutni ontologiji velja \texttt{license=true} in \texttt{GDPVC=true}. Deterministični del zato vrne \emph{PASS}. Oba kriterija imata visoko zaželenost, zato se Beta posteriorja inicializirata s srednjo vrednostjo približno $0{,}91$. Po normalizaciji uteži (približno $0{,}44$ in $0{,}56$) dobimo verjetnostno oceno:
 \[
     \textit{prob\_score} \approx 0{,}91 \geq 0{,}75.
@@ -894,7 +895,7 @@ Kombinirana odločitev je:
     \textit{combined}^{(\text{A}, \text{MedLogix})} = \textit{PASS}.
 \]
 
-\paragraph{Primer: SkyFreight (transporter).}
+\paragraph{Primer: SkyFreight (transporter)}
 Za transporterja SkyFreight sta zabeleženi vrednosti \texttt{punctuality} $= 0{,}90$ in \texttt{tempViolationRate} $= 0{,}08$. Deterministični pogoji niso izpolnjeni, ker $0{,}90 < 0{,}99$ in $0{,}08 > 0{,}05$, zato deterministični del vrne \emph{FAIL}. Tudi normalizirana zaželenost $s_0$ za oba kriterija je nizka, kar vodi v nizko srednjo vrednost Beta posteriorja in verjetnostno oceno $\textit{prob\_score} < 0{,}75$. Končna odločitev oraklja je:
 \[
     \textit{combined}^{(\text{A}, \text{SkyFreight})} = \textit{FAIL}.
@@ -928,7 +929,7 @@ Glavne kombinacije kriterijev so:
 
 Ključna značilnost je, da brez ustreznih preverljivih poverilnic odločitev nagiba k \emph{FAIL}, tudi če so druge operativne metrike razmeroma dobre, kar odraža močan poudarek na formalnih dokazih in skladnosti.
 
-\paragraph{Primer: MedLogix (distributer).}
+\paragraph{Primer: MedLogix (distributer)}
 Ker ima MedLogix veljavne poverilnice in licenco, deterministični del vrne \emph{PASS}. Za oba kriterija dobimo srednjo vrednost Beta posteriorja približno $0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
 \[
     \textit{prob\_score} \approx 0{,}91 \geq 0{,}8,
@@ -938,7 +939,7 @@ in kombinirana odločitev ostane:
     \textit{combined}^{(\text{B}, \text{MedLogix})} = \textit{PASS}.
 \]
 
-\paragraph{Primer: HealthChain (transporter).}
+\paragraph{Primer: HealthChain (transporter)}
 Za transporterja HealthChain je v bazi znanja zabeležen \texttt{recallRate} $= 0{,}015$, kar deterministično zadošča pogoju \texttt{hasRecallRate} $\leq 0{,}02$ in daje \emph{PASS}. Pri verjetnostnem delu pa je zaželenost pri vrednosti blizu zgornje meje nizka (npr.\ $s_0 \approx 0{,}25$), kar vodi v srednjo vrednost Beta posteriorja približno $0{,}30$ in:
 \[
     \textit{prob\_score} \approx 0{,}30 < 0{,}8.
@@ -956,7 +957,7 @@ Orakelj C uporablja telemetrijo transporta (časovne serije, agregirane metrike)
     \textit{prob\_threshold}^{(\text{C})} = 0{,}7.
 \]
 
-\paragraph{Kriteriji in uteži.}
+\paragraph{Kriteriji in uteži}
 Za proizvajalce in distributerje uporablja naslednje kriterije:
 \begin{itemize}
     \item \textbf{Manufacturer:}
@@ -972,7 +973,7 @@ Za proizvajalce in distributerje uporablja naslednje kriterije:
 
 Pri transporterjih ta orakelj v trenutni konfiguraciji ne izračunava ocene, saj zanje ni definiranih kriterijev; v takem primeru subjekt v tem pogledu ni ocenjen.
 
-\paragraph{Primer: BioPharm (proizvajalec).}
+\paragraph{Primer: BioPharm (proizvajalec)}
 Za proizvajalca BioPharm sta zabeležena \texttt{tempDev} $= 0{,}08$ in \texttt{GDPVC=true}. Oba pogoja sta deterministično izpolnjena (\emph{PASS}), zaželenost je visoka in oba kriterija dobita srednjo vrednost Beta posteriorja približno $0{,}91$. Verjetnostna ocena je zato:
 \[
     \textit{prob\_score} \approx 0{,}91 \geq 0{,}7,
@@ -982,7 +983,7 @@ kombinirana odločitev pa:
     \textit{combined}^{(\text{C}, \text{BioPharm})} = \textit{PASS}.
 \]
 
-\paragraph{Primer: CanaryLabs (proizvajalec).}
+\paragraph{Primer: CanaryLabs (proizvajalec)}
 Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \texttt{GDPVC=false}. Deterministični del zato vrne \emph{FAIL}. Ker sta temperaturna odstopanja prevelika in ni poverilnice o skladnosti, je tudi verjetnostna ocena nizka ($\textit{prob\_score} \ll 0{,}7$). Kombinirana odločitev je:
 \[
     \textit{combined}^{(\text{C}, \text{CanaryLabs})} = \textit{FAIL}.
@@ -1235,26 +1236,21 @@ Simuliramo, da se je v opazovanem obdobju povečalo število poznih dostav in od
 
 V ontologiji in repozitoriju VC subjekt \texttt{DHL} ostane enak kot v
 scenariju 1: še vedno ima veljavno preverljivo poverilnico skladnosti in
-status transporterja. Spremeni se torej le operativni del – telemetrija.
+status transporterja. Spremeni se torej le telemetrija.
 
 V realnem sistemu tak zapis ne bi bil lokalna JSON datoteka, temveč
 projekcija zunanjih podatkov:
 \begin{itemize}
-  \item meritve iz IoT senzorjev (temperature, šok, vlaga) v hladni verigi,
+  \item meritve iz senzorjev IoT (npr. temperatura, vlaga),
   \item zapisi iz transportnega informacijskega sistema (TMS) o zamudah,
-  \item alarmi iz nadzornih sistemov ali sistemov za kakovost.
+  \item opozorila iz nadzornih sistemov ali sistemov za kakovost.
 \end{itemize}
-Vsak orakelj bi bil konfiguriran z lastnimi adapterji do takih virov (npr.\
-API-ji, sporočilni sistemi, podatkovna jezera). Nekaterim orakljem (npr.\
-telemetrijskemu) so ti podatki ključni, drugi (npr.\ VC-centrični) jih
-namerno ignorirajo ali jim dajejo zelo majhno težo. V prototipu te
-razlike modeliramo z različnimi algoritmi orakljev A, B in C nad istim
-simuliranim telemetrijskim virom.
+Vsak orakelj bi bil konfiguriran z lastnimi adapterji do takih virov. Nekaterim orakljem so ti podatki ključni drugi jih namerno ignorirajo ali jim dajejo zelo majhno težo. V prototipu te razlike modeliramo z različnimi algoritmi orakljev A, B in C nad istim simuliranim telemetrijskim virom.
 
 \subsubsection*{Novi izračuni orakljev}
 
 Na podlagi spremenjenih podatkov oraklji ponovno izvedejo svoje algoritme
-in pripravijo nova podpisana poročila. Rezultati so:
+in pripravijo nova podpisana poročila. Rezultati so predstavljeni v tabeli \ref{tab:scenarij2-dhl}.
 
 \begin{table}[ht]
   \centering
@@ -1331,32 +1327,149 @@ odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
         zapis tako ne le označi subjekt kot nezaupanja vreden, temveč
         tudi razloži razlog: nizka številčna ocena, pod pragom sprejemljive
         ravni.
-  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo
-        enak \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo
-        na isto veljavno preverljivo poverilnico. Agregator pri tem preveri,
-        da poverilnica v lokalni shrambi ni označena kot preklicana. To
-        pomeni, da je sprememba ocene iz \emph{PASS} (scenarij 1) v
-        \emph{FAIL} (scenarij 2) posledica izključno poslabšanja
-        operativnih metrik in zunanjih podatkov, ne pa spremembe
-        formalnih dokazil.
+  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgoščeno vrednost poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \emph{PASS} (scenarij 1) v \emph{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih metrik in zunanjih podatkov, ne pa spremembe formalnih dokazil.
 \end{itemize}
 
 Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
 poizvedbi nad \texttt{TrustGraph.sol} za subjekt \texttt{DHL} dobijo informacijo,
 da je transporter po novih incidentih označen kot nezaupanja vreden
-(\emph{FAIL}) z agregirano številčno oceno zaupanja približno
-$6267/10000$ in z zastavico \texttt{0x02}, ki označuje nizko oceno.
-Primerjava scenarijev~\ref{subsec:scenarij-1} in~\ref{subsec:scenarij-2}
-jasno pokaže, da sistem ni statičen: isti subjekt se ob poslabšanju
-telemetrije in drugih zunanjih podatkov premakne iz zaupanja vrednega v
-nezaupanja vreden, kljub temu da njegovo preverljivo digitalno potrdilo
-ostane nespremenjeno.
+(\emph{FAIL}) z agregirano številčno oceno zaupanja približno $6267/10000$ in z zastavico \texttt{0x02}, ki označuje nizko oceno. Primerjava scenarijev~\ref{subsec:scenarij-1} in~\ref{subsec:scenarij-2} jasno pokaže, da je sistem dinamično prilagodil oceno zaupanja na podlagi novih podatkov, pri čemer so semantični in telemetrijski signali pretehtali formalna dokazila, ki jih je predstavljala preverljiva poverilnica.
+
+\section{Varnostna analiza sistema}
+\label{sec:varnostna-analiza}
+
+V tem poglavju obravnavamo varnostni vidik ključnega dela razvitega sistema – decentraliziranega omrežja orakljev (DON) in pametne pogodbe. Prav ti dve komponenti skupaj izvajata proces izračuna zaupanja, pripravljata poročila, preverjata njihove podpise in na koncu zapišeta agregirane odločitve v nespremenljivo podatkovno strukturo na verigi.
+
+Ostali deli arhitekture, kot so podatkovna baza preverljivih poverilnic, ontologija v strežniku Fuseki ali lokalni telemetrični viri podatkov, niso predmet podrobne varnostne analize v tem poglavju. Te komponente obravnavamo kot zunanje storitve, ki imajo svoje mehanizme za zagotavljanje integritete, razpoložljivosti in zanesljivosti. Varnostno pomembne so predvsem v toliko, kolikor lahko s svojimi podatki vplivajo na vhodne informacije za oraklje, ne vplivajo pa neposredno na zapisovanje ali branje rezultatov na verigi blokov.
+
+Osrednji del analize zato posvečamo mehanizmom, ki odločajo o tem, komu system zaupa pri izračunu in zapisu rezultatov, ter kako se podatki premikajo med posameznimi komponentami. Ključni poudarek je na dveh vidikih: prvič, na zaščiti pametne pogodbe pred nepooblaščenimi vpisi ali manipulacijami, in drugič, na zagotovilih, da lahko agregator prepozna veljavne prispevke orakljev, preveri njihove podpise in zavrne kakršne koli nepravilne ali ponarejene podatke. Tok podatkov med oraklji in agregatorjem je zato ena izmed osrednjih točk varnostne presoje, saj se prav tam zgodi največji del logike, ki odloča, katera poročila bodo na koncu vplivala na stanje sistema.
+
+V nadaljevanju najprej opišemo metodologijo in model napadalca, ki ga uporabljamo v analizi, nato pa sistematično pregledamo grožnje, ki zadevajo pametno pogodbo in decentralizirano omrežje orakljev, ter prikažemo obstoječe in predlagane mehanizme za njihovo ublažitev.
+
+\subsection{Cilji varnostne analize}
+\label{subsec:cilji-varnost}
+
+Prvi cilj varnostne analize je konceptualen: želimo jasno opredeliti, katere varnostne lastnosti mora imeti sistem, ki združuje verigo blokov, pametne pogodbe in decentralizirano omrežje orakljev. Pri takem sistemu mora biti zagotovljeno, da so odločitve o zaupanju, zapisane na verigi, pravilne, preverljive in odporne na manipulacije, ter da jih lahko drugi akterji neodvisno preverijo. Sistem mora vzdržati tudi primere nepoštenih ali kompromitiranih orakljev, napake infrastrukture in poskuse vplivanja na agregirane rezultate.
+
+Drugi cilj je praktičen in izhaja iz konkretne implementacije prototipa. Pregledati moramo, katere od teh ključnih lastnosti so že ustrezno podprte in kje še obstajajo vrzeli, ki bi jih bilo treba zapolniti za namestitev v produkcijsko okolje. Pri tem se osredotočamo na integriteto podatkov, zapisano v pametni pogodbi, na avtentikacijo orakljev in agregatorja, na preverljivost posameznih poročil ter na razpoložljivost mehanizma za izračun zaupanja, tudi kadar pride do izpada ali nepravilnega delovanja posameznih komponent.
+
+Varnostna analiza se tako osredotoča na del sistema, kjer se sprejemajo in zapisujejo odločitve o zaupanju. Posebej nas zanima, ali je potek podatkov med oraklji, agregatorjem in pametno pogodbo zaščiten pred napačnimi podpisi, ponarejenimi identitetami, spreminjanjem vsebine poročil, napadi zavrnitve storitve in drugimi oblikami poskusov vplivanja na rezultat. Ker so prav ti podatki podlaga za nadaljnje odločitve v dobavni verigi, mora biti jedro sistema načrtovano tako, da nepravilne ali zlonamerne posege zazna in zavrne ter omogoča preverljivo delovanje.
+
+\subsection{Pregled arhitekture DON in pametne pogodbe}
+\label{subsec:pregled-arhitekture-varnost}
+
+Za potrebe varnostne analize na kratko povzamemo del arhitekture, ki je ključen za mehanizem zaupanja. Pametna pogodba \texttt{TrustGraph.sol}, ki teče na testnem Ethereum omrežju, hrani agregirane odločitve o zaupanju za posamezne subjekte ter posamične prispevke orakljev, vezane na identifikatorje zahtev \texttt{requestId}. Agregator deluje kot edini pooblaščeni zapisovalec teh rezultatov in ima zato lasten naslov ter zasebni ključ v omrežju. Klice na pametno pogodbo \texttt{TrustGraph.sol} pošilja prek varnega klica RPC (HTTPS) do vozlišča verige blokov, pri čemer je identiteta klicatelja na ravni Ethereum protokola kriptografsko potrjena s podpisom transakcije.
+
+Funkcije pametne pogodbe, ki sprejemajo rezultate, so zaščitene z vlogo oziroma modifikatorjem \texttt{onlyEvaluator}, kar pomeni, da jih lahko kliče le z zasebnim ključem, katerega lastnik je agregator. Klici z drugih naslovov povzročijo zavrnitev transakcije (v pametnih pogodbah se kliče funkcija \texttt{revert}). Za spremembe nastavitev, kot so menjava agregatorja ali dodeljevanje novih vlog, je predvideno upravljanje z vlogami in potrjevanjem z več podpisi(angl.\ \emph{multi-sig}). To preprečuje, da bi en sam zasebni ključ samovoljno spremenil pravila delovanja sistema. 
+
+Na verigo se nikoli ne pošiljajo surovi vhodni podatki. Zapisujejo se le zgoščene vrednosti (povzetki politike, preverljivega dokazila in ontoloških podatkov), agregirana ocena ter opozorilne zastavice. Pametna pogodba tako deluje kot kriptografsko zavarovana osrednja plast, ki zagotavlja integriteto rezultatov, ne da bi hranila osebne ali poslovno občutljive podatke.
+
+Oraklji spremljajo dogodke \texttt{TrustOracleRequested}, pridobijo vhodne podatke iz plasti znanja ter izračunajo svojo oceno zaupanja. Ko je izračun opravljen, orakelj pripravi podpisano poročilo \texttt{SignedOracleReport} in ga posreduje agregatorju prek klica HTTP \texttt{/reports}. Vsak orakelj ima lasten par javnega in zasebnega ključa, ki ga uporablja za digitalno podpisovanje poročil s shemo ECDSA \texttt{secp256k1}. Pred podpisom se celotno poročilo pretvori v JSON predstavitev, kjer sta vrstni red ključev in oblika serializacije vnaprej določena. Ta pristop zagotavlja, da ima identičen podatkovni objekt vedno enako binarno predstavitev in s tem tudi enoličen kriptografski podpis, kar je bistveno za preverljivost.
+
+Agregator ob prejemu poročila najprej izvede matematično obnovo javnega ključa iz podpisa (t. i.\ ECDSA \emph{public key recovery}) in iz njega izpelje Ethereum naslov pošiljatelja. Na ta način preveri, ali podpis res ustreza podatkom v poročilu in ali naslov pripada oraklju, ki je na seznamu dovoljenih vozlišč. Če se podpis ne ujema ali če naslov ni dovoljen, agregator poročilo zavrne. Tako sistem ne temelji na zaupanju v omrežno povezavo, temveč na kriptografski verifikaciji vsake posamične oddaje.
+
+Pri branju iz verige blokov pametna pogodba ponuja standardne funkcije tipa \texttt{view} in \texttt{pure}. Prek njih lahko katerikoli odjemalec brez plačila za izvajanje (\texttt{gas}) dostopa do trenutnih in zgodovinskih rezultatov ocenjevanja. Dodatni podatki so na voljo tudi prek dnevnikov dogodkov, ki jih objavi pogodba ob zapisovanju posamičnih prispevkov in končnih agregiranih rezultatov. Ker se na verigi hranijo le zgoščene vrednosti in psevdonimni identifikatorji, branje podatkov ne razkriva nobenih surovih informacij o subjektih ali njihovih lastnostih.
+
+Takšen podatkovni tok določa glavne meje zaupanja in razkriva ključne točke, kjer je sistem potencialno ranljiv: pri klicih pametne pogodbe (kdo lahko sproži izračun in kdo lahko objavi rezultat), na povezavi med pametno pogodbo in oraklji (pravilna interpretacija identitete in politike) ter na povezavi med oraklji in agregatorjem (preverjanje pristnosti pošiljateljev, zaščita pred ponarejenimi podpisi, preverjanje preverljivih dokazil ter zaščita pred napadi ponovnega predvajanja). V nadaljevanju zato ločeno obravnavamo grožnje za pametno pogodbo \texttt{TrustGraph.sol} in grožnje za decentralizirano omrežje orakljev, ter pokažemo, kateri mehanizmi so že implementirani in kje bi bilo treba zasnovo dodatno utrditi pri prehodu v produkcijsko okolje.
+
+\subsection{Metodologija analize in model napadalca}
+\label{subsec:metodologija-napadalec}
+
+Varnostno analizo izvedemo po načelih formalnega modeliranja groženj, kot jih predlagajo smernice OWASP in Microsoftovi standardi za decentralizirane sisteme. Osrednji okvir, ki ga uporabimo, je model STRIDE, ki razvršča varnostne grožnje v šest razredov glede na vrsto kršitve: lažno predstavljanje identitete (Spoofing), spreminjanje podatkov (Tampering), zanikanje sodelovanja (Repudiation), razkritje informacij (Information disclosure), zavrnitev storitve (Denial of service) ter povečanje privilegijev (Elevation of privilege). STRIDE je primeren za naš sistem, ker se osredotoča na integriteto, avtentičnost in dostopnost podatkov — lastnosti, ki so v mehanizmu zaupanja ključne, saj neposredno vplivajo na pravilnost izračunov in na zanesljivost registra zaupanja v pametni pogodbi.
+
+Pri analizi ne razčlenjujemo le posameznih komponent, temveč tudi meje med njimi. V sistemu so te meje izrazite: pametna pogodba predstavlja kriptografsko zaščiteno točko trajnega dnevnika, oraklji izvajajo izračune zunaj verige in so zato izpostavljeni manipulacijam, agregator pa deluje kot povezovalni element med izračuni in verigo blokov. STRIDE zato uporabimo kot okvir skozi celoten tok podatkov. Na grožnje se osredotočamo tam, kjer so povezave najšibkejše: pri podpisovanju poročil, pri prenosu rezultatov v agregator, pri preverjanju upravičenosti klicev pametne pogodbe ter pri mehanizmih, ki določajo, kdo lahko objavi končno oceno na verigi.
+
+Čeprav je STRIDE široko uporabljen model, se je treba zavedati njegovih omejitev. Ne obravnava vprašanj gospodarskih spodbud, semantičnih napadov ali zlorab na ravni ontologije, zato te grožnje obravnavamo ločeno kot dopolnilno analizo.
+
+Pri določanju tipa napadalca predpostavimo več ravni zmogljivosti. Prvi scenarij predstavlja zunanjega napadalca, ki ima enaka dovoljenja kot tipični uporabniki verige blokov: lahko kliče javne funkcije pametne pogodbe, spremlja dogodke in poskuša  sprožiti izračune ali preobremeniti pogodbo. Drugi scenarij predvideva škodoželjnega oraklja. Tak orakelj lahko odda napačno poročilo, manipulira z vhodnimi podatki ali poskuša ponarediti podpis. Ker uporabljamo digitalne podpise ECDSA nad deterministično JSON predstavitvijo, tak napadalec ne more ponarediti avtentičnosti, lahko pa poskuša vplivati na izračun s prirejenimi podatki iz ontologije ali preverljivih dokazil.
+
+Tretji scenarij predvideva napadalca, ki cilja na spremembo agregiranja. Ta bi lahko poskušal sprejeti lažna poročila, zlorabiti svoj položaj pri zapisovanju rezultatov ali poskušal reproducirati stare podpise. Ker agregator rekonstruira naslov pošiljatelja iz digitalnega podpisa in preverja časovni žig ter identifikator izvajanja, je zaščiten pred ponarejenimi sporočili in ponavljanjem že obdelanih poročil. Zadnja kategorija so napadi zavrnitve storitve, kjer napadalec poskuša preobremeniti oraklje ali agregator z velikim številom zahtev in tako zmanjšati razpoložljivost izračunov.
+
+Tak model napadalca nam omogoča, da jasno opredelimo, katere komponente se morajo zanašati na kriptografske zaščite (podpisi, zgoščene vrednosti, preverjanje naslovov), katere so zaščitene z logiko pametne pogodbe (vloge, omejitve klicev) ter kje sistem zahteva dodatne arhitekturne ukrepe za produkcijsko okolje, kot so redundančni agregatorji, nadzor nad ključi ter mehanizmi zaščite pred preobremenitvijo. STRIDE tako ponuja ogrodje, ki ga v nadaljevanju uporabimo za razvrščanje groženj in vrednotenje implementiranih protiukrepov.
+
+\subsection{Grožnje in protiukrepi za pametno pogodbo}
+\label{subsec:groznje-contract}
+
+Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na verigi blokov, saj hrani končne odločitve o zaupanju in posamične prispevke orakljev. Pomembno je, da sprejema le veljavne agregirane rezultate, pravilno povezuje prispevke z identifikatorji zahtev \texttt{requestId} in ne omogoča nepooblaščenih sprememb stanja. V tabeli~\ref{tab:threat-contract} je zbran pregled glavnih razredov groženj (po STRIDE), tipičnih protiukrepov ter oblik testnega pokrivanja.
+
+\begin{landscape}
+\begin{table}[ht]
+  \centering
+  \caption{Povzetek glavnih groženj in protiukrepov za pametno pogodbo \texttt{TrustGraph.sol}.}
+  \label{tab:threat-contract}
+  \begin{tabularx}{\linewidth}{l X X X}
+    \hline
+    STRIDE & Grožnja & Protiukrepi & Testno pokritje \\
+    \hline
+    Spoofing & Nepooblaščeni klici funkcij za zapis rezultatov & Vloga \texttt{EVALUATOR} oziroma modifikator \texttt{onlyEvaluator}, ki omeji klice na naslov(e) agregatorja & Enotski testi klicev z nedovoljenih naslovov, ki pričakujejo \texttt{revert} \\
+    Tampering & Neveljavne spremembe stanja odločitev o zaupanju & Preverjanje parametrov in invarianti stanja (ujemanje \texttt{requestId}, monotoni časovni žigi, veljavne zastavice) & Fuzzing in regresijski testi zaporednih klicev, ki preverjajo, da pogodba ne ostane v nelogičnem stanju \\
+    DoS & Preobremenitev pogodbe z velikim številom zahtev ali dragimi klici & Omejitve, kdo lahko sproži nove zahteve, ter preverjanje velikosti in kompleksnosti zapisov & Merjenje porabe plina in testi mejnih primerov za funkcije \texttt{requestTrustReport} in \texttt{fulfillTrustReport} \\
+    Info disclosure & Prevelika količina podatkov o subjektih na verigi & Shranjevanje le zgoščenih identifikatorjev (hash VC, hash politike, hash ontologije) in agregiranih ocen & Pregled sheme stanja in testi za nove različice, ki preverjajo, da se na verigo ne dodajajo surovi identifikatorji ali PII \\
+    Elevation of privilege & Zloraba upravljavskih oziroma administrativnih vlog & Vloge in večpodpisno upravljanje nad kritičnimi konfiguracijskimi funkcijami (npr.\ zamenjava agregatorja) & Enotski testi dodeljevanja, rotacije in preklica vlog ter zaščite privilegiranih funkcij \\
+    \hline
+  \end{tabularx}
+\end{table}
+\end{landscape}
+
+Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja (spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski Foundry testi simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne z \texttt{revert}.
+
+Drugi sklop je povezan z integriteto stanja (tampering). Čeprav veriga blokov po naravi preprečuje brisanje preteklosti, lahko napačno zasnovane funkcije vseeno pustijo pogodbo v nelogičnem stanju (na primer napačna povezava med \texttt{requestId} in subjektom ali nazadovanje časovnega žiga \texttt{asOf}). Zato v definiciji funkcij uvajamo preverjanje parametrov in invarianti stanja, na primer zahtevo, da se novo poročilo nanaša na isto identiteto in da je novi časovni žig večji ali enak prejšnjemu. Fuzzing in regresijski testi zaporednih klicev pomagajo odkriti robne primere, kjer bi se takšne invariante lahko kršile.
+
+Tretji sklop se nanaša na napade zavrnitve storitve (DoS). Ker so nekatere funkcije pametne pogodbe javno dostopne, lahko velik del zahtev za izračun zaupanja ali nepravilno konfigurirani paketni klici povzročijo, da postane uporaba pogodbe ekonomsko neupravičena. Pri prehodu v produkcijo bi bilo treba omejiti, kdo lahko sproži \texttt{requestTrustReport}, uvesti pragove za velikost paketov ter z regresijskimi testi spremljati porabo plina pri tipičnih scenarijih, da se pravočasno zazna degradacija.
+
+Četrti sklop pokriva razkritje informacij (information disclosure). Pametna pogodba shranjuje le zgoščene identifikatorje subjektov in politik, agregirano številčno oceno zaupanja ter zastavice, kar sledi načelu minimizacije podatkov. Pri nadaljnjem razvoju je pomembno ohraniti isto filozofijo tudi pri razširitvah sheme: novi podatki naj bodo vedno agregirani ali zgoščeni, enotski testi pa naj preverjajo, da pogodba ne začne nenamerno shranjevati podrobnih metrik ali neposrednih identifikatorjev podjetij in pacientov.
+
+Zadnji sklop se nanaša na zlorabo privilegijev (elevation of privilege). V produkcijskem okolju pričakujemo upravljavske funkcije za posodobitev konfiguracije ali migracijo stanja (npr.\ zamenjava agregatorja, posodobitev parametrov politik). Take funkcije je treba zaščititi z uveljavljenimi vzorci, kot so vloge in večpodpisno upravljanje, ter podpreti z enotskimi testi, ki preverjajo pravilno dodeljevanje, rotacijo in preklic vlog ter varnostne meje med njimi.
+
+\subsection{Grožnje in protiukrepi za decentralizirano omrežje orakljev}
+\label{subsec:groznje-don}
+
+Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odgovorno za izračun in agregacijo ocen zaupanja. Pretok podatkov poteka tako, da pametna pogodba izda dogodek \texttt{TrustOracleRequested} za dani \texttt{requestId} in subjekt, oraklji preberejo dogodek, iz zunanjih podatkov izračunajo oceno zaupanja in pripravijo podpisano poročilo \texttt{SignedOracleReport}, agregator pa sprejme poročila prek HTTP vmesnika \texttt{/reports}, preveri podpise, preveri priložene poverilnice, izvede agregacijo in rezultat zapiše v pametno pogodbo. Tabela~\ref{tab:threat-don} povzema glavne grožnje po modelu STRIDE, tipične protiukrepe ter predvideno testno pokritje na ravni orakljev in agregatorja.
+
+\begin{landscape}
+\begin{table}[ht]
+  \centering
+  \caption{Povzetek glavnih groženj in protiukrepov za mrežo orakljev in agregator.}
+  \label{tab:threat-don}
+  \small
+  \begin{tabularx}{\linewidth}{l X X X}
+    \hline
+    \textbf{STRIDE} & \textbf{Grožnja} & \textbf{Protiukrepi} & \textbf{Testno pokritje} \\
+    \hline
+    Spoofing & Lažni orakelj pošilja poročila agregatorju & Kriptografsko preverjanje podpisov (ECDSA \texttt{recover}) in seznam dovoljenih naslovov orakljev & Integracijski test, ki na \texttt{/reports} pošlje napačno podpisan zahtevek ali zahtevek z neznanega naslova in pričakuje napako \\
+    Tampering & Spreminjanje vsebine poročil med prenosom ali v agregatorju & Podpis kanonične JSON predstavitve, preverjanje hashov in zavrnitev pri neskladju & Enotski testi deterministične serializacije ter preverjanja podpisov in hashov \\
+    Repudiation & Orakelj zanika, da je oddal določeno poročilo & Shranjevanje podpisanih poročil oziroma njihovih hashov ter deterministična obnova naslova iz podpisa & Testi obnove naslova iz podpisa in ujemanja z zapisanim \texttt{node\_id} ter revizijske sledi \\
+    Info disclosure & Prekomerno logiranje identitet subjektov ali poverilnic & Redakcija logov (hashi namesto URI-jev) in uporaba psevdonimnih identifikatorjev & Enotski testi nad vzorčnimi logi, ki preverjajo, da se občutljivi podatki ne pojavijo v izpisu \\
+    DoS & Preobremenitev orakljev ali agregatorja z zahtevki & Omejitve na nivoju omrežja (rate limiting, požarni zid), kvote in redundanca vozlišč & Obremenitveni testi HTTP vmesnika ter spremljanje odzivnega časa in števila zahtevkov \\
+    Elevation of privilege & Kompromitiran agregator zlorabi svojo vlogo pri zapisovanju rezultatov & Več agregatorjev ali delna agregacija na verigi, ločeno upravljanje konfiguracije in jasna omejitev pooblastil & Simulacijski testi različnih konfiguracij kvora in scenarijev kompromitiranih vozlišč \\
+    \hline
+  \end{tabularx}
+\end{table}
+\end{landscape}
+
+Prva skupina groženj za DON je povezana z istovetnostjo orakljev (spoofing). Agregator pri prejemu poročila kriptografsko obnovi naslov iz podpisa in ga preveri proti konfiguriranemu seznamu dovoljenih vozlišč; poročila z neznanih naslovov ali napačnimi podpisi zavrne. Ker podpis vključuje tudi nonce oziroma \emph{run-id} in časovni žig, lahko agregator zazna in zavrne ponovno predvajanje starega sporočila in s tem prepreči replay napade. Integracijski testi za HTTP vmesnik preverijo, da so spremenjeni ali napačno podpisani payloadi zavrnjeni z ustrezno napako.
+
+Pri tamperingu ščitimo predvsem integriteto vsebine poročil. Ker je podpisan kanonični JSON celotnega poročila, agregator zazna vsako spremembo vsebine med prenosom ali vmesnim shranjevanjem. Za produkcijsko okolje je smiselno dodati revizijsko sled (na primer zapis hashov sprejetih poročil), kar omogoča naknadno preverjanje skladnosti med prejetimi poročili in on-chain zapisi. Enotski testi pri tem preverijo, da serializacija poročila v kanonično obliko vedno vrne enak rezultat in da vsaka sprememba vsebine povzroči neuspeh preverjanja podpisa.
+
+Grožnja repudiacije je pomembna z vidika transparentnosti: orakelj bi lahko poskušal zanikati, da je oddal negativno poročilo za določenega partnerja. S podpisanimi poročili in deterministično obnovo naslova iz podpisa lahko vedno pokažemo, kateri ključ je poročilo podpisal. Če agregator dodatno hrani hash sprejetih poročil, je revizijska sled za potrebe kasnejših sporov ali regulatornih pregledov relativno preprosto dosegljiva.
+
+Poseben del zasnove DON je tudi preverjanje preverljivih poverilnic (VC), ki spremljajo poročila. Vsak orakelj poleg ocene zaupanja priloži VC, ki dokazuje njegovo pooblastilo ali lastnosti subjekta; agregator pred sprejemom poročila preveri podpis VC, status preklica, časovno veljavnost in skladnost sheme z vnaprej definirano politiko. Poročila z neveljavnimi ali preklicanimi poverilnicami so zavrnjena in se nikoli ne zapišejo na verigo, kar zmanjša tveganje, da bi se na grafe zaupanja oprli ponarejeni ali zastareli dokazi.
+
+Napadi zavrnitve storitve (DoS) ciljajo na razpoložljivost omrežja. Ker v prototipu omejevanje hitrosti ni povsod implementirano, so oraklji in agregator teoretično dovzetni za preobremenitev z veliko količino zahtev. V produkcijski rabi bi morali definirati kvote na nivoju omrežja (API prehodi, požarni zidovi), dodati health-checke ter zagotoviti redundanco vozlišč, tako da izpad posameznega oraklja ali agregatorja ne onemogoči sistema in da se promet enakomerno porazdeli.
+
+Informacijsko razkritje v DON se tipično zgodi skozi dnevnike. Ker oraklji in agregator redno logirajo stanje in dogodke, obstaja nevarnost, da bi v logih ostali neposredni identifikatorji subjektov ali poverilnic. Zato je smiselno vpeljati redakcijo logov (na primer izpis le skrajšanega hash-a namesto celotnega URI-ja) in z enotskimi testi preverjati, da vzorčni logi ne vsebujejo občutljivih podatkov. S tem dopolnimo načelo minimizacije podatkov, ki ga že upoštevamo pri zapisih na verigo.
+
+Zadnji sklop groženj se nanaša na privilegije agregatorja. Trenutni model predvideva en osrednji agregator, ki ima pooblastilo za zapis agregiranih odločitev v pametno pogodbo. Če bi bil ta agregator kompromitiran, bi lahko v imenu legitimnih orakljev pošiljal napačne podatke ali spreminjal rezultat agregacije, preden se ta zapiše na verigo. Pri razširitvi v produkcijo bi bilo smiselno razmisliti o več agregatorjih, ki bi morali doseči soglasje, ali o prenosu dela agregacijske logike v pametno pogodbo samo, tako da posamezno vozlišče ne bi moglo samostojno manipulirati z rezultati. Simulacije različnih konfiguracij kvora in scenarijev kompromitiranih vozlišč lahko pomagajo oceniti, kako odporen bi bil tak sistem na zajetje ali okvaro posameznih komponent.
+
+\subsection{Povzetek tveganj in omejitve prototipa}
+\label{subsec:povzetek-don}
+
+V analizi smo se osredotočili na del sistema, ki deluje na verigi blokov in v mreži orakljev. Implementacija že vključuje več ključnih varnostnih mehanizmov: podpisana poročila orakljev, preverjanje naslovov v agregatorju, uporabo nonce in časovnih žigov za zaščito pred replay napadi, osnovno preverjanje preverljivih poverilnic, shranjevanje le zgoščenih identifikatorjev in agregiranih ocen na verigi ter jasno ločitev med on-chain in off-chain logiko.
+
+Kljub temu za produkcijsko uporabo ostaja odprtih več pomembnih vprašanj: registracija in upravljanje identitet orakljev ter agregatorjev na nivoju pametne pogodbe, varno upravljanje z zasebnimi ključi (shramba, rotacija, odziv ob kompromitaciji), odpornost na napade zavrnitve storitve v DON (redundantni oraklji, več agregatorjev, mehanizmi soglasja) ter dodatne invariante in obsežnejše testiranje pametne pogodbe za preprečevanje nelogičnih stanj. Varnostna analiza tako ne služi le kot opis trenutnega stanja, temveč tudi kot usmeritev, katera področja bi bilo treba prioritetno nadgraditi pri prenosu rešitve v realno, produkcijsko okolje.
 
 
-\section{Varnostna analiza}
-\section{Zmogljivost in razširljivost}
-\section{Prednosti in omejitve}
-\section{Primerjava z obstoječimi rešitvami}
+\section{Razprava}
 
 \chapter{Zaključek in nadaljnje delo}
 \section{Povzetek prispevkov}
