@@ -1387,44 +1387,51 @@ Tretji scenarij predvideva napadalca, ki cilja na spremembo agregiranja. Ta bi l
 
 Tak model napadalca nam omogoča, da jasno opredelimo, katere komponente se morajo zanašati na kriptografske zaščite (podpisi, zgoščene vrednosti, preverjanje naslovov), katere so zaščitene z logiko pametne pogodbe (vloge, omejitve klicev) ter kje sistem zahteva dodatne arhitekturne ukrepe za produkcijsko okolje, kot so redundančni agregatorji, nadzor nad ključi ter mehanizmi zaščite pred preobremenitvijo. STRIDE tako ponuja ogrodje, ki ga v nadaljevanju uporabimo za razvrščanje groženj in vrednotenje implementiranih protiukrepov.
 
-\subsection{Grožnje in protiukrepi za pametno pogodbo}
+\subsection{Analiza groženj za pametno pogodbo}
 \label{subsec:groznje-contract}
 
-Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na verigi blokov, saj hrani končne odločitve o zaupanju in posamične prispevke orakljev. Pomembno je, da sprejema le veljavne agregirane rezultate, pravilno povezuje prispevke z identifikatorji zahtev \texttt{requestId} in ne omogoča nepooblaščenih sprememb stanja. V tabeli~\ref{tab:threat-contract} je zbran pregled glavnih razredov groženj (po STRIDE), tipičnih protiukrepov ter oblik testnega pokrivanja.
+Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na verigi blokov, saj hrani končne odločitve o zaupanju in posamične prispevke orakljev. Kot smo objasnili v prejšnjem podpoglavju, je pomembno, da sprejema le veljavne agregirane rezultate, pravilno povezuje prispevke z identifikatorji zahtev \texttt{requestId} in zavrača nepooblaščene spremembe stanj. V tabeli~\ref{tab:threat-contract} je zbran pregled glavnih razredov groženj (po modelu STRIDE), tipičnih protiukrepov ter oblik testnega pokrivanja.
 
 \begin{landscape}
 \begin{table}[ht]
   \centering
   \caption{Povzetek glavnih groženj in protiukrepov za pametno pogodbo \texttt{TrustGraph.sol}.}
   \label{tab:threat-contract}
-  \begin{tabularx}{\linewidth}{l X X X}
+  \begin{tabularx}{\linewidth}{|X|X|X|}
     \hline
-    STRIDE & Grožnja & Protiukrepi & Testno pokritje \\
+    Grožnja & Protiukrepi & Testno pokritje \\
     \hline
-    Spoofing & Nepooblaščeni klici funkcij za zapis rezultatov & Vloga \texttt{EVALUATOR} oziroma modifikator \texttt{onlyEvaluator}, ki omeji klice na naslov(e) agregatorja & Enotski testi klicev z nedovoljenih naslovov, ki pričakujejo \texttt{revert} \\
-    Tampering & Neveljavne spremembe stanja odločitev o zaupanju & Preverjanje parametrov in invarianti stanja (ujemanje \texttt{requestId}, monotoni časovni žigi, veljavne zastavice) & Fuzzing in regresijski testi zaporednih klicev, ki preverjajo, da pogodba ne ostane v nelogičnem stanju \\
-    DoS & Preobremenitev pogodbe z velikim številom zahtev ali dragimi klici & Omejitve, kdo lahko sproži nove zahteve, ter preverjanje velikosti in kompleksnosti zapisov & Merjenje porabe plina in testi mejnih primerov za funkcije \texttt{requestTrustReport} in \texttt{fulfillTrustReport} \\
-    Info disclosure & Prevelika količina podatkov o subjektih na verigi & Shranjevanje le zgoščenih identifikatorjev (hash VC, hash politike, hash ontologije) in agregiranih ocen & Pregled sheme stanja in testi za nove različice, ki preverjajo, da se na verigo ne dodajajo surovi identifikatorji ali PII \\
-    Elevation of privilege & Zloraba upravljavskih oziroma administrativnih vlog & Vloge in večpodpisno upravljanje nad kritičnimi konfiguracijskimi funkcijami (npr.\ zamenjava agregatorja) & Enotski testi dodeljevanja, rotacije in preklica vlog ter zaščite privilegiranih funkcij \\
+    Nepooblaščeni klici funkcij za zapis rezultatov & Vloga \texttt{EVALUATOR} oziroma modifikator \texttt{onlyEvaluator}, ki omeji klice na naslov(e) agregatorja & Enotski testi klicev z nedovoljenih naslovov, ki pričakujejo \texttt{revert} \\
+    \midrule
+    Neveljavne spremembe stanja odločitev o zaupanju & Preverjanje parametrov in invarianti stanja (ujemanje \texttt{requestId}, monotoni časovni žigi, veljavne zastavice) & Fuzzing in regresijski testi zaporednih klicev, ki preverjajo, da pogodba ne ostane v nelogičnem stanju \\
+    \midrule
+    Preobremenitev pogodbe z velikim številom zahtev ali dragimi klici & Omejitve, kdo lahko sproži nove zahteve, ter preverjanje velikosti in kompleksnosti zapisov & Merjenje porabe plina in testi mejnih primerov za funkcije \texttt{requestTrustReport} in \texttt{fulfillTrustReport} \\
+    \midrule
+    Prevelika količina podatkov o subjektih na verigi & Shranjevanje le zgoščenih identifikatorjev (hash VC, hash politike, hash ontologije) in agregiranih ocen & Pregled sheme stanja in testi za nove različice, ki preverjajo, da se na verigo ne dodajajo surovi identifikatorji ali PII \\
+    \midrule
+    Zloraba upravljavskih oziroma administrativnih vlog & Vloge in večpodpisno upravljanje nad kritičnimi konfiguracijskimi funkcijami (npr.\ zamenjava agregatorja) & Enotski testi dodeljevanja, rotacije in preklica vlog ter zaščite privilegiranih funkcij \\
+    \bottomrule
     \hline
   \end{tabularx}
 \end{table}
 \end{landscape}
 
-Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja (spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski Foundry testi simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne z \texttt{revert}.
+Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja (angl. spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski Foundry testi simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne z \texttt{revert}.
 
-Drugi sklop je povezan z integriteto stanja (tampering). Čeprav veriga blokov po naravi preprečuje brisanje preteklosti, lahko napačno zasnovane funkcije vseeno pustijo pogodbo v nelogičnem stanju (na primer napačna povezava med \texttt{requestId} in subjektom ali nazadovanje časovnega žiga \texttt{asOf}). Zato v definiciji funkcij uvajamo preverjanje parametrov in invarianti stanja, na primer zahtevo, da se novo poročilo nanaša na isto identiteto in da je novi časovni žig večji ali enak prejšnjemu. Fuzzing in regresijski testi zaporednih klicev pomagajo odkriti robne primere, kjer bi se takšne invariante lahko kršile.
+Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl. tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje podatke, ki so med seboj nekonsistentni. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom, ali ko se časovni žig izračuna v preteklost. To iz vidika semantike predstavlja nelogično stanje. 
+Zato so v implementaciji funkcij uvedeni preverjevalni mehanizmi, ki zagotavljajo ohranjanje osnovnih stanjskih invarint (angl. state invariants). Med njih spadajo: zahteva, da se vsak novi zapis nanaša na isti identifikator subjekta kot začetni zahtevek, da je časovni žig (\texttt{asOf}) monoton in nikoli ne nazaduje ter da so meje dovoljenih vrednosti (npr.\ razpon ocene) ustrezno nadzorovane.
+Za dodatno zagotovitev pravilnosti smo izvedli kombinacijo enotskih in regresijskih testov. Enotski testi preverjajo posamezne robne primere. Fuzzing testi pa avtomatsko generirajo veliko število naključnih kombinacij parametrov (različni \texttt{requestId}, časovni žigi, zastavice in ocene). S tem preverimo, ali bi katera od kombinacij lahko pripeljala pogodbo v nelogično stanje ali sprožila neželene stranske učinke. Regresijski testi pa zagotavljajo, da popravki logike ne uvajajo novih nepravilnosti in da se znane invariante v kasnejših posodobitvah ohranjajo.
 
-Tretji sklop se nanaša na napade zavrnitve storitve (DoS). Ker so nekatere funkcije pametne pogodbe javno dostopne, lahko velik del zahtev za izračun zaupanja ali nepravilno konfigurirani paketni klici povzročijo, da postane uporaba pogodbe ekonomsko neupravičena. Pri prehodu v produkcijo bi bilo treba omejiti, kdo lahko sproži \texttt{requestTrustReport}, uvesti pragove za velikost paketov ter z regresijskimi testi spremljati porabo plina pri tipičnih scenarijih, da se pravočasno zazna degradacija.
+Tretji sklop se nanaša na napade zavrnitve storitve (DoS). Ker so nekatere funkcije pametne pogodbe javno dostopne, lahko velik del zahtev za izračun zaupanja ali nepravilno konfigurirani paketni klici povzročijo, da postane uporaba pogodbe ekonomsko neupravičena. Pri prehodu v verigo bi bilo treba omejiti, kdo lahko sproži \texttt{requestTrustReport}, uvesti pragove za velikost paketov ter spremljati porabo stroškov verige blokov pri tipičnih scenarijih, da se pravočasno zazna degradacija.
 
-Četrti sklop pokriva razkritje informacij (information disclosure). Pametna pogodba shranjuje le zgoščene identifikatorje subjektov in politik, agregirano številčno oceno zaupanja ter zastavice, kar sledi načelu minimizacije podatkov. Pri nadaljnjem razvoju je pomembno ohraniti isto filozofijo tudi pri razširitvah sheme: novi podatki naj bodo vedno agregirani ali zgoščeni, enotski testi pa naj preverjajo, da pogodba ne začne nenamerno shranjevati podrobnih metrik ali neposrednih identifikatorjev podjetij in pacientov.
+Četrti sklop pokriva razkritje informacij (angl. information disclosure). Pametna pogodba shranjuje le zgoščene identifikatorje subjektov in politik, agregirano številčno oceno zaupanja ter zastavice, kar sledi načelu minimizacije podatkov. Pri nadaljnjem razvoju je pomembno ohraniti isto filozofijo tudi pri razširitvah sheme: novi podatki naj bodo vedno agregirani ali zgoščeni, enotski testi pa naj preverjajo, da pogodba ne začne nenamerno shranjevati podrobnih metrik ali neposrednih identifikatorjev podjetij in pacientov.
 
-Zadnji sklop se nanaša na zlorabo privilegijev (elevation of privilege). V produkcijskem okolju pričakujemo upravljavske funkcije za posodobitev konfiguracije ali migracijo stanja (npr.\ zamenjava agregatorja, posodobitev parametrov politik). Take funkcije je treba zaščititi z uveljavljenimi vzorci, kot so vloge in večpodpisno upravljanje, ter podpreti z enotskimi testi, ki preverjajo pravilno dodeljevanje, rotacijo in preklic vlog ter varnostne meje med njimi.
+Zadnji sklop se nanaša na zlorabo privilegijev (angl. elevation of privilege). V produkcijskem okolju pričakujemo upravljavske funkcije za posodobitev konfiguracije ali migracijo stanja (npr.\ zamenjava agregatorja, posodobitev parametrov politik). Take funkcije je treba zaščititi z uveljavljenimi vzorci, kot so vloge in večpodpisno upravljanje, ter podpreti z enotskimi testi, ki preverjajo pravilno dodeljevanje, rotacijo in preklic vlog ter varnostne meje med njimi.
 
-\subsection{Grožnje in protiukrepi za decentralizirano omrežje orakljev}
+\subsection{Analiza groženj za decentralizirano omrežje orakljev}
 \label{subsec:groznje-don}
 
-Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odgovorno za izračun in agregacijo ocen zaupanja. Pretok podatkov poteka tako, da pametna pogodba izda dogodek \texttt{TrustOracleRequested} za dani \texttt{requestId} in subjekt, oraklji preberejo dogodek, iz zunanjih podatkov izračunajo oceno zaupanja in pripravijo podpisano poročilo \texttt{SignedOracleReport}, agregator pa sprejme poročila prek HTTP vmesnika \texttt{/reports}, preveri podpise, preveri priložene poverilnice, izvede agregacijo in rezultat zapiše v pametno pogodbo. Tabela~\ref{tab:threat-don} povzema glavne grožnje po modelu STRIDE, tipične protiukrepe ter predvideno testno pokritje na ravni orakljev in agregatorja.
+Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odgovorno za izračun in agregacijo ocen zaupanja. Pretok podatkov poteka tako, da pametna pogodba izda dogodek \texttt{TrustOracleRequested} za dani \texttt{requestId} in subjekt, oraklji preberejo dogodek, iz zunanjih podatkov izračunajo oceno zaupanja in pripravijo podpisano poročilo, agregator pa sprejme poročila prek vmesnika HTTP \texttt{/reports}, preveri podpise, preveri priložene poverilnice, izvede agregacijo in rezultat zapiše v pametno pogodbo. Tabela~\ref{tab:threat-don} povzema glavne grožnje po modelu STRIDE, tipične protiukrepe ter predvideno testno pokritje na ravni orakljev in agregatorja.
 
 \begin{landscape}
 \begin{table}[ht]
@@ -1432,20 +1439,38 @@ Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odg
   \caption{Povzetek glavnih groženj in protiukrepov za mrežo orakljev in agregator.}
   \label{tab:threat-don}
   \small
-  \begin{tabularx}{\linewidth}{l X X X}
-    \hline
-    \textbf{STRIDE} & \textbf{Grožnja} & \textbf{Protiukrepi} & \textbf{Testno pokritje} \\
-    \hline
-    Spoofing & Lažni orakelj pošilja poročila agregatorju & Kriptografsko preverjanje podpisov (ECDSA \texttt{recover}) in seznam dovoljenih naslovov orakljev & Integracijski test, ki na \texttt{/reports} pošlje napačno podpisan zahtevek ali zahtevek z neznanega naslova in pričakuje napako \\
-    Tampering & Spreminjanje vsebine poročil med prenosom ali v agregatorju & Podpis kanonične JSON predstavitve, preverjanje hashov in zavrnitev pri neskladju & Enotski testi deterministične serializacije ter preverjanja podpisov in hashov \\
-    Repudiation & Orakelj zanika, da je oddal določeno poročilo & Shranjevanje podpisanih poročil oziroma njihovih hashov ter deterministična obnova naslova iz podpisa & Testi obnove naslova iz podpisa in ujemanja z zapisanim \texttt{node\_id} ter revizijske sledi \\
-    Info disclosure & Prekomerno logiranje identitet subjektov ali poverilnic & Redakcija logov (hashi namesto URI-jev) in uporaba psevdonimnih identifikatorjev & Enotski testi nad vzorčnimi logi, ki preverjajo, da se občutljivi podatki ne pojavijo v izpisu \\
-    DoS & Preobremenitev orakljev ali agregatorja z zahtevki & Omejitve na nivoju omrežja (rate limiting, požarni zid), kvote in redundanca vozlišč & Obremenitveni testi HTTP vmesnika ter spremljanje odzivnega časa in števila zahtevkov \\
-    Elevation of privilege & Kompromitiran agregator zlorabi svojo vlogo pri zapisovanju rezultatov & Več agregatorjev ali delna agregacija na verigi, ločeno upravljanje konfiguracije in jasna omejitev pooblastil & Simulacijski testi različnih konfiguracij kvora in scenarijev kompromitiranih vozlišč \\
-    \hline
+  \begin{tabularx}{\linewidth}{|X|X|X|}
+    \toprule
+    \textbf{Grožnja} & \textbf{Protiukrepi} & \textbf{Testno pokritje} \\
+    \midrule
+    Lažni orakelj pošilja poročila agregatorju 
+      & Kriptografsko preverjanje podpisov (ECDSA \texttt{recover}) in seznam dovoljenih naslovov orakljev 
+      & Integracijski test, ki na \texttt{/reports} pošlje napačno podpisan zahtevek ali zahtevek z neznanega naslova in pričakuje napako \\
+    \midrule
+    Spreminjanje vsebine poročil med prenosom ali v agregatorju 
+      & Podpis kanonične JSON predstavitve, preverjanje hashov in zavrnitev pri neskladju 
+      & Enotski testi deterministične serializacije ter preverjanja podpisov in hashov \\
+    \midrule
+    Orakelj zanika, da je oddal določeno poročilo 
+      & Shranjevanje podpisanih poročil oziroma njihovih hashov ter deterministična obnova naslova iz podpisa 
+      & Testi obnove naslova iz podpisa in ujemanja z zapisanim \texttt{node\_id} ter revizijske sledi \\
+    \midrule
+    Prekomerno logiranje identitet subjektov ali poverilnic 
+      & Redakcija logov (hashi namesto URI-jev) in uporaba psevdonimnih identifikatorjev 
+      & Enotski testi nad vzorčnimi logi, ki preverjajo, da se občutljivi podatki ne pojavijo v izpisu \\
+    \midrule
+    Preobremenitev orakljev ali agregatorja z zahtevki 
+      & Omejitve na nivoju omrežja (rate limiting, požarni zid), kvote in redundanca vozlišč 
+      & Obremenitveni testi HTTP vmesnika ter spremljanje odzivnega časa in števila zahtevkov \\
+    \midrule
+    Kompromitiran agregator zlorabi svojo vlogo pri zapisovanju rezultatov 
+      & Več agregatorjev ali delna agregacija na verigi, ločeno upravljanje konfiguracije in jasna omejitev pooblastil 
+      & Simulacijski testi različnih konfiguracij kvora in scenarijev kompromitiranih vozlišč \\
+    \bottomrule
   \end{tabularx}
 \end{table}
 \end{landscape}
+
 
 Prva skupina groženj za DON je povezana z istovetnostjo orakljev (spoofing). Agregator pri prejemu poročila kriptografsko obnovi naslov iz podpisa in ga preveri proti konfiguriranemu seznamu dovoljenih vozlišč; poročila z neznanih naslovov ali napačnimi podpisi zavrne. Ker podpis vključuje tudi nonce oziroma \emph{run-id} in časovni žig, lahko agregator zazna in zavrne ponovno predvajanje starega sporočila in s tem prepreči replay napade. Integracijski testi za HTTP vmesnik preverijo, da so spremenjeni ali napačno podpisani payloadi zavrnjeni z ustrezno napako.
 
@@ -1466,7 +1491,7 @@ Zadnji sklop groženj se nanaša na privilegije agregatorja. Trenutni model pred
 
 V analizi smo se osredotočili na del sistema, ki deluje na verigi blokov in v mreži orakljev. Implementacija že vključuje več ključnih varnostnih mehanizmov: podpisana poročila orakljev, preverjanje naslovov v agregatorju, uporabo nonce in časovnih žigov za zaščito pred replay napadi, osnovno preverjanje preverljivih poverilnic, shranjevanje le zgoščenih identifikatorjev in agregiranih ocen na verigi ter jasno ločitev med on-chain in off-chain logiko.
 
-Kljub temu za produkcijsko uporabo ostaja odprtih več pomembnih vprašanj: registracija in upravljanje identitet orakljev ter agregatorjev na nivoju pametne pogodbe, varno upravljanje z zasebnimi ključi (shramba, rotacija, odziv ob kompromitaciji), odpornost na napade zavrnitve storitve v DON (redundantni oraklji, več agregatorjev, mehanizmi soglasja) ter dodatne invariante in obsežnejše testiranje pametne pogodbe za preprečevanje nelogičnih stanj. Varnostna analiza tako ne služi le kot opis trenutnega stanja, temveč tudi kot usmeritev, katera področja bi bilo treba prioritetno nadgraditi pri prenosu rešitve v realno, produkcijsko okolje.
+Kljub temu za uporabo v produkcijskem okolju ostaja odprtih več pomembnih vprašanj: registracija in upravljanje identitet orakljev ter agregatorjev na nivoju pametne pogodbe, varno upravljanje z zasebnimi ključi (shramba, rotacija, odziv ob kompromitaciji), odpornost na napade zavrnitve storitve v DON (redundantni oraklji, več agregatorjev, mehanizmi soglasja) ter dodatne invariante in obsežnejše testiranje pametne pogodbe za preprečevanje nelogičnih stanj. Varnostna analiza tako ne služi le kot opis trenutnega stanja, temveč tudi kot usmeritev, katera področja bi bilo treba prioritetno nadgraditi pri prenosu rešitve v realno, produkcijsko okolje.
 
 
 \section{Razprava}
