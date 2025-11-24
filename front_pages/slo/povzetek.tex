@@ -9,7 +9,15 @@
 \noindent\textbf{Naslov:} \ttitle
 \bigskip
 
-V vzorcu je predstavljen postopek priprave magistrskega dela z uporabo okolja \LaTeX. Vaš povzetek mora sicer vsebovati približno 100 besed, ta tukaj je odločno prekratek. Dober povzetek vključuje: (1) kratek opis obravnavanega problema, (2) kratek opis vašega pristopa za reševanje tega problema in (3) (najbolj uspešen) rezultat ali prispevek magistrske naloge.
+Farmacevtska dobavna veriga je ena najbolj reguliranih in hkrati poslovno občutljivih verig na svetu. V njej sodeluje več različnih akterjev, ki si izmenjujejo podatke in prevzemajo odgovornost za kakovost, varnost ter razpoložljivost zdravil. Odločanje o tem, komu zaupati pri proizvodnji, distribuciji in transportu, danes pogosto temelji na zaprtih bazah podatkov, ročnih revizijah in neformalnih pogodbenih razmerjih. Tak pristop otežuje ponovljivost, transparentnost in strojno preverljivost odločitev, ki so pomembne za regulatorje in industrijo.
+
+V magistrski nalogi obravnavamo, kako lahko kombinacija semantičnih tehnologij in verige blokov prispeva k bolj strukturiranemu in preverljivemu upravljanju zaupanja v farmacevtski dobavni verigi. Zasnovali smo konceptualni model, v katerem ontologija v jeziku OWL opisuje akterje, njihove vloge in relevantne lastnosti, veriga blokov pa deluje kot nespremenljiva plast za zapis agregiranih odločitev. Na tej osnovi smo razvili prototipni sistem, ki povezuje pametno pogodbo \texttt{TrustGraph.sol} na testnem Ethereum omrežju z decentraliziranim omrežjem orakljev. Trije oraklji predstavljajo različne poglede na zaupanje (hibridni, dokazni, telemetrijski), iz ontologije, preverljivih poverilnic in telemetrije izračunajo ocene zaupanja ter jih pošljejo agregatorju, ta pa izvede agregacijo in rezultat zapiše na verigo.
+
+Delovanje sistema prikažemo na ponovljivih scenarijih iz farmacevtske dobavne verige, kjer se ocena zaupanja za konkretnega transporterja dinamično spreminja glede na nove incidente in telemetrijske podatke. Varnostni vidik pametne pogodbe in omrežja orakljev analiziramo z uporabo modela STRIDE ter identificiramo ključne grožnje in protiukrepe. Na koncu predstavimo korake, ki bi bili potrebni za prehod iz laboratorijskega prototipa v produkcijsko okolje, ter nakažemo, kako bi bil enak vzorec grafa zaupanja uporaben tudi v drugih domenah, kot so logistika ali pametna mesta.
+
+\medskip
+\noindent\textbf{Ključne besede:} farmacevtska dobavna veriga, zaupanje, ontologije, veriga blokov, pametne pogodbe, oraklji, preverljive poverilnice
+
 
 \subsection*{Ključne besede}
 \textit{\tkeywords}

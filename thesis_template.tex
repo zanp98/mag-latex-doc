@@ -89,6 +89,31 @@
 % (Uporabite v svojem LaTeX slogovnem predlogu)
 
 \chapter{Uvod}
+\label{sec:uvod}
+
+Farmacevtska dobavna veriga povezuje proizvajalce učinkovin in končnih izdelkov, distributerje, transporterje in lekarne v zapleten ekosistem, v katerem se prepletajo regulativne zahteve, poslovni interesi in kritična odgovornost do pacientov. Napačne odločitve o tem, komu zaupati pri proizvodnji, skladiščenju ali transportu, lahko vodijo v ogroženo kakovost zdravil, prekinitve preskrbe ali celo ogrožanje zdravja. V zadnjih letih so regulatorji in industrija veliko pozornosti namenili sledljivosti serij, preprečevanju ponarejenih zdravil in nadzoru nad dobavitelji, vendar mehanizmi za upravljanje zaupanja ostajajo razpršeni in pogosto slabo formalizirani.
+
+V praksi se zaupanje med akterji dobavne verige še vedno pogosto vzpostavlja na podlagi dvostranskih pogodb, ročnih revizij in zaprtih evidenc. Tak pristop otežuje ponovljivost odločitev in otežuje uporabo podatkov v avtomatiziranih procesih. Regulatorji nimajo enotnega, strojno preverljivega pogleda na to, kako so ocene zaupanja nastale, posamezni akterji pa težko dokazujejo svojo skladnost in kakovost prek različnih tržnih in nacionalnih meja. Ob tem se povečuje količina podatkov, ki bi lahko vplivali na oceno zaupanja (telemetrija transporta, digitalna dokazila, revizijska poročila), vendar ti podatki niso povezani v enoten, transparenten mehanizem odločanja.
+
+Vzporedno z razvojem regulative so nastale tehnologije, ki omogočajo bolj strukturirano obravnavo zaupanja. Semantične tehnologije in ontologije omogočajo eksplicitno modeliranje vlog, relacij in dokazov v dobavni verigi, verige blokov pa ponujajo nespremenljivo plast za zapis odločitev in revizijsko sled. Verifiable Credentials prinašajo standardiziran način za izdajanje in preverjanje digitalnih dokazil, decentralizirana omrežja orakljev pa omogočajo, da se izračuni zaupanja izvajajo zunaj verige, rezultati pa se v preverljivi obliki zapišejo na verigo.
+
+Cilj magistrske naloge je raziskati, kako se lahko ti gradniki povežejo v enoten mehanizem za izračun in objavo odločitev o zaupanju v farmacevtski dobavni verigi. Osrednje raziskovalno vprašanje se glasi, ali lahko kombinacija ontologije, preverljivih poverilnic, decentraliziranega omrežja orakljev in pametne pogodbe na verigi blokov omogoči razložljivo in kriptografsko preverljivo upravljanje zaupanja med akterji dobavne verige.
+
+Na tej podlagi zasledujemo več konkretnih ciljev:
+\begin{itemize}
+  \item oblikovati konceptualni model zaupanja v farmacevtski dobavni verigi, ki povezuje tipe akterjev, njihove lastnosti in vire dokazov o njihovem delovanju,
+  \item razviti ontologijo v jeziku OWL, ki ta model formalizira in omogoča poizvedovanje ter osnovno inferenco nad podatki,
+  \item zasnovati arhitekturo sistema, ki ontologijo poveže s pametno pogodbo in decentraliziranim omrežjem orakljev na verigi blokov,
+  \item implementirati prototipni sistem na testnem Ethereum omrežju s tremi oraklji, ki utelešajo različne pristope k upravljanju zaupanja,
+  \item pripraviti scenarije uporabe, s katerimi prikažemo delovanje sistema pri ocenjevanju konkretnih akterjev in dinamičnem prilagajanju ocene zaupanja,
+  \item izvesti varnostno analizo pametne pogodbe in omrežja orakljev ter opredeliti ključne korake na poti do produkcijskega sistema.
+\end{itemize}
+
+Na konceptualni ravni naloga predstavi model grafa zaupanja, v katerem so semantični opisi akterjev, politik in dokazov povezani z on-chain zapisom odločitev. Na arhitekturni ravni naloga združi ontologijo, preverljive poverilnice, decentralizirano omrežje orakljev in pametno pogodbo \texttt{TrustGraph.sol} v delujoč prototip. Na implementacijski ravni naloga prikaže, kako lahko trije oraklji z različnimi algoritmi izračunajo ocene zaupanja, jih pošljejo agregatorju in preko njega zapišejo agregirano odločitev na verigo blokov. Varnostna analiza na koncu osvetli ključne grožnje in obstoječe protiukrepe ter nakaže, kaj bi bilo potrebno nadgraditi pri prehodu v realno okolje.
+
+Metodološko naloga združuje pregled literature s področja upravljanja zaupanja v razpršenih sistemih in farmacevtskih dobavnih verigah, načrtovanje semantičnega modela in arhitekture, implementacijo prototipa ter eksperimentalno vrednotenje na podlagi scenarijev. Scenariji služijo kot ponovljivi primeri, s katerimi pokažemo, kako se ocene zaupanja spreminjajo ob novih podatkih, na primer ob incidentih v transportu, ter kako se različni pogledi orakljev zlivajo v enotno, na verigi zapisano odločitev. Varnostni del naloge temelji na modelu STRIDE in analizira pametno pogodbo ter decentralizirano omrežje orakljev z vidika ključnih razredov groženj.
+
+Struktura naloge je naslednja. V drugem poglavju predstavimo teoretično ozadje: modele zaupanja v razpršenih sistemih, semantične tehnologije, verige blokov, preverljive poverilnice in decentralizirana omrežja orakljev. V tretjem poglavju opišemo zasnovo sistema, vključno z ontologijo, arhitekturo in izbranimi algoritmi orakljev. Četrto poglavje je posvečeno implementaciji prototipa, opisu komponent ter treh orakljev in agregatorja. V petem poglavju predstavimo scenarije uporabe in rezultate izvajanja prototipa. V šestem poglavju izvedemo varnostno analizo pametne pogodbe in omrežja orakljev. V sedmem poglavju obravnavamo pot od prototipa do produkcijskega sistema ter operativne in regulativne vidike. Zaključek povzema glavne ugotovitve in prispevke naloge ter nakaže smeri nadaljnjega dela.
 
 
 \chapter{Pregled literature in ozadje}
@@ -1358,7 +1383,7 @@ Varnostna analiza se tako osredotoča na del sistema, kjer se sprejemajo in zapi
 \subsection{Pregled arhitekture DON in pametne pogodbe}
 \label{subsec:pregled-arhitekture-varnost}
 
-Za potrebe varnostne analize na kratko povzamemo del arhitekture, ki je ključen za mehanizem zaupanja. Pametna pogodba \texttt{TrustGraph.sol}, ki teče na testnem Ethereum omrežju, hrani agregirane odločitve o zaupanju za posamezne subjekte ter posamične prispevke orakljev, vezane na identifikatorje zahtev \texttt{requestId}. Agregator deluje kot edini pooblaščeni zapisovalec teh rezultatov in ima zato lasten naslov ter zasebni ključ v omrežju. Klice na pametno pogodbo \texttt{TrustGraph.sol} pošilja prek varnega klica RPC (HTTPS) do vozlišča verige blokov, pri čemer je identiteta klicatelja na ravni Ethereum protokola kriptografsko potrjena s podpisom transakcije.
+Za potrebe varnostne analize na kratko povzamemo del arhitekture, ki je ključen za mehanizem zaupanja. Pametna pogodba \texttt{TrustGraph.sol}, ki teče na testnem Ethereum omrežju, hrani agregirane odločitve o zaupanju za posamezne subjekte ter posamične prispevke orakljev, vezane na identifikatorje zahtev \texttt{requestId}. Agregator deluje kot edini pooblaščeni zapisovalec teh rezultatov in ima zato lasten naslov ter zasebni ključ v omrežju. Klice na pametno pogodbo \texttt{TrustGraph.sol} pošilja prek varnega klica RPC do vozlišča verige blokov, pri čemer je identiteta klicatelja na ravni Ethereum protokola kriptografsko potrjena s podpisom transakcije.
 
 Funkcije pametne pogodbe, ki sprejemajo rezultate, so zaščitene z vlogo oziroma modifikatorjem \texttt{onlyEvaluator}, kar pomeni, da jih lahko kliče le z zasebnim ključem, katerega lastnik je agregator. Klici z drugih naslovov povzročijo zavrnitev transakcije (v pametnih pogodbah se kliče funkcija \texttt{revert}). Za spremembe nastavitev, kot so menjava agregatorja ali dodeljevanje novih vlog, je predvideno upravljanje z vlogami in potrjevanjem z več podpisi(angl.\ \emph{multi-sig}). To preprečuje, da bi en sam zasebni ključ samovoljno spremenil pravila delovanja sistema. 
 
@@ -1509,7 +1534,7 @@ Za samo infrastrukturo DON bi bilo smiselno obstoječe rešitve za decentralizir
 
 Na ravni pametne pogodbe bi prehod v produkcijo zahteval utrditev mehanizmov upravljanja in nadgradnje. Ključno je, da pogodba jasno loči vloge (regulator, agregatorji, tehnični skrbniki) in omeji njihova pooblastila z dobro preizkušenimi vzorci, kot so večpodpisne denarnice in formalno definirani postopki nadgradnje. Vsak poseg v konfiguracijo, na primer dodajanje ali odstranjevanje oraklja, zamenjava agregatorja ali sprememba pragov zaupanja, bi moral biti transparenten, sledljiv in odobren s strani vnaprej definiranega kvora udeležencev, ne pa vezan na en sam zasebni ključ.
 
-Poleg identitet in upravljanja vlog bi bilo treba v produkcijskem okolju bistveno več pozornosti nameniti varnemu upravljanju zasebnih ključev ter razpoložljivosti celotne arhitekture. Ključi orakljev in agregatorjev bi morali biti shranjeni v varnih modulih (HSM, upravljavci skrivnosti v oblaku), z dolgoživimi politikami rotacije ter jasnimi postopki ob zaznani kompromitaciji. Infrastrukturo orakljev bi bilo treba postaviti v redundantnem okolju, z nadzorovanimi posodobitvami, spremljanjem izpada in mehanizmi za avtomatsko preusmeritev prometa v primeru okvare.
+Poleg identitet in upravljanja vlog bi bilo treba v produkcijskem okolju bistveno več pozornosti nameniti varnemu upravljanju zasebnih ključev ter razpoložljivosti celotne arhitekture. Ključi orakljev in agregatorjev bi morali biti shranjeni v varnih modulih, z dolgoživimi politikami rotacije ter jasnimi postopki ob zaznani kompromitaciji. Infrastrukturo orakljev bi bilo treba postaviti v redundantnem okolju, z nadzorovanimi posodobitvami, spremljanjem izpada in mehanizmi za avtomatsko preusmeritev prometa v primeru okvare.
 
 Pot od trenutnega prototipa do produkcijskega sistema bi v praksi potekala v več korakih. Najprej bi bilo smiselno utrditi že implementirane varnostne mehanizme na ravni pametne pogodbe in agregatorja, dodati formalizirano upravljanje vlog ter razširiti testno pokritost. Sledila bi faza razširitve DON z več neodvisnimi oraklji in morda več agregatorji, kjer bi se v pilotnem okolju preizkusile različne konfiguracije kvoruma in algoritmi agregacije. V naslednjem koraku bi se sistem integriral z realno infrastrukturo preverljivih poverilnic (EBSI) in z izbranimi operativnimi sistemi akterjev v dobavni verigi, ob tem pa bi se v sodelovanju z regulatorji definirali formalni postopki uporabe rezultatov zaupanja v odločanju o odpošiljanju in licenciranju. Po uspešnem pilotnem obdobju bi sledil popoln prehod v produkcijsko okolje, z ustrezno dokumentacijo, usposabljanjem uporabnikov in vzpostavitvijo postopkov za dolgoročno vzdrževanje in nadgradnje sistema.
 
@@ -1560,7 +1585,6 @@ Nadaljnje delo mora zato zajeti razširitev sistema v smeri realističnega okolj
   label={lst:trust-ontology}
 ]{ontologies/pharma-trust.owl}
 
-\chapter{Izvlečki kode pametnih pogodb}
 
 %----------------------------------------------------------------
 % SLO: bibliografija
