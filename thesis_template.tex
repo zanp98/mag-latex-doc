@@ -887,7 +887,7 @@ kjer je v implementaciji uporabljena lestvica $\textit{obs\_scale} = 9$. Za »po
 Pri novih opazovanjih posterior posodobimo z uporabo EWMA faktorja $\gamma \approx 0{,}2$, tako da nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
 
 \paragraph{Kombinirana odločitev}
-Za posamezen subjekt se verjetnostna ocena izračuna kot uteženo povprečje srednjih vrednosti Beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
+Za posameznega akterja se verjetnostna ocena izračuna kot uteženo povprečje srednjih vrednosti beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
 \[
     \sum_i w_i = 1, \qquad w_i \geq 0.
 \]
@@ -1046,12 +1046,12 @@ V opisu scenarijev bomo tabelarično pokazali, kako so posamezne ocene orakljev 
 Za dane tri (ali več) veljavnih poročil agregator uporabi preprosta deterministična pravila:
 
 \paragraph{Skupni subjekt in politika}
-Najprej preveri, da:
+
+Najprej preveri, ali so vsa poročila skladna glede na tri kriterije:
 \begin{itemize}
   \item vsa poročila veljajo za istega subjekta (isti zgoščeni identifikator),
   \item vsa poročila uporabljajo enak povzetek politike (\texttt{policy\_hash}),
-  \item povzetek poverilnic (\texttt{credential\_hash}) ni v nasprotju z
-        lokalno shrambo poverilnic (če ta obstaja).
+  \item povzetek poverilnic (\texttt{credential\_hash}) ni v nasprotju z shrambo poverilnic (če ta obstaja).
 \end{itemize}
 Če katero od teh preverjanj pade, agregator poročil ne združi in zahteva v
 scenariju velja za neuspešno.
@@ -1079,8 +1079,7 @@ Oraklji z zastavicami označijo posebna stanja, npr.\ pomanjkanje podatkov, nizk
 
 \subsubsection*{Zapis agregirane odločitve na verigo}
 
-Ko je agregacija uspešna, agregator za dani \texttt{request\_id} izvede klic
-\texttt{fulfillTrustReport} v pametni pogodbi \texttt{TrustGraph.sol}. V
+Ko je agregacija uspešna, agregator za dani \texttt{request\_id} izvede klic \texttt{fulfill\-Trust\-Report} v pametni pogodbi \texttt{TrustGraph.sol}. V
 verigo blokov se zapiše:
 \begin{itemize}
   \item identifikator subjekta (zgoščena identiteta),
