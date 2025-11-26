@@ -926,7 +926,7 @@ Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih dat
     \item \texttt{hasAuditScore} $\geq 0{,}90$,
     \item \texttt{hasGDPVC} $=$ \texttt{true}.
 \end{itemize}
-Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najbližje \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
+Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najboljši približek \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
 
 \paragraph{Verjetnostni del}
 Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke (angl.\ \emph{basis points}, 0--10000). Za vsak kriterij se vodi Beta posterior, ki se posodablja po principu eksponentno uteženega drsečega povprečja (EWMA). S tem se približamo obnašanju modelov iz podpoglavij o priporočilnih modelih in dinamičnem posodabljanju zaupanja.
@@ -936,9 +936,9 @@ Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednost
     \alpha = 1 + s_0 \cdot \textit{obs\_scale}, \qquad
     \beta = 1 + (1 - s_0) \cdot \textit{obs\_scale},
 \]
-kjer je v implementaciji uporabljena lestvica $\textit{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost Beta porazdelitve $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko, a ne absolutno zaupanje.
+kjer je v implementaciji uporabljena lestvica $\textit{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost porazdelitve beta $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko, a ne absolutno zaupanje.
 
-Pri novih opazovanjih posterior posodobimo z uporabo EWMA faktorja $\gamma \approx 0{,}2$, tako da nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
+Pri novih opazovanjih posterior posodobimo z uporabo faktorja EWMA $\gamma \approx 0{,}2$, tako da nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno podobno formuli za dinamično posodabljanje zaupanja v podpoglavju o amortizacijskih faktorjih, kjer nove interakcije s časom prevladajo nad starimi.
 
 \paragraph{Kombinirana odločitev}
 Za posameznega akterja se verjetnostna ocena izračuna kot uteženo povprečje srednjih vrednosti beta posteriorjev aktivnih kriterijev. Uteži so zapisane v polju \texttt{\_weights} v politiki in se normalizirajo tako, da zadošča:
