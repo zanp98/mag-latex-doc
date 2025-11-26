@@ -541,7 +541,7 @@ WHERE {
 
 Ker je ontologija zgrajena v OWL, omogoča tudi uporabo razumevalnika (angl. reasoner). Razumevalnik lahko samodejno razvrsti akterje v razrede (npr. \texttt{TrustedTransporter}), zazna nedoslednosti in izpelje lastnosti, ki niso zapisane neposredno. Vsak orakelj lahko razumevalnik po potrebi zažene lokalno in s tem pridobi izpeljane podatke.
 
-
+\newpage
 \paragraph{Preverljiva dokazila (VC)}
 
 Poleg podatkov iz ontologije sistem uporablja še preverljiva dokazila (VC), ki jih izdajajo regulatorji ali druge zaupanja vredne organizacije. Ta dokazila vsebujejo trditve o akterjih, kot so veljavnost licence, GMP skladnost ali datum zadnje presoje kakovosti. Dokazila so zapisana v formatu JSON-LD in digitalno podpisana.
@@ -678,12 +678,12 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
 \end{enumerate}
 
 Ker je celoten postopek sestavljen iz več medsebojno odvisnih korakov, se v naslednjih podpoglavjih osredotočimo na bolj podroben pregled posameznih delov. Najprej pogledamo notranje delovanje omrežja orakljev in agregacije rezultatov, nato pa še na branje podatkov iz registra zaupanja.
-
+\newpage
 \subsection{Agregiranje rezultatov v omrežju orakljev}
 
 Na sliki~\ref{fig:seq-diagram-aggregation} je prikazan podroben potek obdelave poročil znotraj decentraliziranega omrežja orakljev (DON). Diagram prikazuje fazo po tem, ko oraklji prejmejo zahtevo za izračun zaupanja, in se osredotoča na izvajanje izračuna, podpisovanje poročil ter postopek agregacije v agregatorju. Ta proces je ključen za zagotavljanje verodostojnih rezultatov, saj združi poročila več neodvisnih orakljev v en sam, konsenzni izračun.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/seq-diagram-aggregation.png}
   \caption{Potek agregiranja rezultatov v decentraliziranem omrežju orakljev}
@@ -769,6 +769,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
 
 Agregator povezuje izračune več orakljev v enoten rezultat, pametna pogodba pa poskrbi, da je končni izračun trajno in preverljivo zapisan v verigi blokov. V naslednjem podpoglavju si bomo ogledali, kako akterji v sistemu pridobijo te rezultate in kako poteka branje podatkov iz registra zaupanja.
 
+\newpage
 \subsection{Branje rezultatov zaupanja}
 Po zaključenem izračunu in zapisu rezultatov v pametno pogodbo lahko akterji iz sistema pridobijo podatke o zaupanju na dva načina: (i) kot posamezne oddaje orakljev in (ii) kot agregiran, konsenzni rezultat omrežja orakljev (DON). 
 
@@ -1495,15 +1496,14 @@ Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na
     Grožnja & Protiukrepi & Testno pokritje \\
     \hline
     Nepooblaščeni klici funkcij za zapis rezultatov & Vloga \texttt{EVALUATOR} oziroma modifikator \texttt{onlyEvaluator}, ki omeji klice na naslov(e) agregatorja & Enotski testi klicev z nedovoljenih naslovov, ki pričakujejo \texttt{revert} \\
-    \midrule
+    \hline
     Neveljavne spremembe stanja odločitev o zaupanju & Preverjanje parametrov in invarianti stanja (ujemanje \texttt{requestId}, monotoni časovni žigi, veljavne zastavice) & Fuzzing in regresijski testi zaporednih klicev, ki preverjajo, da pogodba ne ostane v nelogičnem stanju \\
-    \midrule
+    \hline
     Preobremenitev pogodbe z velikim številom zahtev ali dragimi klici & Omejitve, kdo lahko sproži nove zahteve, ter preverjanje velikosti in kompleksnosti zapisov & Merjenje porabe plina in testi mejnih primerov za funkcije \texttt{requestTrustReport} in \texttt{fulfillTrustReport} \\
-    \midrule
+    \hline
     Prevelika količina podatkov o subjektih na verigi & Shranjevanje le zgoščenih identifikatorjev (hash VC, hash politike, hash ontologije) in agregiranih ocen & Pregled sheme stanja in testi za nove različice, ki preverjajo, da se na verigo ne dodajajo surovi identifikatorji ali PII \\
-    \midrule
+    \hline
     Zloraba upravljavskih oziroma administrativnih vlog & Vloge in večpodpisno upravljanje nad kritičnimi konfiguracijskimi funkcijami (npr.\ zamenjava agregatorja) & Enotski testi dodeljevanja, rotacije in preklica vlog ter zaščite privilegiranih funkcij \\
-    \bottomrule
     \hline
   \end{tabularx}
 \end{table}
@@ -1533,29 +1533,29 @@ Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odg
   \label{tab:threat-don}
   \small
   \begin{tabularx}{\linewidth}{|X|X|X|}
-    \toprule
+    \hline
     \textbf{Grožnja} & \textbf{Protiukrepi} & \textbf{Testno pokritje} \\
-    \midrule
+    \hline
     Lažni orakelj pošilja poročila agregatorju 
       & Kriptografsko preverjanje podpisov (ECDSA \texttt{recover}) in seznam dovoljenih naslovov orakljev 
       & Integracijski test, ki na \texttt{/reports} pošlje napačno podpisan zahtevek ali zahtevek z neznanega naslova in pričakuje napako \\
-    \midrule
+    \hline
     Spreminjanje vsebine poročil med prenosom ali v agregatorju 
       & Podpis kanonične JSON predstavitve, preverjanje hashov in zavrnitev pri neskladju 
       & Enotski testi deterministične serializacije ter preverjanja podpisov in hashov \\
-    \midrule
+    \hline
     Orakelj zanika, da je oddal določeno poročilo 
       & Shranjevanje podpisanih poročil oziroma njihovih hashov ter deterministična obnova naslova iz podpisa 
       & Testi obnove naslova iz podpisa in ujemanja z zapisanim \texttt{node\_id} ter revizijske sledi \\
-    \midrule
+    \hline
     Prekomerno logiranje identitet subjektov ali poverilnic 
       & Redakcija logov (hashi namesto URI-jev) in uporaba psevdonimnih identifikatorjev 
       & Enotski testi nad vzorčnimi logi, ki preverjajo, da se občutljivi podatki ne pojavijo v izpisu \\
-    \midrule
+    \hline
     Preobremenitev orakljev ali agregatorja z zahtevki 
       & Omejitve na nivoju omrežja (rate limiting, požarni zid), kvote in redundanca vozlišč 
       & Obremenitveni testi HTTP vmesnika ter spremljanje odzivnega časa in števila zahtevkov \\
-    \midrule
+    \hline
     Kompromitiran agregator zlorabi svojo vlogo pri zapisovanju rezultatov 
       & Več agregatorjev ali delna agregacija na verigi, ločeno upravljanje konfiguracije in jasna omejitev pooblastil 
       & Simulacijski testi različnih konfiguracij kvora in scenarijev kompromitiranih vozlišč \\
