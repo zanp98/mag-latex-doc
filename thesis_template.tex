@@ -570,18 +570,18 @@ Primer dokazila, ki ga izda regulator:
 
 Preverljiva dokazila so shranjena v ločeni podatkovni bazi. Ob izračunu zaupanja orakelj preveri kriptografski podpis izdajatelja, iz podatkov izlušči relevantne lastnosti in jih združi z informacijami iz ontologije. Tako sestavi popoln nabor kriterijev, ki jih akter uporabi pri ocenjevanju zaupanja.
 
-Plast znanja združuje semantične opise akterjev in njihove lastnosti z regulatorno potrjenimi podatki iz preverljivih dokazil. Oraklji pri izračunu zaupanja dostopajo do obeh virov: iz Fusekija pridobijo opisne metrike, iz VC-jev pa dodatne podatke, ki jih ontologija ne vsebuje. S tem plast znanja omogoča enoten, strukturen in preverljiv nabor podatkov, na katerem temelji celoten izračun zaupanja.
+Plast znanja združuje semantične opise akterjev in njihove lastnosti z regulatorno potrjenimi podatki iz preverljivih dokazil. Oraklji pri izračunu zaupanja dostopajo do obeh virov: iz Fusekija pridobijo opisne metrike, iz VC-jev pa dodatne podatke, ki jih ontologija ne vsebuje. S tem plast znanja omogoča enoten in strukturiran nabor podatkov, na katerem temelji celoten izračun zaupanja.
 
 \subsubsection{Plast izračuna zaupanja}
 Plast izračuna zaupanja predstavlja osrednjo procesno komponento arhitekture. Njena naloga je, da podatke iz plasti znanja pretvori v konkretne odločitve o zaupanju in jih posreduje verigi blokov. V tej plasti se nahaja omrežje orakljev in agregator, ki skupaj tvorita neodvisen mehanizem sklepanja. Oraklji izvajajo izračune, agregator pa skrbi za preverjanje rezultatov in zapis končnega stanja v pametno pogodbo.
 
 \paragraph{Oraklji}
-Ko sistem prejme zahtevo za izračun zaupanja, pametna pogodba sproži dogodek, ki služi kot signal orakljem, da morajo izvesti novo oceno. Oraklji ne delujejo kot pasivni odjemalci, temveč aktivno spremljajo verigo blokov in zaznavajo zahteve, ki jih je treba obdelati. Za podani subjekt nato pridobijo vse podatke iz plasti znanja: opisne lastnosti iz ontologije ter pripadajoča preverljiva dokazila iz baze poverilnic VC. Na ta način je izračun zaupanja vedno vezan na najnovejše in preverljive podatke.
+Ko sistem prejme zahtevo za izračun zaupanja, pametna pogodba sproži dogodek, ki služi kot signal, da morajo oraklji izvesti novo oceno. Oraklji ne delujejo kot pasivni odjemalci, temveč aktivno spremljajo verigo blokov in zaznavajo zahteve, ki jih je treba obdelati. Za podani subjekt nato pridobijo vse podatke iz plasti znanja: opisne lastnosti iz ontologije ter pripadajoča preverljiva dokazila iz baze poverilnic VC. Na ta način je izračun zaupanja vedno vezan na najnovejše in preverljive podatke.
 
 Pridobljene podatke orakelj združi s pravili ocenjevalca. Pravila določajo, katere lastnosti mora ocenjevan akter izpolnjevati in pod kakšnimi pogoji. Orakelj izvede ocenjevanje in pripravi strukturirano poročilo, ki vsebuje identifikator subjekta, končno odločitev, numerično oceno, kriptografske povzetke uporabljenih dokazil ter čas izračuna. Poročilo je serializirano v JSON obliki in digitalno podpisano z zasebnim ključem oraklja. S tem postane rezultat preverljiv in vezan na točno določen orakelj.
 
 \paragraph{Agregator}
-Podpisano poročilo orakelj pošlje agregatorju, ki deluje kot zbirni člen med oraklji in pametno pogodbo. Agregator preveri digitalni podpis, preveri, ali je poročilo prišlo od dovoljenega oraklja, ter ga zapiše na verigo kot posamično oddajo. Ko prejme zadostno število poročil, izvede konsenz nad prejetimi odločitvami in oceno zaupanja ter prek transakcije posreduje končni rezultat v pametno pogodbo \texttt{TrustGraph}.
+Podpisano poročilo orakelj pošlje agregatorju, ki deluje kot zbirni člen med oraklji in pametno pogodbo. Ob prejemu poročila preveri digitalni podpis in, če je poročilo prišlo od dovoljenega oraklja. Poročilo zapiše na verigo kot posamično oddajo. Ko prejme zadostno število poročil, izvede konsenz nad prejetimi odločitvami in oceno zaupanja ter prek transakcije posreduje končni rezultat v pametno pogodbo \texttt{TrustGraph}.
 
 Na visoki ravni potek izračuna poteka v naslednjih korakih:
 \begin{enumerate}
@@ -604,7 +604,7 @@ Ko agregator prejme dovolj veljavnih poročil orakljev, izvede postopek združev
 
 Register zaupanja hrani dve vrsti podatkov. Prva vrsta so posamične oddaje orakljev, ki predstavljajo neobdelane rezultate izračuna. Druga vrsta so konsenzni rezultati, ki jih agregator izračuna na podlagi več oddaj in jih pogodba obravnava kot veljavno končno stanje zaupanja za posameznega akterja. Na ta način lahko sistem ohranja celovito sliko o tem, kako so se rezultati spreminjali in kako je bila sprejeta končna odločitev.
 
-Zapis v register omogoča tudi poizvedovanje nad trenutnim ali zgodovinskim stanjem zaupanja. Akterji v dobavni verigi lahko kadar koli preverijo, ali je določen partner trenutno ocenjen kot zaupanja vreden ali ne. Ker podatki niso shranjeni v centraliziranem sistemu, temveč v porazdeljeni verigi blokov, se vnosov ne da naknadno spreminjati ali brisati. To daje sistemu lastnost dolgoročne preverljivosti, kar je ključno v okoljih, kjer se sprejemajo odločitve z regulatornimi posledicami.
+Zapis v register omogoča tudi poizvedovanje nad trenutnim ali zgodovinskim stanjem zaupanja. Akterji v dobavni verigi lahko kadar koli preverijo, ali je določen partner trenutno ocenjen kot zaupanja vreden ali ne. Ker podatki niso shranjeni v centraliziranem sistemu, temveč v verigi blokov, se vnosov ne da naknadno spreminjati ali brisati. To daje sistemu lastnost dolgoročne preverljivosti, kar je ključno v okoljih, kjer se sprejemajo odločitve z regulatornimi posledicami.
 
 Plast registra zaupanja tako predstavlja stičišče celotnega sistema: prejme rezultate iz računske plasti, jih trajno zapiše in omogoča zanesljiv vpogled v relacije zaupanja v vsakem trenutku. V nadaljevanju bomo opisali funkcije pametne pogodbe \texttt{TrustGraph}, podatkovne strukture, dogodke ter način, kako zunanji akterji dostopajo do registra.
 
@@ -645,7 +645,7 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
       \item semantične lastnosti akterja iz ontologije prek poizvedb SPARQL na strežniku Fuseki,
       \item veljavna preverljiva dokazila (VC), ki jih orakelj prebere iz lokalne baze dokazil.
     \end{itemize}
-    Pridobivanje podatkov iz ontologije poteka prek SPARQL končne točke, ki vrne lastnosti subjekta (npr.\ točnost dostav, licenčne statuse, GMP skladnost). Preverljiva dokazila se preverijo z validacijo digitalnega podpisa izdaje. S tem orakelj zagotovi, da izračun temelji na najnovejših in verodostojnih podatkih.
+    Pridobivanje podatkov iz ontologije poteka prek končne točke SPARQL, ki vrne lastnosti subjekta (npr.\ točnost dostav, licenčne statuse, skladnost GMP). Preverljiva dokazila se preverijo z validacijo digitalnega podpisa izdaje. S tem orakelj zagotovi, da izračun temelji na najnovejših in verodostojnih podatkih.
 
   \item \textbf{Izvedba izračuna glede na pravila ocenjevalca}\newline
     Ko ima orakelj na voljo vse relevantne podatke, izvede izračun zaupanja. Pri tem uporabi pravila, ki si jih bomo v nadaljevanju pogledali na testnih scenarijih. Rezultat tega koraka je numerična ocena in binarna odločitev, ali akter izpolnjuje zahtevane pogoje. Poleg tega orakelj pripravi tudi metapodatke, kot so:
@@ -908,7 +908,20 @@ V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili razli�
     \item \textbf{Orakelj C} je \emph{telemetrijsko usmerjen} in se naslanja na dinamično posodabljanje zaupanja preko operativnih metrik, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
 \end{itemize}
 
-Čeprav so v prototipu algoritmi implementirani v isti kodni bazi, jih v nadaljevanju obravnavamo kot tri samostojne oraklje, od katerih ima vsak svoj lastni algoritem izračuna zaupanja.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/oracles-sources.png}
+  \caption{Viri podatkov za posamezne oraklje v plasti znanja}
+  \label{fig:oracle-sources}
+\end{figure}
+
+Na sliki~\ref{fig:oracle-sources} je prikazano, iz katerih virov črpajo podatke
+posamezni oraklji. Orakelj~A ima hibriden pogled: pri izračunu zaupanja hkrati
+upošteva telemetrijo, preverljive poverilnice VC in podatke iz ontologije.
+Orakelj~B pri odločanju uporablja samo preverljive poverilnice VC,
+medtem ko Orakelj~C izhaja predvsem iz telemetrijskih metrik. Vsi trije oraklji
+ontologijo uporabljajo kot skupni imenik akterjev, iz katerega pridobijo
+njihove identifikatorje in osnovne oznake.
 
 \subsubsection*{Skupna struktura izračuna}
 
@@ -952,31 +965,6 @@ Vsak orakelj uporablja svoj prag \textit{verjetnostne ocene}, $\textit{prob\_thr
     \textit{combined} = \textit{deterministic} \;\text{OR}\; \left(\textit{prob\_score} \geq \textit{prob\_threshold}\right),
 \]
 kjer je \textit{deterministic} deterministična odločitev (\emph{PASS}/\emph{FAIL}), \textit{prob\_score} pa izračunana verjetnostna ocena. Na ta način se trda pragovna pravila (dokazni pogled) kombinirajo z mehko, številsko oceno, ki je bližje priporočilnim in porazdeljenim modelom zaupanja.
-
-
-Kot je razvidno iz tabele~\ref{tab:oracle-concepts}, oraklji uporabljajo različne vire podatkov. Orakelj~A pri izračunu zaupanja kombinira ontologijo, preverljiva dokazila in telemetrijo, orakelj~B bere iz baze preverljivih poverilnic, orakelj~C pa ima na voljo svoj vir telemetrijskih podakov.
-
-
-\begin{table}[ht]
-  \centering
-  \caption{Primerjava treh orakljev glede na uporabljen vir podatkov}
-  \label{tab:oracle-concepts}
-  \small
-  \begin{tabular}{lccc}
-    \hline
-                    & Orakelj A & Orakelj B & Orakelj C \\
-    \hline
-    Ontologija      & \cmark    & \xmark    & \xmark    \\
-    Preverljive poverilnice
-                    & \cmark    & \cmark    & \xmark    \\
-    Telemetrija     & \cmark    & \xmark    & \cmark    \\
-    \hline
-  \end{tabular}
-
-
-  \vspace{0.3em}
-  {\footnotesize \cmark{} primarni vir, \xmark{} sekundarni ali neuporabljen vir.}
-\end{table}
 
 V nadaljevanju opišemo konkretne konfiguracije in primere za omenjene oraklje, ki uporabljajo različne pristope iz poglavja~\ref{sec:trust-management-distributed-systems}.
 
@@ -1113,7 +1101,7 @@ Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \textt
 
 \medskip
 
-Takšna predstavitev treh orakljev neposredno gradi na modelih iz poglavja~\ref{sec:trust-management-distributed-systems}: Orakelj A predstavlja hibridni semantičen in dinamično podprt pristop, Orakelj B predstavlja strogo dokazno-kriptografski pogled, Orakelj C pa dinamično, na meritvah temeljeno ocenjevanje. V scenarijih, ki sledijo, bomo za izbranega subjekta pokazali, kako različni algoritmi privedejo do različnih, a razložljivih odločitev o zaupanju.
+Takšna predstavitev treh orakljev neposredno gradi na modelih iz poglavja~\ref{sec:trust-management-distributed-systems}: Orakelj A predstavlja hibridni semantičen in dinamično podprt pristop, Orakelj B predstavlja strogo dokazno-kriptografski pogled, Orakelj C pa dinamično, na meritvah temeljeno ocenjevanje. V scenarijih, ki sledijo, bomo za izbrani subjekt pokazali, kako različni algoritmi privedejo do različnih, a razložljivih odločitev o zaupanju.
 
 \subsection{Agregacija poročil orakljev}
 \label{subsec:agregator-scenariji}
@@ -1564,15 +1552,15 @@ Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odg
       & Integracijski test, ki na \texttt{/reports} pošlje napačno podpisan zahtevek ali zahtevek z neznanega naslova in pričakuje napako \\
     \hline
     Spreminjanje vsebine poročil med prenosom ali v agregatorju 
-      & Podpis kanonične JSON predstavitve, preverjanje hashov in zavrnitev pri neskladju 
-      & Enotski testi deterministične serializacije ter preverjanja podpisov in hashov \\
+      & Podpis predstavitve JSON, preverjanje zgoščenih vrednosti in zavrnitev pri neskladju
+      & Enotski testi serializacije ter preverjanja podpisov in zgoščenih vrednosti \\
     \hline
     Orakelj zanika, da je oddal določeno poročilo 
-      & Shranjevanje podpisanih poročil oziroma njihovih hashov ter deterministična obnova naslova iz podpisa 
+      & Shranjevanje zgoščenih vrednosti podpisanih poročil in obnova naslova iz podpisa 
       & Testi obnove naslova iz podpisa in ujemanja z zapisanim \texttt{node\_id} ter revizijske sledi \\
     \hline
-    Prekomerno logiranje identitet subjektov ali poverilnic 
-      & Redakcija logov (hashi namesto URI-jev) in uporaba psevdonimnih identifikatorjev 
+    Prekomerno evidentiranje identitet subjektov ali poverilnic 
+      & Zgoščene vrednosti identifikatorjev v dnevnikih 
       & Enotski testi nad vzorčnimi logi, ki preverjajo, da se občutljivi podatki ne pojavijo v izpisu \\
     \hline
     Preobremenitev orakljev ali agregatorja z zahtevki 
@@ -1594,11 +1582,11 @@ Pri tamperingu ščitimo predvsem integriteto vsebine poročil. Ker je podpisan 
 
 Grožnja repudiacije je pomembna z vidika transparentnosti: orakelj bi lahko poskušal zanikati, da je oddal negativno poročilo za določenega partnerja. S podpisanimi poročili in deterministično obnovo naslova iz podpisa lahko vedno pokažemo, kateri ključ je poročilo podpisal. Če agregator dodatno hrani hash sprejetih poročil, je revizijska sled za potrebe kasnejših sporov ali regulatornih pregledov relativno preprosto dosegljiva.
 
-Poseben del zasnove DON je tudi preverjanje preverljivih poverilnic (VC), ki spremljajo poročila. Vsak orakelj poleg ocene zaupanja priloži VC, ki dokazuje njegovo pooblastilo ali lastnosti subjekta; agregator pred sprejemom poročila preveri podpis VC, status preklica, časovno veljavnost in skladnost sheme z vnaprej definirano politiko. Poročila z neveljavnimi ali preklicanimi poverilnicami so zavrnjena in se nikoli ne zapišejo na verigo, kar zmanjša tveganje, da bi se na grafe zaupanja oprli ponarejeni ali zastareli dokazi.
+Poseben del zasnove DON je tudi preverjanje preverljivih poverilnic (VC), ki spremljajo poročila. Vsak orakelj poleg ocene zaupanja priloži VC, ki dokazuje njegovo pooblastilo ali lastnosti subjekta. Agregator pred sprejemom poročila preveri podpis VC, status preklica, časovno veljavnost in skladnost sheme z vnaprej definirano politiko. Poročila z neveljavnimi ali preklicanimi poverilnicami so zavrnjena in se nikoli ne zapišejo na verigo. To zmanjša tveganje, da bi se na grafe zaupanja oprli ponarejeni ali zastareli dokazi.
 
-Napadi zavrnitve storitve (DoS) ciljajo na razpoložljivost omrežja. Ker v prototipu omejevanje hitrosti ni povsod implementirano, so oraklji in agregator teoretično dovzetni za preobremenitev z veliko količino zahtev. V produkcijski rabi bi morali definirati kvote na nivoju omrežja (API prehodi, požarni zidovi), dodati health-checke ter zagotoviti redundanco vozlišč, tako da izpad posameznega oraklja ali agregatorja ne onemogoči sistema in da se promet enakomerno porazdeli.
+Informacijsko razkritje v omrežju orakljev se najpogosteje zgodi prek dnevniških zapisov. V prototipu oraklji in agregator že uporabljajo zgoščene identifikatorje subjektov, saj se DID pred zapisom v dnevnik pretvori v vrednost \texttt{bytes32}. Kljub temu je pri nadaljnjem razvoju treba paziti, da v dnevnikih ne ostanejo neposredni naslovi URI ali vsebine poverilnic. Priporočljivo je dosledno uvesti preverjanje dnevnikov (npr. izpis le skrajšanih zgoščenih vrednosti in anonimnih oznak namesto poslovnih imen) ter z enotnimi testi preverjati, da dnevniki ne vsebujejo občutljivih podatkov.
 
-Informacijsko razkritje v DON se tipično zgodi skozi dnevnike. Ker oraklji in agregator redno logirajo stanje in dogodke, obstaja nevarnost, da bi v logih ostali neposredni identifikatorji subjektov ali poverilnic. Zato je smiselno vpeljati redakcijo logov (na primer izpis le skrajšanega hash-a namesto celotnega URI-ja) in z enotskimi testi preverjati, da vzorčni logi ne vsebujejo občutljivih podatkov. S tem dopolnimo načelo minimizacije podatkov, ki ga že upoštevamo pri zapisih na verigo.
+Napadi zavrnitve storitve (DoS) ciljajo na razpoložljivost omrežja. Ker v prototipu omejevanje hitrosti ni povsod implementirano, so oraklji in agregator teoretično dovzetni za preobremenitev z veliko količino zahtev. V produkcijski rabi bi morali definirati omejitev dostopa na nivoju omrežja in zagotoviti redundanco vozlišč, tako da izpad posameznega oraklja ali agregatorja ne poruši sistema in da se promet enakomerno porazdeli.
 
 Zadnji sklop groženj se nanaša na privilegije agregatorja. Trenutni model predvideva en osrednji agregator, ki ima pooblastilo za zapis agregiranih odločitev v pametno pogodbo. Če bi bil ta agregator kompromitiran, bi lahko v imenu legitimnih orakljev pošiljal napačne podatke ali spreminjal rezultat agregacije, preden se ta zapiše na verigo. Pri razširitvi v produkcijo bi bilo smiselno razmisliti o več agregatorjih, ki bi morali doseči soglasje, ali o prenosu dela agregacijske logike v pametno pogodbo samo, tako da posamezno vozlišče ne bi moglo samostojno manipulirati z rezultati. Simulacije različnih nastavitev kvoruma in scenarijev kompromitiranih vozlišč lahko pomagajo oceniti, kako odporen bi bil tak sistem na zajetje ali okvaro posameznih komponent.
 
