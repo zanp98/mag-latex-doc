@@ -92,11 +92,11 @@
 \chapter{Uvod}
 \label{sec:uvod}
 
-Farmacevtske dobavne verige sodijo med najbolj regulirana in podatkovno zahtevna okolja v sodobni industriji. Zdravila, cepiva in drugi farmacevtski proizvodi potujejo med številnimi akterji, kot so proizvajalci, distributerji, transporterji, regulatorji in zdravstvene ustanove. Od vseh se pričakuje visoka stopnja zanesljivosti in skladnosti, vendar so tovrstne verige kljub temu izpostavljene številnim tveganjem. Pogosti so primeri ponarejenih zdravil, nepravilno ravnanje z izdelki, nepopolna poročila ter pomanjkanje transparentnosti. V veliki meri ti problemi izhajajo iz nezmožnosti pravočasnega, jasnega in doslednega preverjanja zaupanja v posamezne akterje.
+Farmacevtske dobavne verige sodijo med najbolj regulirana in podatkovno zahtevna okolja v sodobni industriji. Zdravila, cepiva in drugi farmacevtski proizvodi potujejo med številnimi akterji, kot so proizvajalci, distributerji, transporterji, regulatorji in zdravstvene ustanove. Od vseh se pričakuje visoka stopnja zanesljivosti in skladnosti, vendar so tovrstne verige kljub temu izpostavljene številnim tveganjem. Pogosti so primeri ponarejenih zdravil, nepravilno ravnanje z izdelki, nepopolna poročila ter pomanjkanje transparentnosti \cite{world2024global}. V veliki meri ti problemi izhajajo iz nezmožnosti pravočasnega, jasnega in doslednega preverjanja zaupanja v posamezne akterje \cite{kayhan2022ensuring}.
 
-Obstoječi sistemi za upravljanje zaupanja pogosto temeljijo na delno centraliziranih podatkovnih virih, ročnih revizijah ali statičnih ocenah. Te pa dejanskega obnašanja akterjev ne odražajo dovolj hitro. Takšni pristopi omejujejo sposobnost regulatorjev in podjetij, da prepoznajo tveganja, ki izhajajo iz sprememb v kakovosti ali skladnosti delovanja. V literaturi so predlagani različni koncepti, ki vključujejo semantično modeliranje, decentralizirane sisteme, kriptografsko preverjanje ter obdelavo telemetrij, manjka pa splošna zasnova modela, ki bi te elemente povezala v enoten in razširljiv okvir za dinamično ocenjevanje zaupanja.
+Obstoječi sistemi za upravljanje zaupanja pogosto temeljijo na delno centraliziranih podatkovnih virih, ročnih revizijah ali statičnih ocenah \cite{us2013dscsa, uddin2021blockchain}. Te pa dejanskega obnašanja akterjev ne odražajo dovolj hitro. Takšni pristopi omejujejo sposobnost regulatorjev in podjetij, da prepoznajo tveganja, ki izhajajo iz sprememb v kakovosti ali skladnosti delovanja. V literaturi so predlagani različni koncepti, ki vključujejo semantično modeliranje, decentralizirane sisteme, kriptografsko preverjanje ter obdelavo telemetrij \cite{uddin2021blockchain}, manjka pa splošna zasnova modela, ki bi te elemente povezala v enoten in razširljiv okvir za dinamično ocenjevanje zaupanja.
 
-Magistrsko delo se zato osredotoča na vprašanje, kako v farmacevtski dobavni verigi oblikovati model in mehanizem, ki omogoča transparentno, preverljivo in razširljivo upravljanje zaupanja med akterji, ne da bi bilo treba razkrivati občutljive operativne ali poslovne podatke.
+V magistrski nalogi se zato osredotočamo na vprašanje, kako v farmacevtski dobavni verigi oblikovati model in mehanizem, ki omogoča transparentno, preverljivo in razširljivo upravljanje zaupanja med akterji, ne da bi bilo treba razkrivati občutljive operativne ali poslovne podatke.
 
 Cilj naloge je razviti konceptualni in arhitekturni okvir ter na njegovi podlagi izdelati prototip sistema, ki omogoča:
 \begin{itemize}
@@ -108,7 +108,7 @@ Cilj naloge je razviti konceptualni in arhitekturni okvir ter na njegovi podlagi
 
 Hipoteza naloge je, da je mogoče tak prototip zasnovati tako, da demonstrira izvedljivost decentraliziranega sistema za izračun zaupanja ter hkrati ohrani lastnosti, ki so ključne za regulativno okolje: razložljivost postopkov, razširljivost arhitekture, odpornost na posamične okvare ter minimizacijo razkritja podatkov.
 
-V nadaljevanju naloga najprej predstavi teoretično ozadje upravljanja zaupanja v razpršenih sistemih ter izzive, značilne za farmacevtske dobavne verige. Sledi opis konceptualnega modela zaupanja in arhitekture sistema, ki omogoča izračun in usklajevanje ocene zaupanja. Sledi poglavje implementacije, kjer je opisana celotna zasnova sistema. V poglavju evalvacije so opisani eksperimentalni scenariji, ki prikazujejo praktično delovanje sistema in s pomočjo modela groženj predstavljene ključne varnostne lastnosti sistema. Zaključek povzame ugotovitve in predstavi smernice za nadaljnjo nadgradnjo rešitve.
+V nadaljevanju naloge najprej predstavimo teoretično ozadje upravljanja zaupanja v razpršenih sistemih ter izzive, značilne za farmacevtske dobavne verige. Nadaljujemo z opisom konceptualnega modela zaupanja in arhitekture sistema, ki omogoča izračun in usklajevanje ocene zaupanja. Sledi poglavje implementacije, kjer opišemo celotno zasnovo sistema. V poglavju evalvacije opišemo eksperimentalne scenarije, ki prikazujejo praktično delovanje sistema in z modelom groženj predstavimo ključne varnostne lastnosti sistema. V zaključku povzamemo ugotovitve in predstavimo smernice za nadaljnjo nadgradnjo rešitve.
 
 \chapter{Pregled literature in ozadje}
 \label{ch:background}
@@ -163,20 +163,20 @@ Model uporablja pogojno tranzitivnost zaupanja – entiteta A lahko zaupa entite
 Pri tem se uporablja zvezna vrednost zaupanja $tv_T$ med $0$ in $1$, izračunana iz vrednosti priporočil po poti $A \rightarrow B \rightarrow C \rightarrow D$.
 Za končno vrednost se uporabi zmnožek delnih zaupanj na poti:
 \[
-  tv_T = \prod_{i=1}^{n} \frac{rtv(i)}{4} \times tv(T)
+  tv_T = \prod_{i=1}^{n} \frac{rtv(i)}{4} \times tv(T),
 \]
-kjer $rtv(i)$ predstavlja stopnjo zaupanja v posameznega posrednika, $tv(T)$ pa končno vrednost zaupanja v ciljno entiteto.
+kjer $rtv(i)$ predstavlja stopnjo zaupanja v posameznega posrednika, $tv(T)$ pa končno vrednost zaupanja v ciljno entiteto \cite{abdul1998distributed}.
 Če obstaja več poti med akterjema, se končna vrednost določi kot povprečje rezultatov posameznih poti.
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
 
 V omrežjih enakovrednih akterjev se zaupanje ocenjuje na decentraliziran način. Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. Xiong in Liu predlagata metriko, ki temelji na razmerju med pozitivnimi in negativnimi interakcijami:
 \[
-  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t) \, Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}
+  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t) \, Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)},
 \]
 kjer $S(u,v,t)$ označuje zadovoljstvo uporabnika $u$ z $v$ do časa $t$, $Cr(v,t)$ je korekcijski faktor za filtriranje povratnih informacij, $I(u,v,t)$ pa število interakcij med $u$ in $v$.
 Rezultat $T(u,t)$ je vedno v intervalu $(0,1)$ in predstavlja trenutno stopnjo zaupanja v entiteto.
-Sistem lahko določi pragove $C_1$ in $C_2$, pri čemer entiteta velja za zaupanja vredno, če velja $I(u,t) > C_1$ in $T(u,t) > C_2$.
+Sistem lahko določi pragove $C_1$ in $C_2$, pri čemer entiteta velja za zaupanja vredno, če velja $I(u,t) > C_1$ in $T(u,t) > C_2$ \cite{xiong2002building}.
 
 Takšni sistemi so učinkoviti pri akumuliranju ocen, vendar občutljivi za napačne ali zlonamerne povratne informacije.
 Zato številne rešitve uvajajo uteževanje priporočil glede na zanesljivost virov ali na starost podatkov.
@@ -187,9 +187,11 @@ Ker se vedenje akterjev sčasoma spreminja, se mora zaupanje prilagajati novim p
 Posodobitev vrednosti se pogosto izvede z amortizacijskimi ali diskontnimi faktorji, ki dajejo večjo težo nedavnim interakcijam.
 Primer takega mehanizma je izračun nove vrednosti zaupanja po zaključeni interakciji:
 \[
-  T_{\text{new}} = \frac{r + N \, T_{\text{old}} \, e^{-\beta \Delta t}}{1 + N \, e^{-\beta \Delta t}}
-\]
-kjer $T_{\text{old}}$ predstavlja prejšnjo vrednost zaupanja, $r$ novo oceno po transakciji, $N$ število izvedenih interakcij, $\beta$ faktor dušenja, $\Delta t$ pa čas od zadnje posodobitve.
+T_{\text{new}}
+  = e^{-\beta \Delta t}\,\frac{N}{N+1} T_{\text{old}}
+    + \left(1 - e^{-\beta \Delta t}\right)\frac{N}{N+1} r,
+\] 
+kjer $T_{\text{old}}$ predstavlja prejšnjo vrednost zaupanja, $r$ novo oceno po transakciji, $N$ število izvedenih interakcij, $\beta$ faktor dušenja, $\Delta t$ pa čas od zadnje posodobitve \cite{lin2005reputation}.
 Na ta način sistem zagotavlja, da nove izkušnje bolj vplivajo na oceno, stare pa postopoma izgubijo težo.
 
 \subsection{Povezava z našo rešitvijo}
@@ -284,7 +286,7 @@ Na ta način odpravimo potrebo po centraliziranem zaupnem posredniku, hkrati pa 
 
 Decentralizirane identitete (DID) predstavljajo mehanizem za dosledno in preverljivo identifikacijo akterjev v decentraliziranih okoljih. Standard W3C DID opisuje identifikatorje, ki niso vezani na centraliziranega ponudnika, temveč so pod nadzorom lastnika identitete \cite{didcore2020}. DID je globalno enoličen identifikator, na primer \texttt{did:ethr:0x1234...}, pri čemer se podatki o tem, kako identiteto preveriti, hranijo v tako imenovanem DID dokumentu. Ta dokument vsebuje javne ključe, metode preverjanja in dodatne atribute, ki jih sistem lahko uporabi pri avtentikaciji.
 
-Preverljiva dokazila (angl. Verifiable Credentials - VC) so standardizirana digitalna dokazila, ki jih neka entiteta izda drugi entiteti. Model W3C sledi arhitekturi izdajatelj–imetnik–preveritelj. Izdajatelj (Issuer) ustvari in podpiše dokazilo, imetnik (Holder) ga hrani, preveritelj (Verifier) pa ga validira s pomočjo kriptografskih podpisov \cite{vcdata2019}. VC omogočajo prenos lastnosti ali certifikatov na način, ki je preverljiv, varen in ne potrebuje zaupanja v posrednika. V literaturi so prepoznani kot jedrni gradnik digitalnih identitet, ki združujejo suverenost uporabnika, interoperabilnost ter preverljivost podatkov \cite{mazzocca2025survey}.
+Preverljiva dokazila (angl. Verifiable Credentials - VC) so standardizirana digitalna dokazila, ki jih neka entiteta izda drugi entiteti. Model W3C sledi arhitekturi izdajatelj–imetnik–preveritelj. Izdajatelj (Issuer) ustvari in podpiše dokazilo, imetnik (Holder) ga hrani, preveritelj (Verifier) pa ga validira s kriptografskim podpisom \cite{vcdata2019}. VC omogočajo prenos lastnosti ali certifikatov na način, ki je preverljiv, varen in ne potrebuje zaupanja v posrednika. V literaturi so prepoznani kot jedrni gradnik digitalnih identitet, ki združujejo suverenost uporabnika, interoperabilnost ter preverljivost podatkov \cite{mazzocca2025survey}.
 
 V predstavljenem sistemu ima vsak akter v ontologiji lasten DID. DID služi kot osnovni identifikator, na katerega se vežejo atributi in podatki v ontologiji. Na ta način sistem ohrani enotno identiteto akterjev med vsemi plastmi arhitekture.
 
@@ -330,7 +332,7 @@ V tabeli~\ref{tab:primerjava-pristopov} povzamemo ključne kategorije pristopov,
 \hline
 
 Centralizirani sistemi kakovosti (GDP/GMP) &
-ročne revizije, certifikati, agencije &
+ročne revizije, digitalna potrdila, agencije &
 nizka; periodične revizije &
 delna; opis revizij &
 centralizacija, počasen odziv, ni kriptografske sledljivosti \\
@@ -409,7 +411,7 @@ Ontologija farmacevtske dobavne verige je zapisana v jeziku OWL, ki definira raz
 Za zapis rezultatov zaupanja smo uporabili verigo blokov Ethereum.
 Pametna pogodba \texttt{TrustGraph.sol}, napisana v jeziku Solidity, hrani relacije zaupanja med akterji.
 Ethereum je bil izbran zaradi široke podpore za orodja, stabilnega ekosistema in zmožnosti izvajanja pametnih pogodb brez zaupanja v enega posrednika.
-Razvoj in testiranje sta izvedena s pomočjo orodja Foundry, ki nudi lokalno testno omrežje, prevajalnik ter hitre skripte za izvajanje transakcij.
+Razvoj in testiranje sta izvedena z orodjem Foundry, ki nudi lokalno testno omrežje, prevajalnik ter hitre skripte za izvajanje transakcij.
 
 Pametna pogodba omogoča zapis rezultatov izračuna, preverjanje stanja zaupanja in beleženje dogodkov. Deluje kot nespremenljiv register, ki je dostopen vsem akterjem sistema.
 
@@ -626,7 +628,7 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
 
 \begin{enumerate}
   \item \textbf{Aplikacija ali uporabnik ustvari zahtevo}\newline
-    Uporabnik preko aplikacije ali klica API sproži postopek za izračun zaupanja za želenega akterja. Akterjev DID pred klicem funkcije pretvorimo v binarno vrednost \texttt{bytes32} s pomočjo zgoščevalne funkcije Keccak-256, ki je značilna za Ethereumov ekosistem. Aplikacija preko odjemalca RPC pokliče funkcijo na pametni pogodbi:
+    Uporabnik preko aplikacije ali klica API sproži postopek za izračun zaupanja za želenega akterja. Akterjev DID pred klicem funkcije pretvorimo v binarno vrednost \texttt{bytes32} z zgoščevalno funkcijo Keccak-256, ki je značilna za Ethereumov ekosistem. Aplikacija preko odjemalca RPC pokliče funkcijo na pametni pogodbi:
     \begin{quote}\texttt{requestTrustReport(subject, ttl)}\end{quote}
 
     \item \textbf{Pametna pogodba obdela zahtevo in izda signal za izračun}\newline
@@ -853,7 +855,7 @@ Preden predstavimo konkretne scenarije uporabe, najprej opišemo, kako je postav
 \subsubsection{Vsebniki in omrežje}
 Sistem sestavlja več vsebnikov Docker, ki so povezani v skupno virtualno omrežje in delujejo z orodjem \texttt{Docker Compose}. V sekciji \ref{subsec:algoritmi-orakljev} so opisani posamezni vsebniki in načini ocenjevanja zaupanja za vsak orakelj.
 
-\paragraph{Veriga blokov} Prvi vsebnik vsebuje testno Ethereum omrežje s pomočjo orodja Anvil. Na njem namestimo  pametno pogodbo \texttt{TrustGraph.sol}. Na omrežju takoj dobimo tudi 10 prednastavljenih računov z velikimi količinami testnih kovancev ETH, ki jih oraklji in agregator uporabljajo za plačevanje transakcijskih stroškov. Zato prve račune dodelimo agregatorju in orakljem. Potrebujemo tudi en račun za namestitev pametne pogodbe, katerega dodelimo regulatorju EMA. Ta račun bo imel potem tudi pravico do sprožanja novih izračunov zaupanja.
+\paragraph{Veriga blokov} Prvi vsebnik vsebuje testno Ethereum omrežje v orodju Anvil. Na njem namestimo  pametno pogodbo \texttt{TrustGraph.sol}. Na omrežju takoj dobimo tudi 10 prednastavljenih računov z velikimi količinami testnih kovancev ETH, ki jih oraklji in agregator uporabljajo za plačevanje transakcijskih stroškov. Zato prve račune dodelimo agregatorju in orakljem. Potrebujemo tudi en račun za namestitev pametne pogodbe, katerega dodelimo regulatorju EMA. Ta račun bo imel potem tudi pravico do sprožanja novih izračunov zaupanja.
 
 \paragraph{Baza znanja} V vsebniku Fuseki je naložena domenska ontologija. Ta je dostopna preko končne točke SPARQL, ki jo oraklji uporabljajo za pridobivanje semantičnih lastnosti akterjev. V eksperimentalnem okolju uporabljamo ontologijo, ki si jo vsi oraklji delijo. Celotna ontologija, uporabljena za scenarije, je na voljo v prilogi \ref{app:trust-ontology}.
 
@@ -1637,7 +1639,7 @@ Rešitev, predstavljena v tej nalogi je torej le prvi korak na poti k bolj razpr
 
 V magistrski nalogi smo obravnavali problem upravljanja zaupanja v farmacevtskih dobavnih verigah, kjer poteka izmenjava podatkov med številnimi akterji, ki pogosto delujejo z različnimi interesi in v heterogenih podatkovnih okoljih. Obstoječe prakse upravljanja zaupanja temeljijo predvsem na centraliziranih virih, ročnih revizijah in pogodbenih razmerjih. To otežuje, da je sistem transparenten, ponovljiv in onemogoča avtomatizirano preverjanje. Cilj naloge je bil zato razviti konceptualni in arhitekturni model, ki združuje semantično predstavitev domene, mehanizme verige blokov ter decentralizirane izračune ocen zaupanja med akterji dobavne verige zdravil.
 
-Najprej smo predstavili teoretično ozadje in pregled obstoječih modelov zaupanja ter poudarili vrzeli, ki se pojavljajo pri uporabi teh modelov v farmacevtskem kontekstu. Na podlagi teh izhodišč smo zasnovali konceptualni model, ki akterje, njihove lastnosti in dokazila predstavi s pomočjo ontologije. Temu modelu smo dodali arhitekturo, ki vključuje pametno pogodbo za zapis rezultatov, omrežje decentraliziranih orakljev za izračun zaupanja ter agregator za usklajevanje njihovih odločitev. V implementaciji smo razvili prototip z uporabo tehnologij Docker, Jena Fuseki, preverljivih poverilnic VC in testnega omrežja Ethereum. Postavili smo tri oraklje, ki izvajajo ocenjevanje zaupanja z različnimi kriteriji in pravili. Skozi dva eksperimentalna scenarija smo prikazali, kako sistem obravnava realne spremembe podatkov in kako decentralizirani pogledi vodijo do dinamičnih ter razložljivih ocen zaupanja. Z varnostno analizo smo nazadnje ocenili grožnje, ki zadevajo pametno pogodbo in decentralizirano omrežje orakljev. Poudarili smo tudi potrebne korake za prehod na delovanje v produkcijskem okolju.
+Najprej smo predstavili teoretično ozadje in pregled obstoječih modelov zaupanja ter poudarili vrzeli, ki se pojavljajo pri uporabi teh modelov v farmacevtskem kontekstu. Na podlagi teh izhodišč smo zasnovali konceptualni model, ki akterje, njihove lastnosti in dokazila predstavi z ontologijo. Temu modelu smo dodali arhitekturo, ki vključuje pametno pogodbo za zapis rezultatov, omrežje decentraliziranih orakljev za izračun zaupanja ter agregator za usklajevanje njihovih odločitev. V implementaciji smo razvili prototip z uporabo tehnologij Docker, Jena Fuseki, preverljivih poverilnic VC in testnega omrežja Ethereum. Postavili smo tri oraklje, ki izvajajo ocenjevanje zaupanja z različnimi kriteriji in pravili. Skozi dva eksperimentalna scenarija smo prikazali, kako sistem obravnava realne spremembe podatkov in kako decentralizirani pogledi vodijo do dinamičnih ter razložljivih ocen zaupanja. Z varnostno analizo smo nazadnje ocenili grožnje, ki zadevajo pametno pogodbo in decentralizirano omrežje orakljev. Poudarili smo tudi potrebne korake za prehod na delovanje v produkcijskem okolju.
 
 Pomen opravljenega dela je predvsem v tem, da združuje področja, ki so bila v literaturi pogosto obravnavana ločeno: semantično modeliranje domene, decentralizirane identitete, kriptografsko preverjanje in porazdeljeno odločanje. S tem naloga zapolni vrzel med teoretičnimi modeli zaupanja in praktičnimi sistemi, ki jih lahko dejansko uporabljajo regulatorji in organizacije. Predlagana arhitektura pokaže, da je mogoče v kompleksnih okoljih, kot je dobavna veriga zdravil, oblikovati pregledne in preverljive postopke ocenjevanja. S tem se olajša zaznavanje tveganj in poveča zanesljivost odločanja v takšnih sistemih.
 
