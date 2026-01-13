@@ -116,7 +116,7 @@ To poglavje raziskuje koncepte, na katerih temelji sistem, razvit v okviru magis
 
 \section{Zaupanje}
 
-Pojem zaupanja je temeljni gradnik pri zasnovi našega sistema za farmacevtsko dobavno verigo. Zaupanje je kompleksen, večdimenzionalen in interdisciplinaren koncept, ki ga obravnavajo različne vede. Obravnava se v sociologiji, psihologiji, ekonomiji, računalništvu in še ostalih vedah. Prav zaradi te raznolikosti v literaturi ne obstaja enotna definicija, temveč več pristopov, ki poudarjajo različne vidike \cite{holtmanns2008trust,grandison2000survey}.
+Pojem zaupanja je temeljni gradnik pri zasnovi našega sistema za farmacevtsko dobavno verigo. Zaupanje je kompleksen, večdimenzionalen in interdisciplinaren koncept, ki ga obravnavajo različne vede. Obravnava se v sociologiji, psihologiji, ekonomiji, računalništvu in še ostalih vedah. Prav zaradi te raznolikosti v literaturi ne obstaja enotna definicija, temveč več pristopov, ki poudarjajo različne vidike \cite{yan2008trust,grandison2000survey}.
 
 \subsection{Definicije zaupanja}
 V družboslovnem kontekstu je zaupanje pogosto opredeljeno kot stanje pozitivnih pričakovanj glede dejanj druge osebe v okoliščinah, kjer obstaja določena stopnja tveganja \cite{boon1991interpersonal}. Gambetta \cite{gambetta1988trust} zaupanje definira kot subjektivno verjetnost, da bo agent opravil določeno dejanje, še preden je to mogoče preveriti. Mayer, Davis in Schoorman \cite{mayer1995integrative} pa ga opredelijo kot pripravljenost ene stranke, da se izpostavi ranljivosti glede na dejanja druge stranke, ob pričakovanju, da bo ta delovala v skladu s pričakovanji.
@@ -143,37 +143,71 @@ V digitalnih in porazdeljenih okoljih so se pojavili dodatni atributi, ki izhaja
 V kontekstu farmacevtskih dobavnih verig imajo atributi zaupanja izrazito regulatorno in sledilno komponento. Uddin in sodelavci \cite{uddin2021blockchain} poudarjajo, da so pri zagotavljanju zaupanja ključni kazalniki sledljivost, pristnost in celovitost podatkov.
 Kayhan in sodelavci \cite{kayhan2022ensuring} izpostavljajo še pomen transparentnosti, nespremenljivosti in izvorne sledljivosti (angl. provenance), ki jih omogoča tehnologija veriženja blokov.
 
-Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti (angl. data properties) v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavanje zaupanja.
+Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavanje zaupanja.
+
+\subsection{Modeliranje zaupanja v računalniških sistemih}
+\label{subsec:modeliranje-zaupanja}
+
+V informacijskih infrastrukturah zaupanje ne obravnavamo le kot intuitiven občutek, temveč kot količino, ki jo poskušamo formalno zapisati, izračunati in uporabiti kot vhod v algoritme za odločanje. Tipičen cilj modeliranja zaupanja je, da iz opazovanj in dokazov (preteklih transakcij, priporočil, kriptografskih dokazil) izpeljemo numerično oceno zaupanja $T(u,v) \in [0,1]$ med subjektom $u$ in subjektom $v$, ki jo nato uporabimo pri avtorizaciji, izbiri partnerja ali odkrivanju zlonamernih udeležencev \cite{cho2015survey}. Pri tem moramo odločiti, kako bomo zaupanje predstavili (kot številčno oceno, interval, porazdelitev ali vektor lastnosti), kako bomo zbirali in tehtali dokaze ter kako bomo iz ocen izpeljali končne binarne odločitve.
+
+Yan in Holtmanns podata taksonomijo modelov zaupanja, kjer modele razvrstita glede na način modeliranja (lingvistični, grafični, matematični), glede na število obravnavanih lastnosti (eno- ali večlastnostni modeli), način izražanja zaupanja (binarne, diskretne ali kontinuirne ocene) in dimenzionalnost izraza zaupanja.\cite{yan2008trustmodeling} Ta razvrstitev pokaže, da je že na konceptualni ravni treba izbrati, ali bomo zaupanje obravnavali kot enodimenzionalen “score” ali kot večkomponentni opis (npr.\ kompetentnost, integriteta, dobrohotnost), ter ali bomo negotovost izrazili eksplicitno ali pa jo skrijemo v samo številčno vrednost zaupanja.
+
+Cho s sodelavci povzema, da sodobni modeli zaupanja načeloma delijo nekaj skupnih lastnosti: zaupanje je usmerjeno (od trustorja k trusteeju), je odvisno od konteksta, je dinamično in ga je mogoče meriti ter posodabljati skozi čas.\cite{cho2015survey} Avtorji predlagajo ogrodje, v katerem modeliranje zaupanja poteka v treh korakih: (i) zbiranje evidenc o obnašanju subjektov in njihovem okolju, (ii) preslikava teh evidenc v formalno predstavitev zaupanja z ustrezno matematično funkcijo ter (iii) odločanje, kjer sistem uporabi oceno zaupanja in politiko (npr.\ pragove ali pravila), da sprejme ali zavrne sodelovanje. V tem okviru se razlikujejo predvsem izbira matematičnega formalizma (verjetnostne porazdelitve, teorija dokazov, fuzzy logika, grafični modeli) ter način, kako sistem združuje več virov informacij in upravlja negotovost.
+
+V tej nalogi se umeščamo v družino statističnih, na dokazih utemeljenih modelov zaupanja, kot jih identificira Cho in sodelavci.\cite{cho2015survey} Zaupanje v izpolnjevanje posameznih kriterijev modeliramo z beta porazdelitvami, ki se posodabljajo glede na opažene dogodke, podobno kot v beta reputacijskih pristopih.\cite{josang2002beta} Pri tem upoštevamo tudi količino zbranih dokazov in časovni vidik: z amortizacijskim faktorjem tipa EWMA dajemo večjo težo novejšim opazovanjem, končne ocene pa kombiniramo z determinističnimi pravili v ontološkem modelu in jih pretvorimo v binarne odločitve skladno s politikami zaupanja.
+
+
+% \subsection{Matematični pristopi k zaupanju}
+
+% Gambetta zaupanje definira kot verjetnost, da bo drugi akter izvedel določeno dejanje v kontekstu, ki vpliva na njegovo lastno ravnanje \cite{gambetta1988trust}. Iz interpretacije zaupanja kot verjetnosti so se razvili številni matematični modeli, ki poskušajo iz pozitivnih in negativnih izkušenj izpeljati napoved obnašanja. Preglede teh pristopov podajajo Yan in Holtmanns v članku \textit{Trust modeling and management: from social trust to digital trust} \cite{yan2008trust}, Wang in Singh v članku \textit{Evidence-based trust: A mathematical model geared for multiagent systems} \cite{wang2010evidence} ter Kochovski in sodelavci  v članku \textit{Trust management in a blockchain based fog computing platform with trustless smart oracles} \cite{kochovski2019trust}. Ker je pristopov veliko, v nadaljevanju povzemamo le tiste, ki so najbolj pomembni za zasnovo sistema v tej nalogi.
+
+% Jøsang in Ismail v članku \emph{The Beta Reputation System} predstavita pristop, ki zaupanje razume kot statistični model nad binarnimi izidi transakcij (uspeh ali neuspeh) \cite{josang2002beta}. Sistem temelji na verjetnostni porazdelitvi beta, ki opisuje verjetnost, da se bo subjekt v prihodnje vedel pošteno. Parametra  porazdelitve beta sta neposredno povezana s količino zbranih povratnih informacij: $r$ predstavlja vsoto pozitivnih izkušenj, $s$ pa vsoto negativnih izkušenj, pričakovana vrednost porazdelitve $E[p] = (r+1)/(r+s+2)$ pa služi kot ocena zaupanja. Pomemben del modela je zmanjšanje teže povratnih informacij glede na zanesljivost ocenjevalca, pri čemer se avtorja opirata na Jøsangovo subjektivno logiko, ki zaupanje opiše s trojico $(b,d,u)$, kjer $b$ predstavlja prepričanje, $d$ dvom in $u$ negotovost \cite{josang1999algebra}. Poleg tega uvedeta še mehanizem postopnega pozabljanja starih povratnih informacij s faktorjem $\lambda$, ki omogoča, da ima novejše vedenje večji vpliv na oceno zaupanja. Avtorja predpostavljata zbiranje povratnih informacij, kjer uporabniki podajajo preproste ocene. Te se pretvorijo v parametre porazdelitve beta, kar poveže matematično podlago s praktično rabo v spletnih trgovinah.
 
 \section{Upravljanje zaupanja v razpršenih sistemih}
 \label{sec:trust-management-distributed-systems}
-Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, kot tudi dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \texttt{peer-to-peer networks}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in usklajene informacije o zaupanju med akterji v omrežju. V naslednjih podpoglavjih povzemamo različne pristope k upravljanju zaupanja, ki so jih avtorji predstavili v svojem pregledu literature.
+Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, kot tudi dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \textit{peer-to-peer networks}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in usklajene informacije o zaupanju med akterji v omrežju. V naslednjih podpoglavjih povzemamo različne pristope k upravljanju zaupanja, ki so jih avtorji predstavili v svojem pregledu literature.
 
 \subsection{Dokazni modeli zaupanja}
-Dokazni modeli temeljijo na preverljivih dokazih, kot so digitalna potrdila, javni ključi ali kriptografski podpisi.
-Ti pristopi zagotavljajo preverjanje identitete in integritete entitet, ne pa tudi njihove dejanske zanesljivosti.
+Pri dokaznih modelih zaupanja se zaupanje ne gradi na preteklih interakcijah ali priporočilih, temveč na preverjanju formalnih dokazil, ki potrjujejo identiteto ali lastnosti entitet.
+
+Eschenauer in sodelavci predstavijo ogrodje za upravljanje zaupanja v omrežjih ad hoc, ki temelji na preverjanju dokazil \cite{eschenauer2002trust}. Zaupanje obravnavajo kot množico odnosov, vzpostavljenih na podlagi dokazil. Dokazila so lahko karkoli, kar zahteva politika za vzpostavitev zaupanja. Po navadi so to javni ključi, naslovi ali identitete. Vsaka entiteta lahko ustvari dokazilo zase ali za druge entitete.
 Najpogostejša primera sta hierarhični sistem X.509 \cite{housley1999rfc2459} in decentralizirani sistem PGP \cite{elkins2001mime}, kjer se zaupanje posreduje prek verige certifikatov oziroma prek subjektivnih ocen uporabnikov.
 Tak model se uporablja predvsem pri inicializaciji zaupanja in zagotavlja osnovno preverjanje pristnosti brez ocenjevanja vedenja.
 
 \subsection{Priporočilni modeli zaupanja}
 Priporočilni modeli gradijo zaupanje na osnovi izkušenj in posredovanih ocen drugih entitet.
+Vsaka entiteta ocenjuje druge glede na pretekle interakcije, te ocene pa se lahko prenašajo naprej kot priporočila.
+
+Abdul-Rahman in Hail v svojem modelu zaupanja \cite{abdul1998distributed} predlagata, da se zaupanje v ciljno entiteto $T$ izračuna kot produkt vmesnih ocen na poti od začetne entitete do ciljne. Naj bo $n$ število entitet na poti do ciljne entitete, $rtv(i) \in \{1,2,3,4\}$ vrednost priporočila za $i$-tega posrednika (preračunana iz subjektivnih ocen), in $tv(T) \in [0,1]$ neposredna vrednost zaupanja v ciljno entiteto.
+
+Skupna vrednost zaupanja $tv_T$ se nato izračuna kot:
+
+\begin{equation}
+  tv_T = \left( \prod_{i=1}^{n} \frac{rtv(i)}{4} \right) \cdot tv(T)
+  \label{eq:abdul-recommendation}
+\end{equation}
+
+Kjer je vsak $rtv(i)$ deljen s 4 zato, da se normalizira na interval $[0.25, 1.0]$.
+Če obstaja več neodvisnih poti med entitetama, se končna vrednost zaupanja določi kot aritmetična sredina rezultatov posameznih poti.
+
+Priporočilni modeli gradijo zaupanje na osnovi izkušenj in posredovanih ocen drugih entitet.
 Vsaka entiteta ocenjuje druge glede na pretekle interakcije, te ocene pa se lahko delijo naprej kot priporočila.
-Model uporablja pogojno tranzitivnost zaupanja – entiteta A lahko zaupa entiteti C, če A zaupa B kot priporočitelju in lahko ovrednoti njegovo oceno.
+Abdul-Rahman in Hailes predlagata model, ki uporablja pogojno tranzitivnost zaupanja – entiteta A lahko zaupa entiteti C, če A zaupa B kot priporočitelju in lahko ovrednoti njegovo oceno.
 
 Pri tem se uporablja zvezna vrednost zaupanja $tv_T$ med $0$ in $1$, izračunana iz vrednosti priporočil po poti $A \rightarrow B \rightarrow C \rightarrow D$.
 Za končno vrednost se uporabi zmnožek delnih zaupanj na poti:
-\[
+\begin{equation}
   tv_T = \prod_{i=1}^{n} \frac{rtv(i)}{4} \times tv(T),
-\]
+\end{equation}
 kjer $rtv(i)$ predstavlja stopnjo zaupanja v posameznega posrednika, $tv(T)$ pa končno vrednost zaupanja v ciljno entiteto \cite{abdul1998distributed}.
 Če obstaja več poti med akterjema, se končna vrednost določi kot povprečje rezultatov posameznih poti.
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
 
 V omrežjih enakovrednih akterjev se zaupanje ocenjuje na decentraliziran način. Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. Xiong in Liu predlagata metriko, ki temelji na razmerju med pozitivnimi in negativnimi interakcijami:
-\[
+\begin{equation}
   T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t) \, Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)},
-\]
+\end{equation}
 kjer $S(u,v,t)$ označuje zadovoljstvo uporabnika $u$ z $v$ do časa $t$, $Cr(v,t)$ je korekcijski faktor za filtriranje povratnih informacij, $I(u,v,t)$ pa število interakcij med $u$ in $v$.
 Rezultat $T(u,t)$ je vedno v intervalu $(0,1)$ in predstavlja trenutno stopnjo zaupanja v entiteto.
 Sistem lahko določi pragove $C_1$ in $C_2$, pri čemer entiteta velja za zaupanja vredno, če velja $I(u,t) > C_1$ in $T(u,t) > C_2$ \cite{xiong2002building}.
@@ -186,11 +220,11 @@ Zato številne rešitve uvajajo uteževanje priporočil glede na zanesljivost vi
 Ker se vedenje akterjev sčasoma spreminja, se mora zaupanje prilagajati novim podatkom.
 Posodobitev vrednosti se pogosto izvede z amortizacijskimi ali diskontnimi faktorji, ki dajejo večjo težo nedavnim interakcijam.
 Primer takega mehanizma je izračun nove vrednosti zaupanja po zaključeni interakciji:
-\[
+\begin{equation}
 T_{\text{new}}
   = e^{-\beta \Delta t}\,\frac{N}{N+1} T_{\text{old}}
     + \left(1 - e^{-\beta \Delta t}\right)\frac{N}{N+1} r,
-\] 
+\end{equation}
 kjer $T_{\text{old}}$ predstavlja prejšnjo vrednost zaupanja, $r$ novo oceno po transakciji, $N$ število izvedenih interakcij, $\beta$ faktor dušenja, $\Delta t$ pa čas od zadnje posodobitve \cite{lin2005reputation}.
 Na ta način sistem zagotavlja, da nove izkušnje bolj vplivajo na oceno, stare pa postopoma izgubijo težo.
 
@@ -247,7 +281,7 @@ Pametne pogodbe predstavljajo enega ključnih konceptov sodobnih verig blokov. G
 
 Pametne pogodbe omogočajo avtomatizacijo pravil in procesov, pri čemer ni potrebno zaupati enemu samemu posredniku. Njihovo delovanje je predvidljivo, saj se vedno izvršijo natančno tako, kot je določeno v kodi. Zaradi teh lastnosti se pogosto uporabljajo v scenarijih, kjer je treba uveljaviti dogovorjena pravila med neodvisnimi akterji. V dobavnih verigah se uporabljajo za potrjevanje dogodkov, beleženje blaga, preverjanje skladnosti podatkov, itn.
 
-V modelih, ki temeljijo na verigi blokov, pametne pogodbe služijo tudi kot enotna plast poslovne logike (angl. business logic). S tem omogočajo, da vsi akterji delujejo na osnovi istega sklopa pravil. Zlasti je to pomembno v okoljih, kjer se morajo organizacije dogovarjati o interpretaciji podatkov ali izvajanju procesov. Pametne pogodbe z nespremenljivo kodo zagotovijo, da se pravila ne spreminjajo brez soglasja deležnikov.
+V modelih, ki temeljijo na verigi blokov, pametne pogodbe služijo tudi kot enotna plast poslovne logike. S tem omogočajo, da vsi akterji delujejo na osnovi istega sklopa pravil. Zlasti je to pomembno v okoljih, kjer se morajo organizacije dogovarjati o interpretaciji podatkov ali izvajanju procesov. Pametne pogodbe z nespremenljivo kodo zagotovijo, da se pravila ne spreminjajo brez soglasja deležnikov.
 
 V predstavljenem sistemu ima pametna pogodba osrednjo vlogo, saj hrani rezultate ocenjevanja zaupanja in omogoča preverjanje vzpostavljenih razmerij med akterji. Pogodba vsebuje funkcije za zapisovanje rezultatov, njihovo posodabljanje in preverjanje stanja zaupanja. Tako tvori register zaupanja, ki je dostopen vsem udeležencem verige.
 
@@ -274,7 +308,7 @@ V praksi se pojavlja več arhitektur, ki omogočajo delovanje orakljev.
 Najpreprostejši so centralizirani oraklji, kjer ena organizacija zbira podatke in jih pošilja pametnim pogodbam.
 Tak pristop je enostaven za implementacijo, vendar ponovno uvaja enotno točko zaupanja in napake.
 Sledijo jim porazdeljeni oziroma decentralizirani oraklji, kjer več neodvisnih vozlišč pridobiva in združuje podatke in tako zmanjšuje tveganje za manipulacijo podatkov.
-Primer takšne zasnove je sistem ASTRAEA, ki uporabi glasovalno igro z vložki (angl. stake) in ločene vloge udeležencev (oddajatelji trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}.
+Primer takšne zasnove je sistem ASTRAEA, ki uporabi glasovalno igro z vložki in ločene vloge udeležencev (oddajatelji trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}.
 Podobno pristopajo tudi druge rešitve, kjer se omrežja orakljev, kot je Chainlink, uporabljajo za zbiranje podatkov iz več API-jev in senzorjev ter za izračun dodatnih metrik (npr. reputacije) še pred zapisom v verigo blokov \cite{kochovski2019trust}.
 
 V okviru te naloge oraklje obravnavamo kot ločeno plast med semantičnim delom sistema in verigo blokov.

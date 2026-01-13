@@ -1,0 +1,119 @@
+\subsection{Matematični in formalni modeli zaupanja}
+
+Čeprav so filozofski in konceptualni pristopi k zaupanju pomembni za razumevanje človeškega obnašanja, jih je v kontekstu računalništva in inženirstva potrebno dopolniti z natančnimi matematičnimi modeli. Kot opozarjata Rodriguez in sodelavci~\cite{rodriguez2023review}, so številni obstoječi modeli zaupanja pretežno konceptualni in vključujejo komponente, ki jih je težko izmeriti. Matematični modeli pa omogočajo formalno analizo, empirično validacijo in implementacijo v realnih sistemih.
+
+\subsubsection{Definicije zaupanja v literaturi}
+
+Literatura ponuja več complementarnih definicij zaupanja, ki odražajo različne discipline. \textbf{Rotter}~\cite{rotter1967} definira zaupanje kot »pričakovanje posameznika, da se lahko zanese na besedo, obljubo ali pisno komunikacijo druge osebe«. Ta interpersonalni okvir poudarja socialni aspekt zaupanja.
+
+\textbf{Mayer in sodelavci}~\cite{mayer1995} so predlagali vplivno definicijo zaupanja kot »pripravljenost stranke, da je ranljiva glede na dejanja druge stranke, na podlagi pričakovanja, da bo ta druga stranka izvedla določeno dejanje, ki je pomembno za zaupajočo stranko, ne glede na zmožnost nadzora ali kontrole te stranke« (str. 712). Ta definicija poudarja element \emph{tveganja} in \emph{ranljivosti}.
+
+V kontekstu avtomatizacije je \textbf{Lee in See}~\cite{lee2004trust} zaupanje definirala kot »stališče, da bo agent pomagal doseči cilje posameznika v situaciji, zaznamovani z negotovostjo in ranljivostjo« (str. 54). Ta definicija je postala široko uporabljena, ker integrira pristope iz več disciplin in jasno razlikuje med zaupanjem kot stališčem in vedenjem (npr. zanašanjem).
+
+Za multiagentne sisteme sta \textbf{Falcone in Castelfranchi}~\cite{falcone2001} zaupanje opredelila kot »mentalno stanje, prepričanje kognitivnega agenta o doseganju želenega cilja skozi drugega agenta«. Ta perspektiva poudarja zaupanje kot kognitivno komponento v procesu odločanja.
+
+\subsubsection{Viri variabilnosti zaupanja}
+
+\textbf{Hoff in Bashir}~\cite{hoff2015} sta identificirala tri ključne vire variabilnosti zaupanja v avtomatizaciji:
+
+\begin{itemize}
+\item \textbf{Dispozicijsko zaupanje}: temeljeno na vnaprejšnjem znanju, demografskih karakteristikah in osebnosti
+\item \textbf{Situacijsko zaupanje}: odvisno od trenutnih okoljskih pogojev, delovne obremenitve in čustvenih stanj
+\item \textbf{Naučeno zaupanje}: osnovano na preteklih izkušnjah in opazovanju zmogljivosti sistema
+\end{itemize}
+
+Ta razvrstitev nakazuje različne časovne skale, pri katerih se zaupanje razvija – od trenutka interakcije (sekunde/minute) do daljšega obdobja učenja (ure/dnevi) in dolgoročnih prepričanj (leta/desetletja)~\cite{rodriguez2023review}.
+
+\subsubsection{Dinamični matematični modeli}
+
+Zgodnji pioneering prispevek k matematičnemu modeliranju zaupanja predstavlja delo \textbf{Lee in Moray}~\cite{lee1992, lee1994}, ki sta uporabila linearne regresijske modele in stohastične diferenčne enačbe za modeliranje dinamike zaupanja operaterjev v avtomatizacijo. Njun model predpostavlja, da je zaupanje $T(t)$ v času $t$ funkcija zaupanja v prejšnji iteraciji, zmogljivosti sistema $P(t)$ in pojavljanja napak $F(t)$:
+
+\begin{equation}
+T(t) = \lambda_1 T(t-1) + A_1[P(t) + \alpha_{12}P(t-1)] + A_2[F(t) + \alpha_{23}F(t-1)] + \epsilon_t
+\end{equation}
+
+kjer so $\lambda_1$, $A_1$, $A_2$, $\alpha_{12}$ in $\alpha_{23}$ parametri modela, $\epsilon_t$ pa predstavlja naključne motnje okolja~\cite{rodriguez2023review}.
+
+\textbf{Muir}~\cite{muir1994} je razvila model na podlagi treh dimenzij iz \textbf{Barberja}~\cite{barber1983} in \textbf{Rempel in sodelavcev}~\cite{rempel1985}: predvidljivost, zanesljivost in vera. Model predpostavlja, da je zaupanje $T_{i,j}$ sestavljeno iz pričakovanj:
+
+\begin{equation}
+T_{i,j} = E_i[P(n,m)] + E_i[\text{TCP}_j] + E_i[\text{FR}_j]
+\end{equation}
+
+kjer $E_i[P(n,m)]$ predstavlja pričakovanje vztrajnosti naravnih in moralnih zakonov, $E_i[\text{TCP}_j]$ pričakovanje tehnično kompetentne izvedbe, $E_i[\text{FR}_j]$ pa pričakovanje fiducijarne odgovornosti~\cite{muir1994, rodriguez2023review}.
+
+\textbf{Gao in Lee}~\cite{gao2006} sta razširila teorijo odločitvenega polja (Decision Field Theory, DFT) za modeliranje zaupanja $T(n)$ in samozavesti $\text{SC}(n)$ operaterja:
+
+\begin{align}
+T(n) &= (1-s)T(n-1) + s \cdot \text{BCA}(n) + \epsilon_n \\
+\text{SC}(n) &= (1-s)\text{SC}(n-1) + s \cdot \text{BCM}(n) + \epsilon_n
+\end{align}
+
+kjer $\text{BCA}(n)$ predstavlja prepričanje o zmogljivosti avtomatizacije, $\text{BCM}(n)$ prepričanje o lastni zmogljivosti, $s$ pa stopnjo rasti/razpada zaupanja~\cite{gao2006, rodriguez2023review}. Model temelji na \textbf{Fishbein in Ajzen}~\cite{fishbein1975} okviru, kjer prepričanja določajo stališča, ta pa namere in posledično vedenje.
+
+\subsubsection{Probabilistični modeli zaupanja}
+
+Probabilistični pristopi ponujajo rigorozne matematične temelje za obravnavo zaupanja kot verjetnostnega fenomena. \textbf{Wang in Singh}~\cite{wang2010} sta razvila evidence-based model zaupanja, ki temelji na statističnih merah verjetnostnih porazdelitev. Model razlikuje med \emph{prostorom dokazov} $E = \{(r,s) \mid r \geq 0, s \geq 0, r+s > 0\}$ in \emph{prostorom zaupanja} $T = \{(b,d,u) \mid b,d \geq 0, b+d+u=1\}$, kjer:
+
+\begin{itemize}
+\item $r, s$ predstavljata število pozitivnih in negativnih izkušenj
+\item $b, d, u$ predstavljajo prepričanje (belief), nezaupanje (disbelief) in negotovost (uncertainty)
+\end{itemize}
+
+Ključna inovacija je definicija \emph{gotovosti} (certainty) $c(r,s)$ na podlagi Mean Absolute Deviation (MAD)~\cite{weisstein2003}:
+
+\begin{equation}
+c(r,s) = \frac{1}{2}\int_0^1 |f(x|r,s) - 1| \, dx
+\end{equation}
+
+kjer je $f(x|r,s)$ pogojna verjetnostna funkcija gostote (PCDF – Probability-Certainty Density Function). Ta pristop zagotavlja dve ključni lastnosti, ki jih pretekli modeli niso ustrezno zajeli~\cite{wang2010}:
+
+\begin{enumerate}
+\item \textbf{Učinek količine dokazov}: Pri fiksnem razmerju pozitivnih in negativnih izkušenj se gotovost povečuje z večanjem količine dokazov.
+\item \textbf{Učinek konflikta}: Pri fiksni količini dokazov se gotovost zmanjšuje z naraščanjem konflikta v dokazih (npr. enako število pozitivnih in negativnih izkušenj).
+\end{enumerate}
+
+Wang in Singh~\cite{wang2010} dokažeta bijekcijo med prostoroma $E$ in $T$, kar omogoča robustno kombiniranje poročil o zaupanju iz več virov ter njihovo diskontiranje glede na zanesljivost vira.
+
+\textbf{Van Maanen in sodelavci}~\cite{vanmaanen2007} so uporabili Bayesov pristop z Beta porazdelitvijo kot konjugirano apriornostjo k Bernoullijevima porazdelitvama za modeliranje verjetnosti uspeha $p(n,N,r,s)$:
+
+\begin{equation}
+p(n,N,r,s) = \frac{\Gamma(N-n+1) \cdot \Gamma(n+r+1) \cdot \Gamma(N-n+s+1)}{\Gamma(N+r+s+1)}
+\end{equation}
+
+kjer $r$ in $s$ predstavljata število uspehov in neuspehov, $N$ celotno število poskusov~\cite{vanmaanen2007, rodriguez2023review}.
+
+\textbf{Xu in Dudek}~\cite{xu2015} sta razvila dinamični Bayesovski model (OPTIMo – Online Probabilistic Trust Inference Model), ki uporablja Gaussove porazdelitve za posodabljanje stanj zaupanja:
+
+\begin{equation}
+P(t_k | t_{k-1}, p_k, p_{k-1}) = \mathcal{N}(t_k \mid t_{k-1} + \tau_b + \tau_p p_k + \tau_d(p_k - p_{k-1}), \sigma_t^2)
+\end{equation}
+
+kjer parametri $\tau_b$, $\tau_p$ in $\tau_d$ odražajo pristranskost, trenutno zmogljivost in razliko v zmogljivosti robota~\cite{xu2015, rodriguez2023review}.
+
+\subsubsection{Povezava z multiagentnimi sistemi}
+
+Matematični modeli zaupanja so ključni za multiagentne sisteme, kjer morajo agenti medsebojno ocenjevati zaupanje in izmenjati poročila o zaupanju. Wang in Singh~\cite{wang2010} prikažeta, kako lahko agent Jon kombinira poročila o zaupanju od Alise in Boba:
+
+\begin{enumerate}
+\item Jon diskontira Alisino poročilo s svojim zaupanjem v Aliso ($b_{\text{Alice}} = 0.2$): $(0.42, 0.1, 0.48) \rightarrow (0.084, 0.02, 0.896)$
+\item Jon diskontira Bobovo poročilo s svojim zaupanjem v Boba ($b_{\text{Bob}} = 0.9$): $(0.08, 0.33, 0.59) \rightarrow (0.072, 0.297, 0.631)$
+\item Obe diskontirani poročili transformira v prostor dokazov: $(0.429, 0.107)$ in $(0.783, 3.13)$
+\item Združi dokaze: $(1.212, 3.237)$
+\item Transformira nazaj v prostor zaupanja: $(0.097, 0.256, 0.645)$
+\end{enumerate}
+
+Rezultat odraža, da Jon bolj zaupa Bobu kot Alisi, zato je končna ocena bližje Bobovi~\cite{wang2010}.
+
+\subsubsection{Implikacije za raziskave}
+
+Matematični modeli zaupanja ponujajo pomembne prednosti za računalniške aplikacije:
+
+\begin{itemize}
+\item \textbf{Formalna analiza}: Omogočajo rigorozne dokaze matematičnih lastnosti (npr. bijekcija, monotonost)
+\item \textbf{Empirična validacija}: Dovoljujejo testiranje na realnih podatkovnih zbirkah (npr. PGP web of trust~\cite{zimmermann1995}, FilmTrust~\cite{kuter2007}, Amazon Marketplace~\cite{wang2010})
+\item \textbf{Implementabilnost}: Zagotavljajo algoritme za računanje zaupanja v realnem času
+\item \textbf{Kompozicionalnost}: Omogočajo kombiniranje in propagacijo zaupanja preko grafov socialnih mrež
+\end{itemize}
+
+Kot poudarjajo Rodriguez in sodelavci~\cite{rodriguez2023review}, je ključni izziv združitev matematičnih modelov z merljivimi komponentami, ki jih je mogoče zajeti skozi eksperimentalne študije. Prihodnje raziskave bodo morale integrirati tudi fiziološke meritve (EEG, GSR, okulografija)~\cite{huang2020, gremillion2019} in pristope strojnega učenja za zajemanje kompleksnih vzorcev zaupanja v večvremenskih skalah~\cite{rodriguez2023review}.
