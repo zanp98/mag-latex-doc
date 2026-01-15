@@ -183,21 +183,20 @@ Abdul-Rahman in Hailes predlagata porazdeljeni model zaupanja, ki temelji na izr
 Vsak agent hrani diskretne vrednosti zaupanja na lestvici od $-1$ do $4$, kjer $-1$ pomeni popolno nezaupanje, $0$ nevednost (agent si ne upa podati ocene), vrednosti $1$ do $3$ označujejo naraščajoče stopnje zaupanja, $4$ pa predstavlja popolno zaupanje.
 Ločita med:
 \begin{itemize}
-  \item \emph{vrednostjo priporočiteljevega zaupanja} $tv(R_i)$, ki opisuje, koliko agent zaupa $i$-temu priporočitelju na poti in
-  \item \emph{priporočeno vrednostjo zaupanja} $rtv(T)$, ki jo o ciljni entiteti $T$ poda zadnji priporočitelj v verigi.
+  \item \emph{vrednostjo priporočiteljevega zaupanja} $\mbox{tv}(R_i)$, ki opisuje, koliko agent zaupa $i$-temu priporočitelju na poti in
+  \item \emph{priporočeno vrednostjo zaupanja} $\mbox{rtv}(T)$, ki jo o ciljni entiteti $T$ poda zadnji priporočitelj v verigi.
 \end{itemize}
 
 Naj bo $p$ indeks konkretne poti priporočil, $n$ število priporočiteljev na tej poti, $R_1, R_2, \dots, R_n$ pa zaporedni priporočitelji na poti od izvornega priporočitelja do tistega, ki priporočilo zahteva.
-Zaupanje v ciljno entiteto $T$ po poti $p$ označimo z $tv_p(T)$.
+Zaupanje v ciljno entiteto $T$ po poti $p$ označimo z $\mbox{tv}_p(T)$.
 Avtorja predlagata naslednjo formulo za izračun zaupanja po poti $p$ \cite{abdul1998distributed}:
-
 \begin{equation}
-  tv_p(T) = \left( \prod_{i=1}^{n} \frac{tv(R_i)}{4} \right) \cdot rtv(T)
+  \mbox{tv}_p(T) = \left( \prod_{i=1}^{n} \frac{\mbox{tv}(R_i)}{4} \right) \cdot \mbox{rtv}(T)
   \label{eq:abdulrahman-path}
 \end{equation}
 
-Ker lahko agent za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $p$ število teh poti, označenih z $i = 1, \dots, p$. Abdul-Rahman in Hailes predlagata, da se vse delne ocene zaupanja $tv_1(T), \dots, tv_p(T)$ povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
-$tv(T) = \frac{1}{p} \sum_{i=1}^{p} tv_i(T)$ \cite{abdul1998distributed}.
+Ker lahko agent za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $p$ število teh poti, označenih z $i = 1, \dots, p$. Abdul-Rahman in Hailes predlagata, da se vse delne ocene zaupanja $\mbox{tv}_1(T), \dots, \mbox{tv}_p(T)$ povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
+$\mbox{tv}(T) = \frac{1}{p} \sum_{i=1}^{p} \mbox{tv}_i(T)$ \cite{abdul1998distributed}.
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
 
@@ -207,29 +206,29 @@ Naj bo $P$ množica vseh vozlišč v omrežju, $u \in P$ opazovani akter, $v \in
 \begin{itemize}
   \item $I(u,v,t)$ je število interakcij med $u$ in $v$ do transakcije $t$,
   \item $S(u,v,t)$ je število interakcij vozlišča $v$ z akterjem $u$ do transakcije $t$, kjer ni prišlo do pritožb, 
-  \item $Cr(v,t) \in [0,1]$ je faktor uravnoteženja zaupanja, ki zmanjšuje tveganje neverodostojnih povratnih informacij iz vozlišča $v$.
+  \item $\mbox{Cr}(v,t) \in [0,1]$ je faktor uravnoteženja zaupanja, ki zmanjšuje tveganje neverodostojnih povratnih informacij iz vozlišča $v$.
 \end{itemize}
 
 Ocena zaupanja v akterja $u$ do časa $t$ je nato definirana kot \cite{xiong2002building}
 \begin{equation}
-  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}
+  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}
   \label{eq:xiong-peertrust}
 \end{equation}
 
 Vrednost $T(u,t)$ leži v intervalu $[0,1]$ in predstavlja globalno reputacijsko oceno akterja $u$ na podlagi skupnega, uteženega zadovoljstva vseh vozlišč, ki so z njim sodelovala. 
 
-\paragraph{$Dokaz.$} Dokažimo, da velja $T(u,t) \in [0,1]$.
-V skladu z definicijo metrike PeerTrust privzamemo, da za vse $v \in P, v \neq u$ in dani $t$ velja
-$0 \leq S(u,v,t) \leq I(u,v,t)$ ter $0 \leq Cr(v,t) \leq 1$, poleg tega pa ima akter $u$ vsaj eno interakcijo, tj.\ $\sum_{v \in P, v \neq u} I(u,v,t) > 0$.
+\paragraph{$Dokaz.$} Dokažimo, da velja $T(u,t) \in [0,1]$.\\
+V skladu z definicijo funkcij privzemimo, da za vse $v \in P, v \neq u$ in dani $t$ velja
+$0 \leq S(u,v,t) \leq I(u,v,t)$ ter $0 \leq \mbox{Cr}(v,t) \leq 1$, poleg tega pa ima akter $u$ vsaj eno interakcijo, torej velja $\sum_{v \in P, v \neq u} I(u,v,t) > 0$.
 
-Ker je $S(u,v,t) \ge 0$ in $Cr(v,t) \in [0,1]$, sledi
-$0 \leq S(u,v,t)\,Cr(v,t) \leq S(u,v,t)$.
+Ker je $S(u,v,t) \ge 0$ in $\mbox{Cr}(v,t) \in [0,1]$, sledi
+$0 \leq S(u,v,t)\,\mbox{Cr}(v,t) \leq S(u,v,t)$.
 Zaradi $S(u,v,t) \leq I(u,v,t)$ dobimo
-$0 \leq S(u,v,t)\,Cr(v,t) \leq I(u,v,t)$
+$0 \leq S(u,v,t)\,\mbox{Cr}(v,t) \leq I(u,v,t)$
 za vse $v \in P, v \neq u$.
 Če to neenakost seštejemo po vseh takih $v$, dobimo
 \[
-  0 \leq \sum_{v \in P, v \neq u} S(u,v,t)\,Cr(v,t)
+  0 \leq \sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)
       \leq \sum_{v \in P, v \neq u} I(u,v,t).
 \]
 
@@ -237,7 +236,7 @@ Ker je imenovalec strogo pozitiven, velja
 \[
   0 \leq
   T(u,t)
-  = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,Cr(v,t)}
+  = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)}
          {\sum_{v \in P, v \neq u} I(u,v,t)}
   \leq 1.
 \]
@@ -260,7 +259,7 @@ T_{\text{new}}
 kjer je $e^{-\beta \Delta t}$ amortizacijski faktor, ki zmanjšuje vpliv starejših ocen glede na časovno razliko ${\Delta}t$. Tako se zagotovi, da novejše ocene bolj vplivajo na ugled, kar omogoča dinamično prilagajanje zaupanja glede na trenutno vedenje akterjev.
 
 \subsection{Povezava z našo rešitvijo}
-Predstavljeni modeli zaupanja predstavljajo osnovo za delovanje razvitega sistema. Vsak akter v dobavni verigi lahko uporabi svoj način izračuna zaupanja, ki temelji na dokazih, priporočilih ali dinamičnih metrikah. Sistem ne vsiljuje enotnega algoritma, temveč omogoča, da akter sam oblikuje pravila na podlagi podatkov iz ontologije. Rezultati teh izračunov se shranjujejo v verigo blokov, ki deluje kot skupen in trajen zapis ocen. S tem smo združili različne pristope v enoten sistem, kjer je zaupanje merljivo in preverljivo.
+Predstavljeni modeli zaupanja predstavljajo osnovo za delovanje razvitega sistema. Vsak akter v dobavni verigi lahko uporabi svoj način izračuna zaupanja, ki temelji na dokazih, priporočilih ali dinamičnih merilih. Sistem ne vsiljuje enotnega algoritma, temveč omogoča, da akter sam oblikuje pravila na podlagi podatkov iz ontologije. Rezultati teh izračunov se shranjujejo v verigo blokov, ki deluje kot skupen in trajen zapis ocen. S tem smo združili različne pristope v enoten sistem, kjer je zaupanje merljivo in preverljivo.
 
 \section{Farmacevtske dobavne verige}
 
