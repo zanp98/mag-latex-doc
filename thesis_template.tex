@@ -177,56 +177,87 @@ Tak model se uporablja predvsem pri inicializaciji zaupanja in zagotavlja osnovn
 \subsection{Priporočilni modeli zaupanja}
 Priporočilni modeli gradijo zaupanje na osnovi izkušenj in posredovanih ocen drugih entitet.
 Vsaka entiteta ocenjuje druge glede na pretekle interakcije, te ocene pa se lahko prenašajo naprej kot priporočila.
+Model uporablja pogojno tranzitivnost zaupanja – entiteta $A$ lahko zaupa entiteti $C$, če zaupa entiteti $B$ kot priporočitelju in lahko ovrednoti kakovost njegovih priporočil.
 
-Abdul-Rahman in Hail v svojem modelu zaupanja \cite{abdul1998distributed} predlagata, da se zaupanje v ciljno entiteto $T$ izračuna kot produkt vmesnih ocen na poti od začetne entitete do ciljne. Naj bo $n$ število entitet na poti do ciljne entitete, $rtv(i) \in \{1,2,3,4\}$ vrednost priporočila za $i$-tega posrednika (preračunana iz subjektivnih ocen), in $tv(T) \in [0,1]$ neposredna vrednost zaupanja v ciljno entiteto.
+Abdul-Rahman in Hailes predlagata porazdeljeni model zaupanja, ki temelji na izračunu zaupanja iz verig priporočil med agenti \cite{abdul1998distributed}.
+Vsak agent hrani diskretne vrednosti zaupanja na lestvici od $-1$ do $4$, kjer $-1$ pomeni popolno nezaupanje, $0$ nevednost (agent si ne upa podati ocene), vrednosti $1$ do $3$ označujejo naraščajoče stopnje zaupanja, $4$ pa predstavlja popolno zaupanje.
+Ločita med:
+\begin{itemize}
+  \item \emph{vrednostjo priporočiteljevega zaupanja} $tv(R_i)$, ki opisuje, koliko agent zaupa $i$-temu priporočitelju na poti in
+  \item \emph{priporočeno vrednostjo zaupanja} $rtv(T)$, ki jo o ciljni entiteti $T$ poda zadnji priporočitelj v verigi.
+\end{itemize}
 
-Skupna vrednost zaupanja $tv_T$ se nato izračuna kot:
+Naj bo $p$ indeks konkretne poti priporočil, $n$ število priporočiteljev na tej poti, $R_1, R_2, \dots, R_n$ pa zaporedni priporočitelji na poti od izvornega priporočitelja do tistega, ki priporočilo zahteva.
+Zaupanje v ciljno entiteto $T$ po poti $p$ označimo z $tv_p(T)$.
+Avtorja predlagata naslednjo formulo za izračun zaupanja po poti $p$ \cite{abdul1998distributed}:
 
 \begin{equation}
-  tv_T = \left( \prod_{i=1}^{n} \frac{rtv(i)}{4} \right) \cdot tv(T)
-  \label{eq:abdul-recommendation}
+  tv_p(T) = \left( \prod_{i=1}^{n} \frac{tv(R_i)}{4} \right) \cdot rtv(T)
+  \label{eq:abdulrahman-path}
 \end{equation}
 
-Kjer je vsak $rtv(i)$ deljen s 4 zato, da se normalizira na interval $[0.25, 1.0]$.
-Če obstaja več neodvisnih poti med entitetama, se končna vrednost zaupanja določi kot aritmetična sredina rezultatov posameznih poti.
-
-Priporočilni modeli gradijo zaupanje na osnovi izkušenj in posredovanih ocen drugih entitet.
-Vsaka entiteta ocenjuje druge glede na pretekle interakcije, te ocene pa se lahko delijo naprej kot priporočila.
-Abdul-Rahman in Hailes predlagata model, ki uporablja pogojno tranzitivnost zaupanja – entiteta A lahko zaupa entiteti C, če A zaupa B kot priporočitelju in lahko ovrednoti njegovo oceno.
-
-Pri tem se uporablja zvezna vrednost zaupanja $tv_T$ med $0$ in $1$, izračunana iz vrednosti priporočil po poti $A \rightarrow B \rightarrow C \rightarrow D$.
-Za končno vrednost se uporabi zmnožek delnih zaupanj na poti:
-\begin{equation}
-  tv_T = \prod_{i=1}^{n} \frac{rtv(i)}{4} \times tv(T),
-\end{equation}
-kjer $rtv(i)$ predstavlja stopnjo zaupanja v posameznega posrednika, $tv(T)$ pa končno vrednost zaupanja v ciljno entiteto \cite{abdul1998distributed}.
-Če obstaja več poti med akterjema, se končna vrednost določi kot povprečje rezultatov posameznih poti.
+Ker lahko agent za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $p$ število teh poti, označenih z $i = 1, \dots, p$. Abdul-Rahman in Hailes predlagata, da se vse delne ocene zaupanja $tv_1(T), \dots, tv_p(T)$ povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
+$tv(T) = \frac{1}{p} \sum_{i=1}^{p} tv_i(T)$ \cite{abdul1998distributed}.
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
 
-V omrežjih enakovrednih akterjev se zaupanje ocenjuje na decentraliziran način. Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. Xiong in Liu predlagata metriko, ki temelji na razmerju med pozitivnimi in negativnimi interakcijami:
-\begin{equation}
-  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t) \, Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)},
-\end{equation}
-kjer $S(u,v,t)$ označuje zadovoljstvo uporabnika $u$ z $v$ do časa $t$, $Cr(v,t)$ je korekcijski faktor za filtriranje povratnih informacij, $I(u,v,t)$ pa število interakcij med $u$ in $v$.
-Rezultat $T(u,t)$ je vedno v intervalu $(0,1)$ in predstavlja trenutno stopnjo zaupanja v entiteto.
-Sistem lahko določi pragove $C_1$ in $C_2$, pri čemer entiteta velja za zaupanja vredno, če velja $I(u,t) > C_1$ in $T(u,t) > C_2$ \cite{xiong2002building}.
+V omrežjih enakovrednih akterjev (P2P) se zaupanje ocenjuje na decentraliziran način. Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. Xiong in Liu v okviru sistema PeerTrust predlagata metriko, ki zaupanje akterja $u$ izrazi kot razmerje med združenimi ocenami zadovoljstva drugih z njegovimi storitvami in skupnim številom interakcij \cite{xiong2002building}.
 
-Takšni sistemi so učinkoviti pri akumuliranju ocen, vendar občutljivi za napačne ali zlonamerne povratne informacije.
-Zato številne rešitve uvajajo uteževanje priporočil glede na zanesljivost virov ali na starost podatkov.
+Naj bo $P$ množica vseh vozlišč v omrežju, $u \in P$ opazovani akter, $v \in P$ ($v \neq u$) preostala vozlišča, $t$ pa številka transakcije. Funkcije so definirane tako:
+\begin{itemize}
+  \item $I(u,v,t)$ je število interakcij med $u$ in $v$ do transakcije $t$,
+  \item $S(u,v,t)$ je število interakcij vozlišča $v$ z akterjem $u$ do transakcije $t$, kjer ni prišlo do pritožb, 
+  \item $Cr(v,t) \in [0,1]$ je faktor uravnoteženja zaupanja, ki zmanjšuje tveganje neverodostojnih povratnih informacij iz vozlišča $v$.
+\end{itemize}
+
+Ocena zaupanja v akterja $u$ do časa $t$ je nato definirana kot \cite{xiong2002building}
+\begin{equation}
+  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,Cr(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}
+  \label{eq:xiong-peertrust}
+\end{equation}
+
+Vrednost $T(u,t)$ leži v intervalu $[0,1]$ in predstavlja globalno reputacijsko oceno akterja $u$ na podlagi skupnega, uteženega zadovoljstva vseh vozlišč, ki so z njim sodelovala. 
+
+\paragraph{$Dokaz.$} Dokažimo, da velja $T(u,t) \in [0,1]$.
+V skladu z definicijo metrike PeerTrust privzamemo, da za vse $v \in P, v \neq u$ in dani $t$ velja
+$0 \leq S(u,v,t) \leq I(u,v,t)$ ter $0 \leq Cr(v,t) \leq 1$, poleg tega pa ima akter $u$ vsaj eno interakcijo, tj.\ $\sum_{v \in P, v \neq u} I(u,v,t) > 0$.
+
+Ker je $S(u,v,t) \ge 0$ in $Cr(v,t) \in [0,1]$, sledi
+$0 \leq S(u,v,t)\,Cr(v,t) \leq S(u,v,t)$.
+Zaradi $S(u,v,t) \leq I(u,v,t)$ dobimo
+$0 \leq S(u,v,t)\,Cr(v,t) \leq I(u,v,t)$
+za vse $v \in P, v \neq u$.
+Če to neenakost seštejemo po vseh takih $v$, dobimo
+\[
+  0 \leq \sum_{v \in P, v \neq u} S(u,v,t)\,Cr(v,t)
+      \leq \sum_{v \in P, v \neq u} I(u,v,t).
+\]
+
+Ker je imenovalec strogo pozitiven, velja
+\[
+  0 \leq
+  T(u,t)
+  = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,Cr(v,t)}
+         {\sum_{v \in P, v \neq u} I(u,v,t)}
+  \leq 1.
+\]
+Torej je $T(u,t) \in [0,1]$.
+
+Za odločanje, ali je akter zaupanja vreden, avtorja uvedeta pragova $c_1$ in $c_2$. Prag $c_1$ določa minimalno število skupnih interakcij, ki jih mora imeti akter, da lahko opazovalec sprejme informirano odločitev. Prag $c_2$ pa izraža, kako visoko vrednost zaupanja je opazovalec pripravljen sprejeti kot še dovolj dobro: bolj toleranten akter lahko izbere nižji $c_2$, manj toleranten pa višjega. Akter $u$ se obravnava kot zaupanja vreden, če hkrati velja $I(u,t) > c_1$ in $T(u,t) > c_2$ \cite{xiong2002building}.
 
 \subsection{Dinamično posodabljanje zaupanja}
 
-Ker se vedenje akterjev sčasoma spreminja, se mora zaupanje prilagajati novim podatkom.
-Posodobitev vrednosti se pogosto izvede z amortizacijskimi ali diskontnimi faktorji, ki dajejo večjo težo nedavnim interakcijam.
-Primer takega mehanizma je izračun nove vrednosti zaupanja po zaključeni interakciji:
+Ker se vedenje akterjev sčasoma spreminja, se mora zaupanje prilagajati novim informacijam.
+Posodobitev vrednosti se pogosto izvede z amortizacijskimi faktorji, ki dajejo večjo težo nedavnim interakcijam.
+Primer takpšnega modela predstavijo Lin in sodelavci v članku \textit{A Reputation and Trust Management Broker Framework for Web Applications} \cite{lin2005reputation}. 
+
+Avtorji predlagajo porazdeljen sistem posrednikov zaupanja, kjer vsak posrednik vzdržuje bazo podatkov o ugledu storitev na podlagi povratnih informacij uporabnikov po opravljenih transakcijah. Ko uporabnik posreduje novo oceno $r$ za določeno storitev, posrednik posodobi shranjeno vrednost ugleda $T_{old}$ v novo vrednost $T_{new}$. Pri tem upošteva število preteklih transakcij $N$, časovno razliko ${\Delta}t$ med novo oceno in zadnjo shranjeno oceno ter parameter časovnega zastaranja $\beta$, ki določa, kako hitro starejše ocene postanejo manj pomembne. Formula za posodobitev ugleda je podana kot \cite{lin2005reputation}:
 \begin{equation}
 T_{\text{new}}
   = e^{-\beta \Delta t}\,\frac{N}{N+1} T_{\text{old}}
     + \left(1 - e^{-\beta \Delta t}\right)\frac{N}{N+1} r,
 \end{equation}
-kjer $T_{\text{old}}$ predstavlja prejšnjo vrednost zaupanja, $r$ novo oceno po transakciji, $N$ število izvedenih interakcij, $\beta$ faktor dušenja, $\Delta t$ pa čas od zadnje posodobitve \cite{lin2005reputation}.
-Na ta način sistem zagotavlja, da nove izkušnje bolj vplivajo na oceno, stare pa postopoma izgubijo težo.
+kjer je $e^{-\beta \Delta t}$ amortizacijski faktor, ki zmanjšuje vpliv starejših ocen glede na časovno razliko ${\Delta}t$. Tako se zagotovi, da novejše ocene bolj vplivajo na ugled, kar omogoča dinamično prilagajanje zaupanja glede na trenutno vedenje akterjev.
 
 \subsection{Povezava z našo rešitvijo}
 Predstavljeni modeli zaupanja predstavljajo osnovo za delovanje razvitega sistema. Vsak akter v dobavni verigi lahko uporabi svoj način izračuna zaupanja, ki temelji na dokazih, priporočilih ali dinamičnih metrikah. Sistem ne vsiljuje enotnega algoritma, temveč omogoča, da akter sam oblikuje pravila na podlagi podatkov iz ontologije. Rezultati teh izračunov se shranjujejo v verigo blokov, ki deluje kot skupen in trajen zapis ocen. S tem smo združili različne pristope v enoten sistem, kjer je zaupanje merljivo in preverljivo.
@@ -980,20 +1011,24 @@ Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih dat
 Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najboljši približek \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
 
 \paragraph{Verjetnostni del}
-Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke (angl.\ \emph{basis points}) med 0 in 10000. Za vsak kriterij se vodi aposterior prazdelitve beta $B(\alpha, \beta)$, ki modelira zaupanje v izpolnjevanje tega kriterija.
+Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke med 0 in 10000. Za vsak kriterij se vodi aposterior prazdelitve beta $B(\alpha, \beta)$, ki modelira zaupanje za izpolnitev tega kriterija.
 
-Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve Beta sta:
-\[
+Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve beta sta:
+\begin{equation}
     \alpha = 1 + s_0 \cdot \textit{obs\_scale}, \qquad
+\end{equation}
+\begin{equation}
     \beta = 1 + (1 - s_0) \cdot \textit{obs\_scale},
-\]
+\end{equation}
 kjer je v implementaciji uporabljena utežni faktor $\textit{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost porazdelitve beta $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko zaupanje.
 
 Pri novih opazovanjih (interakcijah) se aposterior posodobi po principu eksponentno uteženega drsečega povprečja (EWMA) s faktorjem $\gamma \approx 0{,}2$. Če opazovanje prinese zaželenost $s$, se nova parametra $\alpha'$ in $\beta'$ izračunata kot:
-\begin{align*}
-    \alpha' &= (1 - \gamma) \cdot \alpha + \gamma \cdot (1 + s \cdot \textit{obs\_scale}), \\
-    \beta' &= (1 - \gamma) \cdot \beta + \gamma \cdot (1 + (1 - s) \cdot \textit{obs\_scale}).
-\end{align*}
+\begin{equation}
+    \alpha' = (1 - \gamma) \cdot \alpha + \gamma \cdot (1 + s \cdot \textit{obs\_scale}),
+\end{equation}
+\begin{equation}
+    \beta' = (1 - \gamma) \cdot \beta + \gamma \cdot (1 + (1 - s) \cdot \textit{obs\_scale}).
+\end{equation}
 S tem pristopom nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno skladno z modeli dinamičnega posodabljanja zaupanja z amortizacijskimi faktorji, kjer novejše interakcije prevladajo nad starimi.
 
 \paragraph{Kombinirana odločitev}
