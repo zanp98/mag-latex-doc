@@ -143,7 +143,7 @@ V digitalnih in porazdeljenih okoljih so se pojavili dodatni atributi, ki izhaja
 V kontekstu farmacevtskih dobavnih verig imajo atributi zaupanja izrazito regulatorno in sledilno komponento. Uddin in sodelavci \cite{uddin2021blockchain} poudarjajo, da so pri zagotavljanju zaupanja ključni kazalniki sledljivost, pristnost in celovitost podatkov.
 Kayhan in sodelavci \cite{kayhan2022ensuring} izpostavljajo še pomen transparentnosti, nespremenljivosti in izvorne sledljivosti (angl. provenance), ki jih omogoča tehnologija veriženja blokov.
 
-Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih metrik, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavanje zaupanja.
+Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbirko značilnosti, ki jih lahko posamezen akter uporabi pri lastni presoji zaupanja. V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti v ontologiji. Te omogočajo, da akterji formalno zapišejo svoje kriterije za ocenjevanje drugih entitet. S tem v sistemu omogočamo standardizirano predstavitev vhodnih meril, ki jih posamezni akterji uporabljajo pri svojem algoritmu za izračunavanje zaupanja.
 
 \subsection{Modeliranje zaupanja v računalniških sistemih}
 \label{subsec:modeliranje-zaupanja}
@@ -200,7 +200,7 @@ $\mbox{tv}(T) = \frac{1}{p} \sum_{i=1}^{p} \mbox{tv}_i(T)$ \cite{abdul1998distri
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
 
-V omrežjih enakovrednih akterjev (P2P) se zaupanje ocenjuje na decentraliziran način. Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. Xiong in Liu v okviru sistema PeerTrust predlagata metriko, ki zaupanje akterja $u$ izrazi kot razmerje med združenimi ocenami zadovoljstva drugih z njegovimi storitvami in skupnim številom interakcij \cite{xiong2002building}.
+V omrežjih enakovrednih akterjev (P2P) se zaupanje ocenjuje na decentraliziran način. Vsako vozlišče vodi lastno evidenco interakcij in vrednoti druge glede na uspešnost sodelovanja. Xiong in Liu v okviru sistema PeerTrust predlagata merilo, ki zaupanje akterja $u$ izrazi kot razmerje med združenimi ocenami zadovoljstva drugih z njegovimi storitvami in skupnim številom interakcij \cite{xiong2002building}.
 
 Naj bo $P$ množica vseh vozlišč v omrežju, $u \in P$ opazovani akter, $v \in P$ ($v \neq u$) preostala vozlišča, $t$ pa številka transakcije. Funkcije so definirane tako:
 \begin{itemize}
@@ -339,7 +339,7 @@ Najpreprostejši so centralizirani oraklji, kjer ena organizacija zbira podatke 
 Tak pristop je enostaven za implementacijo, vendar ponovno uvaja enotno točko zaupanja in napake.
 Sledijo jim porazdeljeni oziroma decentralizirani oraklji, kjer več neodvisnih vozlišč pridobiva in združuje podatke in tako zmanjšuje tveganje za manipulacijo podatkov.
 Primer takšne zasnove je sistem ASTRAEA, ki uporabi glasovalno igro z vložki in ločene vloge udeležencev (oddajatelji trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}.
-Podobno pristopajo tudi druge rešitve, kjer se omrežja orakljev, kot je Chainlink, uporabljajo za zbiranje podatkov iz več API-jev in senzorjev ter za izračun dodatnih metrik (npr. reputacije) še pred zapisom v verigo blokov \cite{kochovski2019trust}.
+Podobno pristopajo tudi druge rešitve, kjer se omrežja orakljev, kot je Chainlink, uporabljajo za zbiranje podatkov iz več API-jev in senzorjev ter za izračun dodatnih meril (npr. reputacije) še pred zapisom v verigo blokov \cite{kochovski2019trust}.
 
 V okviru te naloge oraklje obravnavamo kot ločeno plast med semantičnim delom sistema in verigo blokov.
 Podobno kot pri Chainlinku smo zasnovali decentralizirano omrežje pametnih orakljev, kjer se izvaja koda. Omrežje orakljev iz ontologije in pravil zaupanja prebere podatke, izvede izračun zaupanja ter rezultat posreduje pametni pogodbi.
@@ -354,7 +354,7 @@ Preverljiva dokazila (angl. Verifiable Credentials - VC) so standardizirana digi
 
 V predstavljenem sistemu ima vsak akter v ontologiji lasten DID. DID služi kot osnovni identifikator, na katerega se vežejo atributi in podatki v ontologiji. Na ta način sistem ohrani enotno identiteto akterjev med vsemi plastmi arhitekture.
 
-Preverljiva dokazila uporabljamo za opis lastnosti, ki so pomembne za ocenjevanje zaupanja. Regulator, kot je EMA, lahko na primer izda VC, ki potrjuje veljavnost licence, certifikat GMP ali rezultat presoje kakovosti. Ta dokazila so digitalno podpisana in povezana z DID akterja. Orakelj lahko med izračunom zaupanja prebere VC, preveri podpis izdajatelja ter iz podatkov izlušči metrike, ki jih akter uporablja v svoji politiki zaupanja. Če akter v svojih pravilih določi, da mora imeti partner veljavno licenco ali ustrezno oceno presoje kakovosti, lahko te kriterije pridobi neposredno iz VC.
+Preverljiva dokazila uporabljamo za opis lastnosti, ki so pomembne za ocenjevanje zaupanja. Regulator, kot je EMA, lahko na primer izda VC, ki potrjuje veljavnost licence, certifikat GMP ali rezultat presoje kakovosti. Ta dokazila so digitalno podpisana in povezana z DID akterja. Orakelj lahko med izračunom zaupanja prebere VC, preveri podpis izdajatelja ter iz podatkov izlušči merila, katera akter uporablja v svoji politiki zaupanja. Če akter v svojih pravilih določi, da mora imeti partner veljavno licenco ali ustrezno oceno presoje kakovosti, lahko te kriterije pridobi neposredno iz VC.
 
 \newpage
 \section{Semantični splet in ontologije}
@@ -436,9 +436,9 @@ odprta vprašanja upravljanja identitet, cena implementacije \\
 \end{landscape}
 
 
-Prispevek te naloge je predlog sistema, ki omenjene elemente poveže v enoten okvir. Ontologija farmacevtske dobavne verige predstavlja skupno semantično plast, v kateri so akterji in njihove lastnosti opisani na strukturiran in razširljiv način. Vsak akter lahko nad temi podatki definira lastna pravila zaupanja in tako določi, katere metrike so zanj pomembne. Mehanizem za sklepanje iz ontologije prebere lastnosti akterjev, uporabi lokalna pravila in za vsak par udeležencev izračuna rezultat zaupanja. Decentralizirani oraklji nato te rezultate prenesejo v pametno pogodbo, ki na verigi blokov hrani register relacij zaupanja. Sistem povezuje tudi decentralizirane identitete (DID) in preverljiva dokazila VC, kadar akterji želijo izvor podatkov podpreti z digitalnimi certifikati.
+Prispevek te naloge je predlog sistema, ki omenjene elemente poveže v enoten okvir. Ontologija farmacevtske dobavne verige predstavlja skupno semantično plast, v kateri so akterji in njihove lastnosti opisani na strukturiran in razširljiv način. Vsak akter lahko nad temi podatki definira lastna pravila zaupanja in tako določi, katera merila so zanj pomembna. Mehanizem za sklepanje iz ontologije prebere lastnosti akterjev, uporabi lokalna pravila in za vsak par udeležencev izračuna rezultat zaupanja. Decentralizirani oraklji nato te rezultate prenesejo v pametno pogodbo, ki na verigi blokov hrani register relacij zaupanja. Sistem povezuje tudi decentralizirane identitete (DID) in preverljiva dokazila VC, kadar akterji želijo izvor podatkov podpreti z digitalnimi certifikati.
 
-Tak pristop neposredno naslavlja vrzeli, opisane v tem poglavju. Namesto enotne, vnaprej določene metrike zaupanja omogoča, da vsak akter oblikuje lastno politiko na osnovi skupnega modela podatkov. Rezultati teh različnih politik so kljub temu zbrani v enoten register, ki ga lahko delijo vsi udeleženci verige. S tem sistem podpira različne poglede na zanesljivost partnerjev, hkrati pa ohranja konsistentno predstavitev identitet in podatkovnih lastnosti.
+Tak pristop neposredno naslavlja vrzeli, opisane v tem poglavju. Namesto enotnih, vnaprej določenih meril zaupanja, omogoča, da vsak akter oblikuje lastno politiko na osnovi skupnega modela podatkov. Rezultati teh različnih politik so kljub temu zbrani v enoten register, ki ga lahko delijo vsi udeleženci verige. S tem sistem podpira različne poglede na zanesljivost partnerjev, hkrati pa ohranja konsistentno predstavitev identitet in podatkovnih lastnosti.
 
 Čeprav je sistem razvit na primeru farmacevtske dobavne verige, je zasnova splošna. Ontologijo in nabor atributov bi bilo mogoče prilagoditi drugim domenam, na primer pametnim mestom ali omrežjem interneta stvari, kjer številni akterji izmenjujejo podatke in storitve. Enak vzorec se ponovi tudi tam: skupni semantični model entitet, subjektivne politike zaupanja, modul za sklepanje in register rezultatov na verigi blokov.
 
@@ -483,7 +483,7 @@ Pametna pogodba omogoča zapis rezultatov izračuna, preverjanje stanja zaupanja
 Vsak akter v ontologiji ima dodeljen decentraliziran identifikator (v nadaljevanju DID).
 DID služi kot enoličen identifikator, ki povezuje podatke v ontologiji s predstavnikom akterja v decentraliziranem okolju.
 Poleg tega sistem podpira uporabo preverljivih dokazil (VC), ki jih lahko izdajajo regulatorji, kot je EMA.
-Ta dokazila vsebujejo metrike, kot so veljavnost licence, skladnost s standardi GMP ali rezultati presoje kakovosti.
+Ta dokazila vsebujejo merila, kot so veljavnost licence, skladnost s standardi GMP ali rezultati presoje kakovosti.
 Orakelj lahko, kadar akter to določi v pravilih, med izračunom zaupanja prebere VC in uporabi podatke kot dodatne kriterije.
 
 \paragraph{Python in osnovne knjižnice}
@@ -637,7 +637,7 @@ Primer dokazila, ki ga izda regulator:
 
 Preverljiva dokazila so shranjena v ločeni podatkovni bazi. Ob izračunu zaupanja orakelj preveri kriptografski podpis izdajatelja, iz podatkov izlušči relevantne lastnosti in jih združi z informacijami iz ontologije. Tako sestavi popoln nabor kriterijev, ki jih akter uporabi pri ocenjevanju zaupanja.
 
-Plast znanja združuje semantične opise akterjev in njihove lastnosti z regulatorno potrjenimi podatki iz preverljivih dokazil. Oraklji pri izračunu zaupanja dostopajo do obeh virov: iz Fusekija pridobijo opisne metrike, iz VC-jev pa dodatne podatke, ki jih ontologija ne vsebuje. S tem plast znanja omogoča enoten in strukturiran nabor podatkov, na katerem temelji celoten izračun zaupanja.
+Plast znanja združuje semantične opise akterjev in njihove lastnosti z regulatorno potrjenimi podatki iz preverljivih dokazil. Oraklji pri izračunu zaupanja dostopajo do obeh virov: iz Fusekija pridobijo opisna merila, iz VC-jev pa dodatne podatke, ki jih ontologija ne vsebuje. S tem plast znanja omogoča enoten in strukturiran nabor podatkov, na katerem temelji celoten izračun zaupanja.
 
 \subsubsection{Plast izračuna zaupanja}
 Plast izračuna zaupanja predstavlja osrednjo procesno komponento arhitekture. Njena naloga je, da podatke iz plasti znanja pretvori v konkretne odločitve o zaupanju in jih posreduje verigi blokov. V tej plasti se nahaja omrežje orakljev in agregator, ki skupaj tvorita neodvisen mehanizem sklepanja. Oraklji izvajajo izračune, agregator pa skrbi za preverjanje rezultatov in zapis končnega stanja v pametno pogodbo.
@@ -765,13 +765,13 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
   \item \textbf{Zajem podatkov iz plasti znanja}\newline
     Orakelj pred izvedbo izračuna pridobi aktualne podatke iz dveh virov:
     \begin{itemize}
-      \item podatki ontologije prek strežnika Fuseki (poizvedbe SPARQL), ki vključujejo opisne metrike akterja,
+      \item podatki ontologije prek strežnika Fuseki (poizvedbe SPARQL), ki vključujejo opisna merila akterja,
       \item preverljiva dokazila (VC), ki jih orakelj preveri glede veljavnosti in morebitnega preklica.
     \end{itemize}
-    Ti podatki predstavljajo vhodne metrike, ki se uporabijo pri izračunu zaupanja.
+    Ti podatki predstavljajo vhodna merila, ki se uporabijo pri izračunu zaupanja.
 
   \item \textbf{Izvedba lokalnega izračuna zaupanja}\newline
-    Orakelj izvede hibridni algoritem ocenjevanja, ki združuje preverjanje pravil ter statistične metrike.  
+    Orakelj izvede hibridni algoritem ocenjevanja, ki združuje preverjanje pravil ter statističnih meril.
     V tej fazi orakelj pripravi tudi oba ključna povzetka:
     \begin{itemize}
       \item \texttt{policy\_hash}, ki predstavlja zgoščeno vrednost pravil akterja,
@@ -935,8 +935,8 @@ Agregator pri združevanju rezultatov ne pozna podrobnosti posameznih politik. V
 
 \paragraph{Telemetrijski podatki}
 Poleg ontologije in preverljivih poverilnic sistem uporablja tudi agregirane
-telemetrijske metrike za izbrane transporterje. V eksperimentalnem okolju so
-te metrike zapisane v JSON datoteki v naslednji obliki:
+telemetrijske podatke za izbrane prevoznike. V eksperimentalnem okolju so
+ti podatki zapisani v JSON datoteki v naslednji obliki:
 
 \begin{verbatim}
 {
@@ -970,9 +970,9 @@ V prototipu so vrednosti zapisane statično in služijo kot simulacija. V realne
 V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili različne pristope k upravljanju zaupanja v razpršenih sistemih: dokazne modele, priporočilne modele, porazdeljeno ocenjevanje ter dinamično posodabljanje zaupanja. Ti koncepti tvorijo teoretično podlago za zasnovo naših orakljev. V nadaljevanju pokažemo, kako vsak orakelj uporabi drugačen pogled na zaupanje. Za potrebe testiranja smo ustvarili tri oraklje z različnimi algoritmi izračuna zaupanja:
 
 \begin{itemize}
-    \item \textbf{Orakelj A} uporablja hibridni pristop, ki kombinira dokazne elemente (licence, certifikati) z dinamično metriko, podobno priporočilnim in porazdeljenim modelom.
+    \item \textbf{Orakelj A} uporablja hibridni pristop, ki kombinira dokazne elemente (licence, digitalna potrdila) z dinamičnimi merili. Podobno, kot je to narejeno v priporočilnih in porazdeljenih modelih zaupanja.
     \item \textbf{Orakelj B} je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi preverljivih poverilnic, podobno kot hierarhični in PGP-sistemi iz podpoglavja o dokaznih modelih.
-    \item \textbf{Orakelj C} je \emph{telemetrijsko usmerjen} in se naslanja na dinamično posodabljanje zaupanja prek operativnih metrik, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
+    \item \textbf{Orakelj C} je \emph{telemetrijsko usmerjen} in se naslanja na dinamično posodabljanje zaupanja prek operativnih meril, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
 \end{itemize}
 
 \begin{figure}[ht]
@@ -986,7 +986,7 @@ Na sliki~\ref{fig:oracle-sources} je prikazano, iz katerih virov črpajo podatke
 posamezni oraklji. Orakelj~A ima hibriden pogled: pri izračunu zaupanja hkrati
 upošteva telemetrijo, preverljive poverilnice VC in podatke iz ontologije.
 Orakelj~B pri odločanju uporablja samo preverljive poverilnice VC,
-medtem ko Orakelj~C izhaja predvsem iz telemetrijskih metrik. Vsi trije oraklji
+medtem ko Orakelj~C izhaja predvsem iz telemetrijskih podatkov. Vsi trije oraklji
 ontologijo uporabljajo kot skupni imenik akterjev, iz katerega pridobijo
 njihove identifikatorje in osnovne oznake.
 
@@ -1110,7 +1110,7 @@ Glavne kombinacije kriterijev so:
     \end{itemize}
 \end{itemize}
 
-Ključna značilnost je, da brez ustreznih preverljivih poverilnic odločitev nagiba k \emph{FAIL}, tudi če so druge operativne metrike razmeroma dobre, kar odraža močan poudarek na formalnih dokazih in skladnosti.
+Ključna značilnost je, da brez ustreznih preverljivih poverilnic odločitev nagiba k \emph{FAIL}, tudi če so druga operativna merila razmeroma dobra. To odraža močan poudarek na formalnih dokazih in skladnosti.
 
 \paragraph{Primer: MedLogix (distributer)}
 Ker ima MedLogix veljavne poverilnice in licenco, deterministični del vrne \emph{PASS}. Za oba kriterija dobimo srednjo vrednost Beta posteriorja približno $0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
@@ -1135,7 +1135,7 @@ kar ilustrira strožji, dokazni pristop: deterministični \emph{PASS} sam po seb
 
 \subsubsection*{Orakelj C (telemetrijski pogled)}
 
-Orakelj C uporablja telemetrijo transporta (časovne serije, agregirane metrike) kot primarni vir informacij. Konceptualno se približa porazdeljenim in dinamičnim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer se zaupanje gradi na osnovi kumulativnih izkušenj in se sproti prilagaja novim dogodkom. Njegov prag za verjetnostno oceno je:
+Orakelj C uporablja telemetrijske podatke med prevozi zdravil (npr. temperatura, vlaga) kot primarni vir informacij. Konceptualno se približa porazdeljenim in dinamičnim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer se zaupanje gradi na osnovi kumulativnih izkušenj in se sproti prilagaja novim dogodkom. Njegov prag za verjetnostno oceno je:
 \[
     \textit{prob\_threshold}^{(\text{C})} = 0{,}7.
 \]
@@ -1258,7 +1258,7 @@ Za subjekt \texttt{DHL} v trenutni konfiguraciji veljajo naslednja dejstva:
         (\texttt{credential\_hash}),
   \item poverilnica je shranjena v skupnem repozitoriju VC na strežniku, do
         katerega imajo dostop vsi oraklji,
-  \item telemetrijske metrike kažejo visoko pravočasnost dostav in sprejemljiva
+  \item telemetrijski podatki kažejo visoko pravočasnost dostav in sprejemljiva
         temperaturna odstopanja v hladni verigi.
 \end{itemize}
 
@@ -1293,7 +1293,7 @@ Scenarij se izvede v naslednjih korakih:
         \begin{itemize}
           \item Orakelj A uporabi politike in semantične podatke ter za prevoznika \texttt{DHL} izračuna negativno odločitev z nizko oceno.
           \item Orakelj B preveri veljavnost poverilnice in subjekt oceni zelo visoko, brez opozoril.
-          \item Orakelj C na podlagi telemetrijskih metrik izračuna pozitivno odločitev in  oceno, ki odraža dobro operativno delovanje.
+          \item Orakelj C na podlagi telemetrijskih podatkov izračuna pozitivno odločitev in  oceno, ki odraža dobro operativno delovanje.
         \end{itemize}
         Vsak orakelj pripravi podpisano poročilo \texttt{SignedOracleReport}.
   \item \textbf{Pošiljanje poročil agregatorju}\newline
@@ -1348,7 +1348,7 @@ Interpretacija posameznih poročil:
         VC, VC-centričen algoritem oceni, da so formalni pogoji za zaupanje
         izpolnjeni.
   \item \textbf{Orakelj C} vrne pozitivno odločitev (\emph{PASS}) z visoko
-        oceno $8879$ in brez zastavic. Telemetrijske metrike (pravočasne
+        oceno $8879$ in brez zastavic. Telemetrijski podatki (pravočasne
         dostave, stabilna temperatura) kažejo dobro operativno delovanje, zato
         telemetrijsko usmerjen pogled subjekt oceni kot zaupanja vreden.
 \end{itemize}
@@ -1396,7 +1396,7 @@ iz zunanjih sistemov, do katerih ima vsak orakelj svoj, ne nujno enak dostop.
 
 \subsubsection*{Spremembe v telemetriji in zunanjih virih}
 
-Simuliramo, da se je v opazovanem obdobju povečalo število poznih dostav in odstopanj v senzorskih meritvah. V prototipu to predstavimo kot spremembo zapisa v datoteki z metrikami telemetrije:
+Simuliramo, da se je v opazovanem obdobju povečalo število poznih dostav in odstopanj v senzorskih meritvah. V prototipu to predstavimo kot spremembo zapisa v datoteki s telemetrijskimi podatki:
 
 \begin{verbatim}
 "http://example.org/trust#DHL": {
@@ -1447,8 +1447,8 @@ Interpretacija posameznih poročil:
         nizko oceno $2382$. Zastavica \texttt{0x02} označuje, da je ocena
         pod notranjim pragom (\emph{nizka ocena}). V realnem okolju bi ta
         orakelj poleg ontologije in VC bral tudi izbran nabor zunanjih
-        podatkov (npr.\ regulatorne incidente, povzetke revizij, agregirane
-        metrike kakovosti) in jih semantično povezal v končno oceno.
+        podatkov (npr.\ regulatorne incidente, povzetke revizij, agregirana
+        merila kakovosti) in jih semantično povezal v končno oceno.
   \item \textbf{Orakelj B} (dokazni, VC model) se opira predvsem na
         preverljivo poverilnico, ki je še vedno veljavna. Odločitev ostane
         pozitivna (\emph{PASS}) z zelo visoko oceno $9500$ in brez
@@ -1456,7 +1456,7 @@ Interpretacija posameznih poročil:
         bral samo iz infrastrukture za digitalna dokazila in ne bi bil neposredno
         povezan z operativno telemetrijo.
   \item \textbf{Orakelj C} (telemetrija) neposredno zazna poslabšanje
-        operativnih metrik. Pri novih vrednostih
+        operativnih meril. Pri novih vrednostih
         \texttt{lateDeliveries} $= 0{,}12$ in \texttt{tempDeviation} $= 0{,}12$
         so \emph{točnost} in \emph{temperaturna stabilnost} le še približno
         $0{,}88$, število alarmov pa se poveča na $2$. Po vgrajeni formuli
@@ -1490,7 +1490,7 @@ odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
           \frac{2382 + 9500 + 6920}{3} \approx 6267.
         \]
         Ocena je bistveno nižja kot v prvem scenariju (kjer je znašala
-        približno $6920$), kar odraža vpliv poslabšanih operativnih metrik.
+        približno $6920$), kar odraža vpliv poslabšanih operativnih meril.
   \item \textbf{Zastavice} Oraklja A in C nastavljata zastavico
         \texttt{0x02} (\emph{nizka ocena}), Orakelj B pa zastavic ne
         nastavlja. Ker ima ta bit nastavljena večina orakljev, agregator
@@ -1498,7 +1498,7 @@ odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
         zapis tako ne le označi subjekt kot nezaupanja vreden, temveč
         tudi razloži razlog: nizka številčna ocena, pod pragom sprejemljive
         ravni.
-  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgoščeno vrednost poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \emph{PASS} (scenarij 1) v \emph{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih metrik in zunanjih podatkov, ne pa spremembe formalnih dokazil.
+  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgoščeno vrednost poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \emph{PASS} (scenarij 1) v \emph{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih meril in zunanjih podatkov, ne pa spremembe formalnih dokazil.
 \end{itemize}
 
 Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
@@ -1593,7 +1593,7 @@ Za dodatno zagotovitev pravilnosti smo izvedli kombinacijo enotskih in regresijs
 
 Tretji sklop se nanaša na napade zavrnitve storitve tipa DoS. Ker so nekatere funkcije pametne pogodbe javno dostopne, lahko velik del zahtev za izračun zaupanja ali nepravilno nastavljeni klici paketov povzročijo, da postane uporaba pogodbe ekonomsko neupravičena. Lahko bi se uvedli stroški za klic vseh funkcij na pametni pogodbi. S tem bi preprečili velike količine zahtevkov. Pri prehodu na produkcijsko verigo bi bilo zagotovo treba omejiti, kdo lahko sproži \texttt{requestTrustReport}, uvesti pragove za velikost paketov ter spremljati porabo stroškov verige blokov, da se pravočasno zazna kršitve.
 
-Četrti sklop pokriva razkritje informacij (angl. information disclosure). Pametna pogodba shranjuje le zgoščene identifikatorje subjektov, agregirano številčno oceno zaupanja ter zastavice, kar sledi načelu minimizacije podatkov. Pri nadaljnjem razvoju je pomembno ohraniti isto filozofijo tudi pri razširitvah sheme: novi podatki naj bodo vedno agregirani ali zgoščeni. Enotski testi v naši implementaciji preverjajo, da pogodba ne začne nenamerno shranjevati podrobnih metrik ali neposrednih identifikatorjev podjetij.
+Četrti sklop pokriva razkritje informacij (angl. information disclosure). Pametna pogodba shranjuje le zgoščene identifikatorje subjektov, agregirano številčno oceno zaupanja ter zastavice, kar sledi načelu minimizacije podatkov. Pri nadaljnjem razvoju je pomembno ohraniti isti pristop tudi pri razširitvah sheme: novi podatki naj bodo vedno agregirani ali zgoščeni. Enotski testi v naši implementaciji preverjajo, da pogodba ne shranjuje neposrednih identifikatorjev podjetij.
 
 Zadnji sklop se nanaša na zlorabo privilegijev (angl. elevation of privilege). V produkcijskem okolju bo potrebno uvesti upravljavske funkcije za posodobitev konfiguracije ali migracijo stanja (npr.\ zamenjava agregatorja, posodobitev parametrov politik). Take funkcije je dobro zaščititi z uveljavljenimi vzorci, kot so vloge in večpodpisno upravljanje, ter podpreti z enotskimi testi, ki preverjajo pravilno dodeljevanje, rotacijo in preklic vlog ter varnostne meje med njimi. Tako bi lahko na primer regulator predlagal spremembo agregatorja, ki bi jo morali potrditi vsi člani sveta za upravljanje sistema, preden bi postala aktivna.
 
