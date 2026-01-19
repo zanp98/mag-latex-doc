@@ -61,6 +61,18 @@
 
 \usepackage{pdflscape}
 \usepackage{listings}
+\lstdefinestyle{trustcode}{
+  basicstyle=\ttfamily\small,     % manjši monospace font
+  columns=fullflexible,                  % okvir okoli kode
+  rulecolor=\color{black!30},
+  backgroundcolor=\color{black!3},% nežno siva podlaga
+  breaklines=true,                % prelamljanje dolgih vrstic
+  breakatwhitespace=true,
+  showstringspaces=false,
+  tabsize=4,
+  numberstyle=\tiny,
+  numbers=none                    % ali left, če želiš številke vrstic
+}
 \usepackage{float}
 \usepackage{tabularx}
 \usepackage{booktabs}

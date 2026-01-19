@@ -168,6 +168,7 @@ V tej nalogi se umeščamo v družino statističnih, na dokazih utemeljenih mode
 Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, kot tudi dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \textit{peer-to-peer networks}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in usklajene informacije o zaupanju med akterji v omrežju. V naslednjih podpoglavjih povzemamo različne pristope k upravljanju zaupanja, ki so jih avtorji predstavili v svojem pregledu literature.
 
 \subsection{Dokazni modeli zaupanja}
+\label{sub:evidence-trust-models}
 Pri dokaznih modelih zaupanja se zaupanje ne gradi na preteklih interakcijah ali priporočilih, temveč na preverjanju formalnih dokazil, ki potrjujejo identiteto ali lastnosti entitet.
 
 Eschenauer in sodelavci predstavijo ogrodje za upravljanje zaupanja v omrežjih ad hoc, ki temelji na preverjanju dokazil \cite{eschenauer2002trust}. Zaupanje obravnavajo kot množico odnosov, vzpostavljenih na podlagi dokazil. Dokazila so lahko karkoli, kar zahteva politika za vzpostavitev zaupanja. Po navadi so to javni ključi, naslovi ali identitete. Vsaka entiteta lahko ustvari dokazilo zase ali za druge entitete.
@@ -362,11 +363,11 @@ Semantični splet predstavlja razširitev svetovnega spleta, kjer podatki niso o
 
 RDF (Resource Description Framework) je osnovni podatkovni model semantičnega spleta. Podatki so predstavljeni v obliki trojk {subjekt-\allowbreak predikat–\allowbreak objekt}, kar omogoča enostavno združevanje in razširjanje podatkovnih grafov \cite{w3crdfconcepts}. RDF ne predpisuje sheme, zato se lahko prilagodi različnim domenam. Zapis se pogosto izvaja v obliki Turtle, RDF/XML ali JSON-LD.
 
-Nad RDF je zasnovan OWL (Web Ontology Language), ki omogoča formalno opisovanje razredov, lastnosti in odnosov med pojmi. OWL temelji na opisni logiki, kar omogoča avtomatsko sklepanje in preverjanje konsistence ontologije \cite{world2012owl}. Z uporabo razumevalnikov (angl. reasoner) lahko sistem samodejno razvršča primerke v ustrezne razrede, zazna protislovja in izpelje nova dejstva, ki niso bila eksplicitno zapisana.
+Nad RDF je zasnovan OWL (Web Ontology Language), ki omogoča formalno opisovanje razredov, lastnosti in odnosov med pojmi. OWL temelji na opisni logiki, kar omogoča avtomatsko sklepanje in preverjanje konsistence ontologije \cite{world2012owl}. Z uporabo sklepalnikov (angl. reasoner) lahko sistem samodejno razvršča primerke v ustrezne razrede, zazna protislovja in izpelje nova dejstva, ki niso bila eksplicitno zapisana.
 
 Ontologije so osrednji gradnik semantičnega spleta. Predstavljajo formalne modele znanja, kjer so pojmi, lastnosti in hierarhije jasno definirani. Tak pristop je posebej uporaben v kompleksnih domenah, kjer nastopa veliko različnih akterjev in množica podatkovnih razmerij. Ontologije omogočajo enotno semantično podlago, ki ni vezana na implementacijo posameznega sistema, temveč na konceptualni model podatkov.
 
-V predstavljenem sistemu ontologija služi kot centralni model znanja za vse akterje farmacevtske dobavne verige. RDF omogoča predstavitev akterjev in njihovih lastnosti kot povezav v grafu, OWL pa dodaja formalne razrede in omejitve, ki omogočajo avtomatsko sklepanje o lastnostih ali vlogah akterjev. Razumevalnik iz grafa izlušči podatke, ki jih orakelj nato uporabi pri izračunu zaupanja. Z uporabo semantičnih tehnologij je mogoče podatke strukturirati na način, ki je razširljiv, interoperabilen in neodvisen od posamezne aplikacije. Zato je plast ontologije primerna kot osnova za izmenjavo informacij med različnimi organizacijami in se dobro povezuje s preostalimi deli sistema.
+V predstavljenem sistemu ontologija služi kot centralni model znanja za vse akterje farmacevtske dobavne verige. RDF omogoča predstavitev akterjev in njihovih lastnosti kot povezav v grafu, OWL pa dodaja formalne razrede in omejitve, ki omogočajo avtomatsko sklepanje o lastnostih ali vlogah akterjev. Sklepalnik iz grafa izlušči podatke, ki jih orakelj nato uporabi pri izračunu zaupanja. Z uporabo semantičnih tehnologij je mogoče podatke strukturirati na način, ki je razširljiv, interoperabilen in neodvisen od posamezne aplikacije. Zato je plast ontologije primerna kot osnova za izmenjavo informacij med različnimi organizacijami in se dobro povezuje s preostalimi deli sistema.
 
 \section{Analiza vrzeli in prispevek te naloge}
 V tem poglavju smo predstavili ključne gradnike, ki so pomembni za razumevanje razvitega sistema. Najprej smo opredelili pojem zaupanja in razložili, da gre za večdimenzionalen koncept, ki ga ni mogoče zajeti z eno samo definicijo. Različni modeli poudarjajo kompetentnost, integriteto, dobrohotnost in zanesljivost, v digitalnem okolju pa se temu pridružijo še vidiki varnosti, verodostojnosti in skladnosti z zahtevami sistema. Nato smo opisali modele upravljanja zaupanja v razpršenih sistemih ter pokazali, da se ti modeli večinoma osredotočajo na izračun številčne vrednosti zaupanja na podlagi dokazov, priporočil ali zgodovine interakcij.
@@ -463,7 +464,7 @@ Na sliki~\ref{fig:architecture-concept} je prikazan konceptualni prikaz ciljne a
 
 \section{Uporabljene tehnologije}
 
-Pri razvoju sistema smo uporabili različna orodja in platforme, ki skupaj omogočajo obdelavo semantičnih podatkov, izvajanje izračuna zaupanja ter zapis rezultatov v verigo blokov. V tej sekciji podajamo pregled najpomembnejših tehnologij in njihovih vlog v sistemu.
+Pri razvoju sistema smo uporabili različna orodja in platforme, ki skupaj omogočajo obdelavo semantičnih podatkov, izvajanje izračuna zaupanja ter zapis rezultatov v verigo blokov. V tem razdelku podajamo pregled najpomembnejših tehnologij in njihovih vlog v sistemu.
 
 \paragraph{Apache Jena Fuseki}
 Semantični podatki o akterjih in njihovih lastnostih so shranjeni v strežniku Apache Jena Fuseki, ki predstavlja RDF podatkovno bazo z dostopom prek vmesnika SPARQL. Fuseki omogoča centralizirano hrambo ontologije in primerkov ter enoten način pridobivanja podatkov za vse oraklje. Zaradi stabilnosti, enostavne uporabe in dobre združljivosti s standardi RDF je bila izbira naravna. Sistem se izvaja v vsebniku Docker, kar omogoča hitro postavitev in ponovljivost okolja.
@@ -583,19 +584,19 @@ Ontologija farmacevtske dobavne verige je napisana v jeziku OWL in zapisana v fo
   \item \texttt{hasAuditScore} – rezultat presoje kakovosti.
 \end{itemize}
 
-Ontologija vsebuje tudi posamezne primerke akterjev, na primer \textit{Pfizer} ali \textit{DHL}, ki imajo pripisane konkretne vrednosti lastnosti. Spodaj je prikazan primer zapisa prevoznika v RDF/Turtle obliki:
+Ontologija vsebuje tudi posamezne primerke akterjev, na primer \textit{Pfizer} ali \textit{DHL}, ki imajo pripisane konkretne vrednosti lastnosti. Spodaj je prikazan primer zapisa prevoznika v obliki RDF/Turtle:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=trustcode]
 ex:DHL a ex:Transporter ;
-  ex:hasDeliveryPunctuality "0.94"^^xsd:decimal ;
-  ex:hasTempViolationRate "0.02"^^xsd:decimal ;
-  ex:hasLicense "true"^^xsd:boolean .
+  ex:hasDeliveryPunctuality "0.94" xsd:decimal ;
+  ex:hasTempViolationRate "0.02" xsd:decimal ;
+  ex:hasLicense "true" xsd:boolean .
 \end{lstlisting}
-
+\newpage
 Ontologija je shranjena na strežniku Apache Jena Fuseki, ki omogoča izvajanje poizvedb tipa SPARQL 1.1 preko spletnega vmesnika. Oraklji tako dostopajo do podatkov z neposrednimi poizvedbami, kot je na primer naslednja poizvedba za pridobitev lastnosti prevoznika DHL:
 
-\begin{minipage}{\linewidth}
-\begin{lstlisting}
+%\begin{minipage}{\linewidth}
+\begin{lstlisting}[style=trustcode]
 PREFIX ex: <http://example.org/trust#>
 
 SELECT ?punctuality ?tempRate ?license
@@ -605,9 +606,9 @@ WHERE {
   ex:DHL ex:hasLicense ?license .
 }
 \end{lstlisting}
-\end{minipage}
+%\end{minipage}
 
-Ker je ontologija zgrajena v OWL, omogoča tudi uporabo razumevalnika (angl. reasoner). Razumevalnik lahko samodejno razvrsti akterje v razrede (npr. \texttt{TrustedTransporter}), zazna nedoslednosti in izpelje lastnosti, ki niso zapisane neposredno. Vsak orakelj lahko razumevalnik po potrebi zažene lokalno in s tem pridobi izpeljane podatke.
+Ker je ontologija zgrajena v OWL, omogoča tudi uporabo sklepalnika (angl. reasoner). Sklepalnik lahko samodejno razvrsti akterje v razrede (npr. \texttt{TrustedTransporter}), zazna nedoslednosti in izpelje lastnosti, ki niso zapisane neposredno. Vsak orakelj lahko sklepalnik po potrebi zažene lokalno in s tem pridobi izpeljane podatke.
 
 \newpage
 \paragraph{Preverljiva dokazila (VC)}
@@ -618,7 +619,7 @@ Primer dokazila, ki ga izda regulator:
 
 \begin{minipage}
 {\linewidth}
-\begin{lstlisting}
+\begin{lstlisting}[style=trustcode]
 {
   "id": "vc-gmp-pfizer-001",
   "type": ["VerifiableCredential", "GMPCertificate"],
@@ -702,7 +703,7 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
     Ta dogodek služi kot edini mehanizem obveščanja decentraliziranega omrežja orakljev, da je treba izvesti nov izračun zaupanja. Obenem funkcija klicatelju tudi vrne \texttt{requestId}, na podlagi katerega lahko spremlja stanje in kasneje pridobi končni rezultat.
 
   \item \textbf{Orakelj zazna novo zahtevo in začne proces izračuna}\newline
-    Vsak orakelj neprestano posluša za nove dogodke, zapisane v verigi blokov (angl.\ \textit{event logs}). Ko zazna dogodek \texttt{TrustOracleRequested}, preveri, ali mora obdelati podani \texttt{requestId}.  
+    Vsak orakelj neprestano posluša za nove dogodke, ki jih proži pametna pogodba. Ko ta sproži dogodek \texttt{TrustOracleRequested}, orakelj preveri, ali mora obdelati zahtevo za podani \texttt{requestId}.  
     Če je orakelj nastavljen za tovrstne izračune, začne postopek ocenjevanja. Najprej pridobi vse potrebne podatke iz plasti znanja: semantične lastnosti akterja preko poizvedb SPARQL strežniku Fuseki ter pripadajoča preverljiva dokazila iz baze VC. Orakelj tako zagotovi, da bo izračun temeljil na najnovejših, verodostojnih in digitalno podpisanih podatkih.
     Šele ko so vsi podatki zbrani in preverjeni, orakelj preide na sam izračun zaupanja, kjer uporabi pravila ocenjevalca.
 
@@ -813,7 +814,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
 
   \item \textbf{Doseganje kvoruma poročil}\newline
     Agregator hrani prejeta poročila in spremlja, ali je dosežen kvorum (minimalno število poročil, potrebnih za izvedbo konsenza).
-    Če kvorum ni dosežen, agregator čaka in nadaljuje zbiranje poročil dokler le ta ni dosežen ali do izteka časa čakanja (\texttt{ttl}).
+    Če ta ni dosežen, agregator čaka in nadaljuje zbiranje poročil dokler le ta ni dosežen ali do izteka časa čakanja (\texttt{ttl}).
 
   \item \textbf{Agregacija rezultatov znotraj DON}\newline
     Ko je kvorum dosežen, agregator izvede agregacijo. Poleg odločitve in ocene agregator združi tudi \texttt{flags}, ki predstavljajo bitna opozorilna polja. Vsak bit ima posebej določen pomen, ki označuje posebne okoliščine ali tveganja, ki so se pojavila med izračunom:
@@ -917,13 +918,13 @@ Najprej opišemo eksperimentalno okolje in konfiguracijo vseh komponent v vsebni
 Preden predstavimo konkretne scenarije uporabe, najprej opišemo, kako je postavljen eksperimentalni sistem. Vse komponente zaganjamo v orodju \texttt{Docker}, kar nam zagotavlja ponovljivo okolje in jasno ločitev med posameznimi storitvami. S tem zmanjšamo odvisnost od lokalne konfiguracije in omogočimo, da sistem testiramo kakor, da bi bile vse komponente že nameščene v oblaku.
 
 \subsubsection{Vsebniki in omrežje}
-Sistem sestavlja več vsebnikov Docker, ki so povezani v skupno virtualno omrežje in delujejo z orodjem \texttt{Docker Compose}. V sekciji \ref{subsec:algoritmi-orakljev} so opisani posamezni vsebniki in načini ocenjevanja zaupanja za vsak orakelj.
+Sistem sestavlja več vsebnikov Docker, ki so povezani v skupno virtualno omrežje in delujejo z orodjem \texttt{Docker Compose}. V podrazdelku \ref{subsec:algoritmi-orakljev} so opisani posamezni vsebniki in načini ocenjevanja zaupanja za vsak orakelj.
 
-\paragraph{Veriga blokov} Prvi vsebnik vsebuje testno Ethereum omrežje v orodju Anvil. Na njem namestimo  pametno pogodbo \texttt{TrustGraph.sol}. Na omrežju takoj dobimo tudi 10 prednastavljenih računov z velikimi količinami testnih kovancev ETH, ki jih oraklji in agregator uporabljajo za plačevanje transakcijskih stroškov. Zato prve račune dodelimo agregatorju in orakljem. Potrebujemo tudi en račun za namestitev pametne pogodbe, katerega dodelimo regulatorju EMA. Ta račun bo imel potem tudi pravico do sprožanja novih izračunov zaupanja.
+\paragraph{Veriga blokov} Prvi vsebnik vsebuje testno Ethereum omrežje v orodju Anvil. Na njem namestimo pametno pogodbo \texttt{TrustGraph.sol}. Na omrežju takoj dobimo tudi 10 prednastavljenih računov z velikimi količinami testnih kovancev ETH, ki jih oraklji in agregator uporabljajo za plačevanje transakcijskih stroškov. Zato prve račune dodelimo agregatorju in orakljem. Potrebujemo tudi en račun za namestitev pametne pogodbe, katerega dodelimo regulatorju EMA. Ta račun bo imel potem tudi pravico do sprožanja novih izračunov zaupanja.
 
-\paragraph{Baza znanja} V vsebniku Fuseki je naložena domenska ontologija. Ta je dostopna preko končne točke SPARQL, ki jo oraklji uporabljajo za pridobivanje semantičnih lastnosti akterjev. V eksperimentalnem okolju uporabljamo ontologijo, ki si jo vsi oraklji delijo. Celotna ontologija, uporabljena za scenarije, je na voljo v prilogi \ref{app:trust-ontology}.
+\paragraph{Baza znanja} V vsebniku Fuseki je naložena domenska ontologija. Ta je dostopna preko končne točke SPARQL, ki jo oraklji uporabljajo za pridobivanje semantičnih lastnosti akterjev. V eksperimentalnem okolju uporabljamo ontologijo, ki si jo vsi oraklji delijo.
 
-\paragraph{Oraklji} Za evalvacijo smo pripravili tri neodvisne oraklje, ki izvajajo svoje politike izračuna zaupanja. Vsak orakelj se izvaja v svojem vsebniku Docker in je konfiguriran z ločeno datoteko, ki določa pravila ocenjevalca, nabor vhodnih podatkov ter težo posameznih kriterijev. Oraklji so implementirani v Pythonu in uporabljajo knjižnice za dostop do verige blokov (web3.py), baze znanja (rdflib, SPARQLWrapper) ter za kriptografske operacije. V sekciji \ref{subsec:algoritmi-orakljev} so podrobneje predstavljeni algoritmi izračuna zaupanja za vsak orakelj.
+\paragraph{Oraklji} Za evalvacijo smo pripravili tri neodvisne oraklje, ki izvajajo svoje politike izračuna zaupanja. Vsak orakelj se izvaja v svojem vsebniku Do\-ck\-er in je konfiguriran z ločeno datoteko, ki določa pravila ocenjevalca, nabor vhodnih podatkov ter težo posameznih kriterijev. Oraklji so implementirani v Pythonu in uporabljajo knjižnice za dostop do verige blokov (web3.py), baze znanja (rdflib, SPARQLWrapper) ter za kriptografske operacije. V podrazdelku \ref{subsec:algoritmi-orakljev} so podrobneje predstavljeni algoritmi izračuna zaupanja za vsak orakelj.
 
 \paragraph{Agregator} Zbiranje poročil posameznih orakljev se izvaja v vsebniku agregatorja. Ta preverja njihove podpise in objavi končno odločitev v pametni pogodbi na verigi. Tudi agregator je implementiran v Pythonu in uporablja podobne knjižnice kot oraklji.
 
@@ -971,7 +972,7 @@ V poglavju~\ref{sec:trust-management-distributed-systems} smo predstavili razli�
 
 \begin{itemize}
     \item \textbf{Orakelj A} uporablja hibridni pristop, ki kombinira dokazne elemente (licence, digitalna potrdila) z dinamičnimi merili. Podobno, kot je to narejeno v priporočilnih in porazdeljenih modelih zaupanja.
-    \item \textbf{Orakelj B} je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi preverljivih poverilnic, podobno kot hierarhični in PGP-sistemi iz podpoglavja o dokaznih modelih.
+    \item \textbf{Orakelj B} je izrazito \emph{dokazni} – odloča skoraj izključno na podlagi preverljivih poverilnic, podobno kot hierarhični in sistem PGP opisanih v podrazdelku \ref{sub:evidence-trust-models}.
     \item \textbf{Orakelj C} je \emph{telemetrijsko usmerjen} in se naslanja na dinamično posodabljanje zaupanja prek operativnih meril, kar je skladno z modeli, ki večjo težo dajejo nedavnim interakcijam.
 \end{itemize}
 
@@ -999,7 +1000,7 @@ Ne glede na specifičen pogled vsak orakelj za dani subjekt izračuna:
     \item kombinirano odločitev.
 \end{enumerate}
 
-\paragraph{Deterministični del}
+\paragraph{Deterministični del.}
 Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih datotekah (\texttt{policy.json}). V njih so za posamezne tipe subjektov (proizvajalec, distributer, transporter) definirani kriteriji in pragovi, na primer:
 \begin{itemize}
     \item \texttt{hasDeliveryPunctuality} $\geq 0{,}99$,
@@ -1009,7 +1010,7 @@ Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih dat
 \end{itemize}
 Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najboljši približek \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
 
-\paragraph{Verjetnostni del}
+\paragraph{Verjetnostni del.}
 Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke med 0 in 10000. Za vsak kriterij se vodi aposterior prazdelitve beta $B(\alpha, \beta)$, ki modelira zaupanje za izpolnitev tega kriterija.
 
 Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve beta sta:
@@ -1030,7 +1031,7 @@ Pri novih opazovanjih (interakcijah) se aposterior posodobi po principu eksponen
 \end{equation}
 S tem pristopom nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno skladno z modeli dinamičnega posodabljanja zaupanja z amortizacijskimi faktorji, kjer novejše interakcije prevladajo nad starimi.
 
-\paragraph{Kombinirana odločitev}
+\paragraph{Kombinirana odločitev.}
 Za posameznega akterja se končna verjetnostna ocena $\textit{prob\_score}$ izračuna kot uteženo povprečje srednjih vrednosti beta aposteriorjev ($\frac{\alpha}{\alpha+\beta}$) vseh aktivnih kriterijev. Uteži $w_i$, zapisane v pravilih ocenjevalca (v našem primeru oraklja), so normalizirane tako, da velja $\sum w_i = 1$.
 
 Kombinirana odločitev združuje trda pravila z mehko oceno. Če orakelj uporablja prag $\textit{prob\_threshold}$, je odločitev:
@@ -1039,7 +1040,7 @@ Kombinirana odločitev združuje trda pravila z mehko oceno. Če orakelj uporabl
 \]
 Na ta način se trda pragovna pravila (dokazni pogled) kombinirajo z mehko, številsko oceno, ki je bližje priporočilnim in porazdeljenim modelom zaupanja.
 
-V nadaljevanju opišemo konkretne konfiguracije in primere za omenjene oraklje, ki uporabljajo različne pristope iz poglavja~\ref{sec:trust-management-distributed-systems}.
+V nadaljevanju opišemo konkretne konfiguracije in primere za omenjene oraklje, ki uporabljajo različne pristope, opisane v razdelku~\ref{sec:trust-management-distributed-systems}.
 
 
 \subsubsection*{Orakelj A (hibridni pogled)}
@@ -1049,7 +1050,7 @@ Orakelj A uporablja hibridni pogled, ki združuje regulatorne kriterije, kakovos
     \textit{prob\_threshold}^{(\text{A})} = 0{,}75.
 \]
 
-\paragraph{Kriteriji in uteži}
+\paragraph{Kriteriji in uteži.}
 Za posamezne tipe subjektov uporablja naslednje kriterije in uteži:
 \begin{itemize}
     \item \textbf{Transporter:}
@@ -1203,7 +1204,7 @@ Agregator uporabi preprosto večinsko pravilo:
 \[
   \text{odločitev} =
   \begin{cases}
-    \text{true}, & \text{če vsaj dva od treh orakljev poročata \emph{true}},\\
+    \text{true}, & \text{če vsaj dva od treh orakljev poročata \text{true}},\\
     \text{false}, & \text{sicer}.
   \end{cases}
 \]
@@ -1303,7 +1304,7 @@ Scenarij se izvede v naslednjih korakih:
   \item \textbf{Agregacija rezultatov}\newline
         Ko agregator za dani \texttt{request\_id} prejme poročila vseh treh
         orakljev, uporabi pravila agregacije iz
-        podpoglavja~\ref{subsec:agregator-scenariji}: večinsko glasovanje
+        podrazdelka \ref{subsec:agregator-scenariji}: večinsko glasovanje
         za diskretno odločitev, povprečje za številčno oceno ter večinsko
         pravilo za zastavice.
   \item \textbf{Zapis končne odločitve na verigo}\newline
@@ -1547,7 +1548,7 @@ Takšen podatkovni tok določa glavne meje zaupanja in razkriva ključne točke,
 \subsection{Metodologija analize in model napadalca}
 \label{subsec:metodologija-napadalec}
 
-Varnostno analizo izvedemo po načelih formalnega modeliranja groženj, kot jih predlagajo smernice OWASP in Microsoftovi standardi za decentralizirane sisteme. Osrednji okvir, ki ga uporabimo, je model STRIDE, ki razvršča varnostne grožnje v šest razredov glede na vrsto kršitve: lažno predstavljanje identitete (Spoofing), spreminjanje podatkov (Tampering), zanikanje sodelovanja (Repudiation), razkritje informacij (Information disclosure), zavrnitev storitve (Denial of service) ter povečanje privilegijev (Elevation of privilege). STRIDE je primeren za naš sistem, ker se osredotoča na integriteto, avtentičnost in dostopnost podatkov — lastnosti, ki so v mehanizmu zaupanja ključne, saj neposredno vplivajo na pravilnost izračunov in na zanesljivost registra zaupanja v pametni pogodbi.
+Varnostno analizo izvedemo po načelih formalnega modeliranja groženj, kot jih predlagajo smernice OWASP in Microsoftovi standardi za decentralizirane sisteme. Osrednji okvir, ki ga uporabimo, je model STRIDE, predstavljen v knjigi Howarda in Lipnerja, \textit{The security development lifecycle} \cite{howard2006security}. Varnostne grožnje razvrščata v šest razredov glede na vrsto kršitve: lažno predstavljanje identitete (Spoofing), spreminjanje podatkov (Tampering), zanikanje sodelovanja (Repudiation), razkritje informacij (Information disclosure), zavrnitev storitve (Denial of service) ter povečanje privilegijev (Elevation of privilege). STRIDE je primeren za naš sistem, ker se osredotoča na integriteto, avtentičnost in dostopnost podatkov — lastnosti, ki so v mehanizmu zaupanja ključne, saj neposredno vplivajo na pravilnost izračunov in na zanesljivost registra zaupanja v pametni pogodbi.
 
 Pri analizi ne razčlenjujemo le posameznih komponent, temveč tudi meje med njimi. V sistemu so te meje izrazite: pametna pogodba predstavlja kriptografsko zaščiteno točko trajnega dnevnika, oraklji izvajajo izračune zunaj verige in so zato izpostavljeni manipulacijam, agregator pa deluje kot povezovalni element med izračuni in verigo blokov. STRIDE zato uporabimo kot okvir skozi celoten tok podatkov. Na grožnje se osredotočamo tam, kjer so povezave najšibkejše: pri podpisovanju poročil, pri prenosu rezultatov v agregator, pri preverjanju upravičenosti klicev pametne pogodbe ter pri mehanizmih, ki določajo, kdo lahko objavi končno oceno na verigi.
 
@@ -1560,7 +1561,7 @@ Tak model napadalca nam omogoča, da jasno opredelimo, katere komponente se mora
 \subsection{Analiza groženj za pametno pogodbo}
 \label{subsec:groznje-contract}
 
-Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na verigi blokov, saj hrani končne odločitve o zaupanju in posamične prispevke orakljev. Kot smo objasnili v prejšnjem podpoglavju, je pomembno, da sprejema le veljavne agregirane rezultate, pravilno povezuje prispevke z identifikatorji zahtev \texttt{requestId} in zavrača nepooblaščene spremembe stanj. V tabeli~\ref{tab:threat-contract} je zbran pregled glavnih razredov groženj (po modelu STRIDE), tipičnih protiukrepov ter oblik testnega pokrivanja.
+Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na verigi blokov, saj hrani končne odločitve o zaupanju in posamične prispevke orakljev. Kot smo objasnili v prejšnjem podrazdelku, je pomembno, da sprejema le veljavne agregirane rezultate, pravilno povezuje prispevke z identifikatorji zahtev \texttt{requestId} in zavrača nepooblaščene spremembe stanj. V tabeli~\ref{tab:threat-contract} je zbran pregled glavnih razredov groženj (po modelu STRIDE), tipičnih protiukrepov ter oblik testnega pokrivanja.
 
 \begin{landscape}
 \begin{table}[ht]
@@ -1585,17 +1586,19 @@ Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na
 \end{table}
 \end{landscape}
 
-Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja (angl. spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski testi implementirani v jeziku Solidity simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne s funkcijo \texttt{revert}.
+Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja. Tovrstne napade imenujemo slepljenje ali zavajanje (angl. spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski testi implementirani v jeziku Solidity simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne s funkcijo \texttt{revert}.
 
-Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl. tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje podatke, ki so nekonsistentni. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom, ali ko se časovni žig izračuna v preteklost. To iz vidika semantike predstavlja nelogično stanje. 
-Zato so v implementaciji funkcij uvedeni preverjevalni mehanizmi, ki zagotavljajo ohranjanje osnovnih stanjskih invariant (angl. state invariants). Med njih spadajo: (i) zahteva, da se vsak novi zapis nanaša na isti identifikator subjekta kot začetni zahtevek, (ii) da je časovni žig (\texttt{asOf}) monoton in nikoli ne nazaduje v preteklost, ter (iii) da so meje dovoljenih vrednosti (npr.\ razpon ocene) ustrezno nadzorovane.
-Za dodatno zagotovitev pravilnosti smo izvedli kombinacijo enotskih in regresijskih testov. Enotski testi preverjajo posamezne robne primere. T. i. testi \textit{fuzzing} pa avtomatsko generirajo veliko število naključnih kombinacij parametrov (različni \texttt{requestId}, časovni žigi, zastavice in ocene). S tem preverimo, ali bi katera od kombinacij lahko pripeljala pogodbo v nelogično stanje ali sprožila neželene stranske učinke. Regresijski testi pa zagotavljajo, da popravki logike ne uvajajo novih nepravilnosti in da se znane invariante v kasnejših posodobitvah ne ohranijo.
+Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl.\ tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje nekonsistentne podatke. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom ali ko nova odločitev dobi časovni žig, ki je kronološko starejši od časovnega žiga že obstoječe odločitve za istega subjekta. V tem primeru “računanje časovnega žiga v preteklost” pomeni, da nova odločitev navidezno nastopi prej kot prejšnja, saj je njen pripisani časovni žig manjši (starejši). V našem primeru časovni žig nastopa kot kriptografsko zaščiten podatek o času, ki se vključi v zgoščeno vrednost in podpis poročila ter se zapiše v verigo blokov skupaj z ostalimi parametri. Takšno stanje je semantično nelogično.
+Zato so v implementaciji funkcij uvedeni preverjevalni mehanizmi, ki zagotavljajo ohranjanje osnovnih stanjskih invariant (angl.\ state invariants). Med njih spadajo: (i) zahteva, da se vsak novi zapis nanaša na isti identifikator subjekta kot začetni zahtevek, (ii) da je časovni žig (\texttt{asOf}) monoton in nikoli ne nazaduje v preteklost ter (iii) da so meje dovoljenih vrednosti (npr.\ razpon ocene) ustrezno nadzorovane.
+Za dodatno zagotovitev pravilnosti smo izvedli kombinacijo enotskih in regresijskih testov. Enotski testi preverjajo posamezne robne primere na ravni funkcij. Regresijski testi pa odkrivajo nove napake v kodi, ki nastanejo z dodajanjem novih funkcij. T. i. testi \textit{fuzz\-ing} avtomatsko generirajo veliko število naključnih kombinacij parametrov (različni \texttt{requestId}, časovni žigi, zastavice in ocene). S tem preverimo, ali bi katera od kombinacij lahko pripeljala pogodbo v nelogično stanje ali sprožila neželene stranske učinke. Regresijski testi pa zagotavljajo, da popravki logike ne uvajajo novih nepravilnosti in da se znane invariante v kasnejših posodobitvah ohranijo.
+
 
 Tretji sklop se nanaša na napade zavrnitve storitve tipa DoS. Ker so nekatere funkcije pametne pogodbe javno dostopne, lahko velik del zahtev za izračun zaupanja ali nepravilno nastavljeni klici paketov povzročijo, da postane uporaba pogodbe ekonomsko neupravičena. Lahko bi se uvedli stroški za klic vseh funkcij na pametni pogodbi. S tem bi preprečili velike količine zahtevkov. Pri prehodu na produkcijsko verigo bi bilo zagotovo treba omejiti, kdo lahko sproži \texttt{requestTrustReport}, uvesti pragove za velikost paketov ter spremljati porabo stroškov verige blokov, da se pravočasno zazna kršitve.
 
 Četrti sklop pokriva razkritje informacij (angl. information disclosure). Pametna pogodba shranjuje le zgoščene identifikatorje subjektov, agregirano številčno oceno zaupanja ter zastavice, kar sledi načelu minimizacije podatkov. Pri nadaljnjem razvoju je pomembno ohraniti isti pristop tudi pri razširitvah sheme: novi podatki naj bodo vedno agregirani ali zgoščeni. Enotski testi v naši implementaciji preverjajo, da pogodba ne shranjuje neposrednih identifikatorjev podjetij.
 
-Zadnji sklop se nanaša na zlorabo privilegijev (angl. elevation of privilege). V produkcijskem okolju bo potrebno uvesti upravljavske funkcije za posodobitev konfiguracije ali migracijo stanja (npr.\ zamenjava agregatorja, posodobitev parametrov politik). Take funkcije je dobro zaščititi z uveljavljenimi vzorci, kot so vloge in večpodpisno upravljanje, ter podpreti z enotskimi testi, ki preverjajo pravilno dodeljevanje, rotacijo in preklic vlog ter varnostne meje med njimi. Tako bi lahko na primer regulator predlagal spremembo agregatorja, ki bi jo morali potrditi vsi člani sveta za upravljanje sistema, preden bi postala aktivna.
+Zadnji sklop se nanaša na zlorabo privilegijev (angl.\ elevation of privilege). V produkcijskem okolju bo potrebno uvesti upravljavske funkcije za posodobitev konfiguracije ali migracijo stanja (npr.\ zamenjava agregatorja, posodobitev parametrov politik). Take funkcije je dobro zaščititi z uveljavljenimi vzorci, kot so vloge in večpodpisno upravljanje. Pri večpodpisnem upravljanju noben posamezen skrbnik ne more sam izvesti kritične operacije, temveč je za odobritev potrebna kombinacija podpisov več neodvisnih udeležencev. Na ta zmanjšamo tveganje zlorabe enega podpisa. Upravljavske funkcije je smiselno podpreti z enotskimi testi, ki preverjajo pravilno dodeljevanje, rotacijo in preklic vlog ter varnostne meje med njimi. Tako bi lahko na primer regulator predlagal spremembo agregatorja, ki bi jo morali potrditi vsi člani sveta za upravljanje sistema, preden bi postala aktivna.
+
 
 \subsection{Analiza groženj za decentralizirano omrežje orakljev}
 \label{subsec:groznje-don}
@@ -1667,7 +1670,7 @@ Kljub temu za uporabo v produkcijskem okolju ostaja odprtih več pomembnih vpra�
 \section{Pot do produkcijskega sistema}
 \label{sec:pot-do-produkcije}
 
-Trenutna implementacija deluje kot laboratorijska postavitev, v kateri deluje omejeno število orakljev, en agregator in ena instanca pametne pogodbe na testnem omrežju verige blokov, vse pa je vezano na poenostavljeno infrastrukturo Docker. Takšen prototip je primeren za demonstracijo koncepta in ponovljivih scenarijev, ni pa neposredno prenosljiv v okolje, kjer bi morali upoštevati zahtevnejše zahteve glede razpoložljivosti, upravljanja identitet, nadzora nad konfiguracijo in dolgoročne vzdržnosti.
+Trenutna implementacija deluje kot laboratorijska postavitev, v kateri deluje omejeno število orakljev, en agregator in ena instanca pametne pogodbe na testnem omrežju verige blokov, vse pa je vezano na poenostavljeno infrastrukturo Docker. Takšen prototip je primeren za demonstracijo koncepta in ponovljivih scenarijev, ni pa neposredno prenosljiv v okolje, kjer bi morali upoštevati zahtevnejše omejitve glede razpoložljivosti, upravljanja identitet, nadzora nad konfiguracijo in dolgoročne vzdržnosti.
 
 V produkcijskem sistemu bi moral DON upravljati večje število neodvisnih orakljev, ki bi jih upravljali različni akterji v dobavni verigi ali specializirani ponudniki storitev zaupanja. Regulator (na primer EMA ali nacionalna agencija) bi imel v takem modelu vlogo skrbnika nad omrežjem orakljev: skrbel bi za upravljanje registracije orakljev, odobritev novih članov, izključevanje neustreznih ter pregled nad konfiguracijo politik. Za to bi bil potreben namenski upravljavski vmesnik, ki bi regulatorju omogočal pregled stanja DON, upravljanje s seznami pooblaščenih vozlišč in konfiguracijo pragov zaupanja brez neposrednega poseganja v kodo pametne pogodbe.
 
@@ -1675,7 +1678,7 @@ Pomemben del prehoda v produkcijo je formalizacija upravljanja identitet in pove
 
 Za samo infrastrukturo DON bi bilo smiselno raziskati uporabo obstoječe rešitve za decentralizirana omrežja orakljev, kot je Chainlink. Ta platforma že nudi vzorce za varno izvajanje orakljev v heterogenem omrežju, mehanizme za nadzor nad zanesljivostjo vozlišč, podpisane povratne klice in zaščito pred posameznimi kompromitiranimi vozlišči. Namesto lastne implementacije bi lahko mehanizem ocenjevanja zaupanja v prihodnje prevedli v Chainlinkove naloge, kjer bi nadzorni sklop (na primer regulator ali konzorcij akterjev) definiral, kateri oraklji sodelujejo v posamezni nalogi, s kakšnimi utežmi in pod katerimi pogoji.
 
-Na ravni pametne pogodbe bi prehod v produkcijo zahteval utrditev mehanizmov upravljanja in nadgradnje. Ključno je, da pogodba jasno loči vloge (regulator, akterji, tehnični skrbniki) in omeji njihova pooblastila z dobro preizkušenimi vzorci, kot so večpodpisne denarnice (angl. Multi-Sig Wallet) in formalno definirani postopki nadgradnje. Vsak poseg v konfiguracijo, na primer dodajanje ali odstranjevanje oraklja, zamenjava agregatorja ali sprememba pragov zaupanja, bi moral biti transparenten, sledljiv in odobren s strani vnaprej definiranega kvora udeležencev.
+Na ravni pametne pogodbe bi prehod v produkcijo zahteval utrditev mehanizmov upravljanja in nadgradnje. Ključno je, da pogodba jasno loči vloge (regulator, akterji, tehnični skrbniki) in omeji njihova pooblastila z dobro preizkušenimi vzorci, kot so večpodpisne denarnice (angl. Multi-Sig Wallet) in formalno definirani postopki nadgradnje. Vsak poseg v konfiguracijo, na primer dodajanje ali odstranjevanje oraklja, zamenjava agregatorja ali sprememba pragov zaupanja, bi moral biti transparenten, sledljiv in odobren s strani vnaprej definiranega deleža udeležencev.
 
 Poleg identitet in upravljanja vlog bi bilo treba v produkcijskem okolju bistveno več pozornosti nameniti varnemu upravljanju zasebnih ključev ter razpoložljivosti celotne arhitekture. Ključi orakljev in agregatorjev bi morali biti shranjeni v varnih shrambah ter jasnimi postopki ob zaznani kompromitaciji. Infrastrukturo orakljev bi bilo treba postaviti v ponovljivem okolju, z nadzorovanimi posodobitvami, spremljanjem izpada in mehanizmi za avtomatsko preusmeritev prometa v primeru okvare.
 
@@ -1720,22 +1723,11 @@ Ontologija, uporabljena v prototipu, bi morala biti za uporabo v realnih okoljih
 
 Zanimiva smer nadaljnjega razvoja je tudi preizkus zasnove v drugih sektorjih. Pametna mesta, energetika, logistika, kritična infrastruktura in omrežja IoT predstavljajo naravne kandidate, kjer podobno kot v farmacevtskem sektorju obstaja potreba po transparentnem, razložljivem in preverljivem mehanizmu zaupanja. Razširitev arhitekture na te domene bi omogočila oceno univerzalnosti predstavljenega koncepta in njegovo prilagodljivost različnim operativnim zahtevam. S tem bi lahko nastal generičen okvir za vzpostavitev digitalnih ekosistemov zaupanja, ki bi prispevali k varnejšemu in bolj transparentnemu razvoju porazdeljenih sistemov v digitalni družbi.
 
-\appendix
-\chapter{Ontologija OWL farmacevtske verige}
-\label{app:trust-ontology}
-\lstinputlisting[
-  language=XML,
-  caption={Ontologija OWL za model zaupanja v farmacevtski verigi},
-  breaklines=true,
-  label={lst:trust-ontology}
-]{ontologies/pharma-trust.owl}
-
-
 %----------------------------------------------------------------
 % SLO: bibliografija
 % ENG: bibliography
 %----------------------------------------------------------------
-\bibliographystyle{elsarticle-num}
+\bibliographystyle{acm}
 
 %----------------------------------------------------------------
 % SLO: odkomentiraj za uporabo zunanje datoteke .bib (ne pozabi je potem prevesti!)

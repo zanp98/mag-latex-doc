@@ -1,0 +1,57 @@
+Magistrska popravki:
+
+1. Kakšen slovarček kriptografskih pojmov, npr. https://lkrv.fri.uni-lj.si/popularizacija/monitor_pametne.kartice.3.napadi.in.obrambe.-.velike.skrivnosti.malih.kartic.pdf
+2. Za certifikat je vsekakor lepše uporabiti termin digitalno potrdilo - se strinjam(v Tabeli 2.1 sta uporabljena hkrati oba termina, kar se seveda ne spodobi). - popravljeno
+3. Že v uvodu se mi zdi prav čudno, da ni praktično nobene reference (npr. konec 1. odstavka). - popravljeno
+4. Nima smisla, da zapišemo, da se mag. osredotoča, ko to počne avtor. Tudi ne predstavlja naloga, pač pa avtor (običajno v 1. osebi množine).  - popravljenoZaključek ne povzema, pač pa "mi". - popravljeno
+5. Lepo je izpustiti kakšen "s pomočjo" (npr. lahko bi rekli, da pišemo s pomočjo svinčnika, a je čisto jasno, če rečemo, da pišemo s svinčnikom), če že ne vse. -  popravljeno
+6. Uvod je relativno kratek, pa je idealna priložnost, za reference (zgodovinski kontekst oz. kaj so pred tem delom postorili drugi, na čigar rame  boš stopil ...). (komentar: več citiranja)
+7. Povzetek poglavij na koncu uvoda bi lahko bil veliko boljši (bi bilo možno bralcu  predstaviti celotno zasnovo sistema?) ...
+8. 2.1. O zaupanju se piše, kot da smo na filozofski. S tem ni nič narobe (ker je vredno razmisliti, kako v resnici prepričati ljudi), pa vendar je za ing./mag. na CS (FRI) potrebno biti bolj konkreten in tudi vsaj namigniti bralcu, kje lahko to najde. (semantični kolaps, zaupanje --> 0/1), povzetek članka survey of trust
+9. 2.1.1. Kako to, da se nikjer pristop kandidata ne naveže na računalniško varnost? (kako je trust povezan z računalniško varnostjo)
+10. Reference malo popraviti, tako da se bo dalo v pdf dokumentu klikniti na njih (torej naj naredi hyperlink povezave). - pri meni je v programu Adobe to trenutno že mogoče tudi na datoteki s Studisa.
+11. Pred samo referenco v tekstu se spodobi postaviti še ime avtorja.
+12. Matematični simboli so običajno v italic (če jih daš med dva "dolarja",  npr. $A$ bo to naredil Latex). - popravljeno
+13. Tri temeljne razsežnosti zaupanja: kompetentnost, integriteta in dobrohotnost ... bi kazalo podrobneje predstaviti (srednji je kriptografski pojem, kaj pa druga dva?). Tu je še pristnost, celovitost,... - tukaj gre za pojme, ki se ne tičejo kriptografije ampak zaupanja kot socialnega koncepta.
+14. Zakaj se avtor prevaja očitne reči, npr. "V sistemu, ki je predstavljen v tej nalogi, se atributi uporabljajo predvsem kot podatkovne lastnosti (angl. data properties) v ontologiji." Podobno "business logic", ... - popravljeno, izbrisani nepotrebni prevodi
+15. "Dokazni modeli temeljijo na preverljivih dokazih, kot so digitalna potrdila, javni ključi ali kriptografski podpisi." Čuden stavek (prevod?). - popravljeno, dodana dodatna pojasnitev, kaj se uporablja za dokazila.
+16. Formule je najbolje oštevilčiti in pojasniti - popravljeno(in če kandidat ni avtor formule, potem mora biti poleg še dobra in natančna referenca.  - popravljenoNa strani 7 je primer take formule (vendar še zdaleč ni edina, npr. tudi na str. 57). - popravljenoPri njej ni definiran "n", pa "T", ... - popravljenoPojme je potrebno definirati (vpeljati prej) in ne razlagati šele po enačbi. - popravljeno
+17. Tudi tabele so brez referenc ali kakršnihkoli utemeljitev (npr. Tabela 2.1). Samo naštevanje dejstev, ki bralcu vzbujajo rastoče nezaupanje.
+18. tv --> \mbox{tv} (naredi macro) ali \text{tv}, sicer pomeni t*v, kar gotovo ni bilo mišljeno.Podobno "rtv",... "Cr" (na naslednji strani),... (kot je to storil za "old", "new", "obs_scale", "prob_threshold", "deterministic", "combined", "PASS", ...). - popravljeno - nevem, če mi je pravilno formatiralo.
+19. Na strani 8 sta dve formuli/enačbi, ki sta še bolj problematični.  Naj kandidat poda neoporečen dokaz, da je količina T(u,t) res na intervalu [0,1],da si vsaj na tem mestu nekoliko "umaže" roke. Naj pojasni tudi korelacijski faktor (zakaj tako ime in za kakšno korelacijo gre)? - popravljeno, obe formuli dopolnjeni z pojasnitvami pojmov in dodan zahtevan dokaz.
+20. Kaj je metrika? - popravljeno. Izbran je bil napačen izraz. V večini primerih zamenjava z besedo "merilo", ponekod namesto "telemetrijske metrike" zamenjane z "telemetrijski podatki".
+21. "uteževanje" ??? Je to pregledal kakšen lektor? - velikokrat se najde v literaturi, zato sem tudi tukaj to uporabil. Primer (SURS): https://www.stat.si/StatWeb/File/DocSysFile/10960/Splosno_MP_Utezevanje.pdf  
+22. DSCSA - kaj pomeni ta kratica? Pa kasneje "EMVS",... - popravljeno, dodano v seznam uporabljenih kratic.
+23. "tehnologija veriženja blokov" - o tem bi bilo res potrebno povedati kaj na začetku.
+24. "kriptografski povzetek" ta pojem ni definiran, prav tako ne "časovna oznaka", tudi ne pojasni, kaj pomeni "neujemanje celotne verige". Kaj je "proof of work" (oz. stake). Pojasni tudi "Verige ... omogočajo nespremenljiv zapis dogodkov""sprožijo" - pojasni
+25. t. i. --> t.i. (sicer nisem lektor oz. slavist) - mislim, da je pravilno s presledkom (vir: https://fran.si/134/slovenski-pravopis/3801786/t-i?Query=t+i&View=2)
+26. "Tak posrednik se imenuje orakelj" (preveč splošno) - popravljeno
+27. "...DID. DID..." slaba navada - popravljeno
+28. "VC omogočajo prenos lastnosti ali certifikatov..." pojasni, na kaj misliš tu. - popravljeno, dodana obrazložitev, zakaj gre za omenjeni način prenosa lastnosti. 
+29. "... varnosti, verodostojnosti in skladnosti ..." - veliko govora, malo dejanske analize.
+30.  Pod sliko je premalo pojasnil, npr. pri 2.1 kaj je UI - glede na to, da je vse v slovenščini, bi morala biti "umetna inteligenca",pa skoraj gotovo ni. DON --> omrežja orakljev, shramba VC --> shramba dokazil VC ali preverljivih poverilnic,...Vsekakor se spodobi to pojasniti pod sliko.Za sliko 3.2 (pa tudi 3.3 in druge) velja enaka pripomba.
+31. Poglavja, podpoglavja (npr. 1.2) oz. sekcije (ali lepše razdelki in potem podrazdelki - npr. 1.2.1).Primer napačne uporabe: podpoglavja 4.1.3. - popravljeno
+32. Na stran 3.2. zares obupna izbira fonta za "kodo" (enako na naslednji strani in tudi kasneje). - popravljeno
+33. razumevalnik? Ta beseda ne obstaja. Poišči boljšo. - popravljeno, zamenjano z besedo "sklepalnik".
+34. Prevod na strni 39 "(event logs)" v resnici ni prevod, torej je potrebno bralcu pojasniti drugače.
+35. kvorum -> soglasje? (pa zopet, nisem slavist!)
+36. 4.1.1: "namestimo" je to pravi izraz?
+37. '...iz podpogjavja o dokazanih modelih." podaj številko in naredi hyperlink (ne moremo pričakovati, da bo bralec iskal ...
+38. "{\bf Deterministični del} Deterministični del" (podobno "Verjetnostni del", "Kriterij in uteži", ,...)Zakaj ponavljanje - če že, potem manjka ločilo.
+39. pragovi --> stopnje (?)
+40. "Za vsak kriterij se vodi aposterior prazdelitve beta B(α, β), ki modelira zaupanje v izpolnjevanje tega kriterija."Rad bi, da kandidat demonstrira razumevanje tega stavka, kar pomeni, da bi moral temu nameniti vsaj en odstavek.
+41. Na strani 63 v enačbi beseda "true" napisana v dveh različnih fontih.
+42. ECDSA je potrebno do neke mere razumeti (to je podpis, ki izhaja iz DSA, torej najprej pojasni DSA in nato zakaj si se odločil za uporabo ECDSA).
+43. Model STRIDE - kaj je to? Brez reference?
+44. Tabela 4.3 - večpodpisno uporavljanje? To je potrebno pojasniti.
+45. "Ko se časovni žig izračuna v preteklost" POJASNITI 
+46. Regresijski testi? Kaj je to?
+47. "Kot prikazuje tabela 4.3, je prvi sklop groženj povezan z nepooblaščenimiklici funkcij, ki spreminjajo stanje grafa zaupanja (angl. spoofing)." To v oklepaju ni prevod, torej se kandidatu zopet ne da pojasnjevati (hiti).
+48. Str. 81: kako je kandidat prišel do teh zaključkov?
+49. "S podpisanimi poročili in deterministično obnovonaslova iz podpisa lahko vedno pokažemo, kateri ključ je poročilo podpisal.Ker agregator dodatno hrani zgoščeno vrednost sprejetih poročil, je revizijska sled za potrebe kasnejših sporov ali regulatornih pregledov relativnopreprosto dostopna." Tule bo moral kandidat prepričati, da ve za kaj gre.Regulatorni pregled - slovenščina!Jaz sem npr. mislil, da je zato potrebna posebna kriptografska tehnika, ki ji pravimo "preprečevanje zanikanja" (angl. non-repudiation: preventing an entity from denying previous commitments or actions)- za to v resnici potrebujemo kriptografijo javnih ključev (seveda pa jo je potrebno pred uporabo tudi razumeti).
+50. "zahtevnejše zahteve" - res slab način izražanja.
+51. "Vsak poseg v konfiguracijo, na primer dodajanje ali odstranjevanje oraklja, zamenjava agregatorja ali sprememba pragov zaupanja, bi moral biti transparenten, sledljiv in odobren s strani vnaprej definiranega kvora udeležencev." --- Kaj je kvor? Spelling!!!!???
+52. Dodatek A:  Čemu je namen 15 str. nečesa, kar je v resnici neberljivo. Ali naj kandidat pojasni, ali pa naj to izključi iz svoje naloge.
+53. Literatura bi lahko bila urejena po abecedi in napisana v skladi s kakšnim standardom, ne pa da je pomanjkljiva.
+       Prosim, da študent poda pisno utemeljitev za vsako točko in prepriča komisijo, da se je potrudil odpraviti vse podobne napake skozi celotno nalog.
+
