@@ -299,7 +299,7 @@ V zadnjem desetletju se pojavljajo projekti, ki preučujejo uporabo tehnologije 
 Kljub temu večina rešitev ostaja usmerjena v zaupanje v podatke, medtem ko je upravljanje zaupanja med posameznimi organizacijami pogosto implicitno, vezano na statične pravice dostopa ali vnaprej dogovorjene pogodbeno–pravne odnose. Manj je pristopov, kjer bi lahko vsak akter izrecno definiral svoje kriterije zaupanja in iz njih izpeljal odločitve o sodelovanju. Prav to vrzel bo zapolnil sistem, predstavljen v tej nalogi, saj kombinira semantični model dobavne verige, subjektivne politike zaupanja in zapis rezultatov v verigo blokov.
 
 \section{Tehnologija veriženja blokov}
-Tehnologija veriženja blokov je bila prvič predstavljena leta 2008 v sklopu kriptovalute Bitcoin \cite{nakamoto2008bitcoin}. Osnovna ideja je zasnova podatkovne strukture, ki povezuje zapise v verigo blokov. Vsak blok vsebuje podatke, kriptografski povzetek prejšnjega bloka in časovno oznako. Takšna vezava med bloki preprečuje naknadne spremembe podatkov, saj bi sprememba v enem bloku povzročila neujemanje celotne verige \cite{crosby2016blockchain}.
+Tehnologija veriženja blokov je bila prvič predstavljena leta 2008 v sklopu kriptovalute Bitcoin \cite{nakamoto2008bitcoin}. Osnovna ideja je zasnova podatkovne strukture, ki povezuje zapise v verigo blokov. Vsak blok vsebuje podatke, zgoščeno vrednost prejšnjega bloka in časovni žig. Takšna vezava med bloki preprečuje naknadne spremembe zapisanih podatkov, saj bi vsaka sprememba v enem izmed starejših blokov spremenila njegovo zgoščeno vrednost. Posledično pa se zgoščena vrednost ne bi več ujemala z vrednostjo, shranjeno v naslednjem bloku \cite{crosby2016blockchain}.
 
 Veriga blokov deluje v porazdeljenem omrežju, kjer vsako vozlišče hrani kopijo celotne verige. Soglasje o pravilnem zaporedju blokov se doseže s konsenznim mehanizmom. V javnih verigah se pogosto uporabljata t. i. Proof of Work ali Proof of Stake, medtem ko zasebna omrežja uporabljajo lažje mehanizme, ki temeljijo na znanih udeležencih. Zaradi porazdeljene narave sistem ne potrebuje centralne avtoritete, kar omogoča zanesljivo beleženje podatkov v okolju z različnimi deležniki.
 
@@ -308,7 +308,7 @@ Poleg javnih omrežij (kot je Ethereum), so v praksi pogosta zasebna omrežja, k
 Verige blokov omogočajo nespremenljiv zapis dogodkov, preverljivo zgodovino podatkov in enoten pogled na transakcije. To so pomembne zahteve farmacevtskih dobavnih verig, saj želimo omogočiti transparenten pogled na transakcije v takšnem sistemu.
 
 \subsection{Pametne pogodbe}
-Pametne pogodbe predstavljajo enega ključnih konceptov sodobnih verig blokov. Gre za programe, ki se shranijo in izvajajo neposredno v verigi blokov ter se sprožijo, ko so izpolnjeni določeni pogoji. Ethereum je prvi uvedel splošno platformo za izvajanje pametnih pogodb prek navideznega stroja EVM (Ethereum Virtual Machine), ki omogoča deterministično izvajanje kode na vseh vozliščih omrežja \cite{wood2014ethereum}.
+Pametne pogodbe predstavljajo enega ključnih konceptov sodobnih verig blokov. Gre za programe, ki se shranijo in izvajajo neposredno v verigi blokov ter izvajajo funkcije, ko so izpolnjeni določeni pogoji. Ethereum je prvi uvedel splošno platformo za izvajanje pametnih pogodb prek navideznega stroja EVM (Ethereum Virtual Machine), ki omogoča deterministično izvajanje kode na vseh vozliščih omrežja \cite{wood2014ethereum}.
 
 Pametne pogodbe omogočajo avtomatizacijo pravil in procesov, pri čemer ni potrebno zaupati enemu samemu posredniku. Njihovo delovanje je predvidljivo, saj se vedno izvršijo natančno tako, kot je določeno v kodi. Zaradi teh lastnosti se pogosto uporabljajo v scenarijih, kjer je treba uveljaviti dogovorjena pravila med neodvisnimi akterji. V dobavnih verigah se uporabljajo za potrjevanje dogodkov, beleženje blaga, preverjanje skladnosti podatkov, itn.
 
@@ -453,7 +453,7 @@ V nadaljevanju naloge bomo opisali, kako je tak sistem konkretno implementiran i
 V tem poglavju preidemo od konceptualnega modela k dejanski implementaciji prototipa. Na začetku opišemo tehnologije, ki smo jih uporabili. V nadaljevanju bolj podrobno orišemo arhitekturo ter njene ključne komponente. Na koncu predstavimo delovanje sistema skozi tokove podatkov in razložimo, kako so različni deli povezani v celoto.  
 
 \newpage
-Na sliki~\ref{fig:architecture-concept} je prikazan konceptualni prikaz ciljne arhitekture sistema. Diagram ponazarja glavne gradnike: akterje dobavne verige, uporabniški vmesnik, plast znanja (ontologija in shramba preverljivih poverilnic), decentralizirano omrežje orakljev (DON) ter verigo blokov s pametno pogodbo, ki služi kot skupni register zaupanja. Prototip, ki ga opišemo v nadaljevanju, realizira to zasnovo v testnem okolju in omogoča izvajanje ponovljivih scenarijev.
+Na sliki~\ref{fig:architecture-concept} je prikazan koncept ciljne arhitekture sistema. Diagram ponazarja glavne gradnike: uporabnike (akterje dobavne verige), uporabniški vmesnik, plast znanja (ontologija in shramba preverljivih poverilnic), decentralizirano omrežje orakljev (DON) ter verigo blokov s pametno pogodbo, ki služi kot skupni register zaupanja. Ciljni koncept delovanja sistema je bil, da lahko uporabniki preko uporabniškega vmesnika komunicirajo s sistemom zaupanja na verigi blokov, ki črpa znanje iz ontologije in shrambe preverljivih poverilnic. Prototip, ki ga opišemo v nadaljevanju, realizira to zasnovo v testnem okolju in omogoča izvajanje ponovljivih scenarijev.
 
 \begin{figure}[H]
   \centering
@@ -520,6 +520,10 @@ Oraklji so zasnovani modularno, zato jih lahko organizacije poganjajo samostojno
 Vse komponente sistema so zajete v vsebnikih Docker. To nam je omogočilo hitro postavitev razvojnega okolja, enostavno upravljanje odvisnosti in ponovljivost testov.
 Vsak orakelj, strežnik Fuseki in lokalna veriga Ethereum se izvajajo v ločenih vsebnikih.
 Docker je uporabljen izključno za potrebe testiranja med razvojem.
+
+\subsection{Kriptografski mehanizmi v implementaciji}
+
+Pomembne funkcije, ki jih uporabljamo v našem sistemu, temlejijo na kriptografskih mehanizmih za zagotavljanje integriteto in preverljivost podatkov. Spodaj sta opisani dve glavni funkciji: digitalno podpisovanje poročil in preverjanje teh podpisov.
 
 \section{Arhitektura sistema}
 \label{sec:arhitektura-sistema}
@@ -724,7 +728,7 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
     \end{itemize}
 
   \item \textbf{Orakelj ustvari poročilo in ga podpiše}\newline
-    Orakelj pripravi končno poročilo v JSON obliki, ki vsebuje ključne informacije o izračunu zaupanja: identifikator subjekta, odločitev, oceno, zastavice in pripadajoče povzetke. Preden ga pošlje agregatorju, mora orakelj poročilo kriptografsko podpisati. Podpis se izvede z uporabo metode \texttt{sign\_message}, ki je del knjižnice web3.py. Ta temelji na Ethereumovi shemi EIP-191. Najprej se pripravi deterministična kanonična oblika JSON zapisa, ta pa se nato podpiše z zasebnim ključem oraklja. Podpis omogoča agregatorju, da preveri, ali je poročilo prišlo od zaupanja vrednega oraklja.
+    Orakelj pripravi končno poročilo v JSON obliki, ki vsebuje ključne informacije o izračunu zaupanja: identifikator subjekta, odločitev, oceno, zastavice in pripadajoče povzetke. Preden ga pošlje agregatorju, mora orakelj poročilo kriptografsko podpisati. Podpis se izvede z uporabo metode \texttt{sign\_message}, ki je del knjižnice \texttt{web3.py}. Ta temelji na Ethereumovi shemi EIP-191. Najprej se pripravi deterministična kanonična oblika JSON zapisa, ta pa se nato podpiše z zasebnim ključem oraklja. Podpis omogoča agregatorju, da preveri, ali je poročilo prišlo od zaupanja vrednega oraklja.
 
   \item \textbf{Agregator sprejme poročila in izvede preverjanje}\newline
     Agregator deluje kot zbirno vozlišče, ki prejema poročila posameznih orakljev prek HTTP vmesnika. Pred prejemom poročila izvede naslednja preverjanja:
@@ -799,7 +803,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
     \end{itemize}
 
     Pred podpisom se poročilo pretvori v kanonično JSON obliko s stabilnim urejanjem ključev.  
-    Podpis se izvede z metodo \texttt{sign\_message} (EIP-191) iz knjižnice \texttt{web3.py}.  
+    Podpis se izvede s funkcijo \texttt{sign\_message} iz knjižnice \texttt{web3.py}.  
     Agregator poročilo sprejme le, če je podpis veljaven, naslov \texttt{node\_id} pripada dovoljenemu oraklju, poročilo ni podvojeno in \texttt{policy\_hash} ter \texttt{credential\_hash} se ujemata z lokalnimi podatki agregatorja.
     Standardizirana struktura omogoča, da lahko vsako poročilo neodvisno preverimo in da se rezultati več orakljev združijo v konsenzni izračun, ki se zapiše v pametno pogodbo.
 
@@ -1648,7 +1652,7 @@ Prva skupina groženj za DON je povezana z istovetnostjo orakljev (spoofing). Ag
 
 Pri napadih s spreminjanjem podatkov ščitimo predvsem integriteto vsebine poročil. Ker je podpisan JSON celotnega poročila, agregator zazna vsako spremembo vsebine med prenosom ali vmesnim shranjevanjem. Za produkcijsko okolje je smiselno dodati revizijsko sled (na primer zapis zgoščenih vrednosti sprejetih poročil), kar omogoča naknadno preverjanje skladnosti med prejetimi poročili in zapisi na verigi. Enotski testi pri tem preverijo, da serializacija poročila v kanonično obliko vedno vrne enak rezultat in da vsaka sprememba vsebine povzroči neuspeh preverjanja podpisa.
 
-Grožnja z zanimkanjem sodelovanja je pomembna z vidika transparentnosti: orakelj bi lahko poskušal zanikati, da je oddal negativno poročilo za določenega partnerja. S podpisanimi poročili in deterministično obnovo naslova iz podpisa lahko vedno pokažemo, kateri ključ je poročilo podpisal. Ker agregator dodatno hrani zgoščeno vrednost sprejetih poročil, je revizijska sled za potrebe kasnejših sporov ali regulatornih pregledov relativno preprosto dostopna.
+Grožnja z zanikanjem sodelovanja je pomembna z vidika transparentnosti: orakelj bi lahko poskušal zanikati, da je oddal poročilo za določenega partnerja. Ker imamo digitalni podpis poročila in, ker lahko iz verige blokov ponovno oblikujemo poročilo oraklja v kanonično obliko JSON, lahko s klicem funkcije \texttt{recover\_message} iz knjižnice \texttt{web3.py} dobimo naslov oraklja, ki je poročilo podpisal. S tem lahko kadarkoli neodvisno preverimo ali je orakelj res oddal določeno poročilo.
 
 Del zasnove DON je tudi preverjanje preverljivih poverilnic (VC), ki spremljajo poročila. Vsak orakelj poleg ocene zaupanja priloži VC, ki dokazuje njegovo pooblastilo ali lastnosti subjekta. Agregator pred sprejemom poročila preveri podpis VC, status preklica, časovno veljavnost in skladnost sheme z vnaprej definirano politiko. Poročila z neveljavnimi ali preklicanimi poverilnicami so zavrnjena in se nikoli ne zapišejo na verigo. To zmanjša tveganje, da bi se na grafe zaupanja zapisali ponarejeni ali zastareli dokazi.
 

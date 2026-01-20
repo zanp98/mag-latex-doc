@@ -1,5 +1,5 @@
 \chapter*{Seznam uporabljenih kratic}
-
+\thispagestyle{empty}
 \begin{table}[ht]
   \centering
   \small
@@ -24,6 +24,9 @@
   \end{tabularx}
 \end{table}
 
+\newpage
+% \markboth{}{}
+\thispagestyle{empty}
 \begin{table}[ht]
   \centering
   \small
@@ -45,14 +48,56 @@
   \end{tabularx}
 \end{table}
 
+\newpage
 \chapter*{Seznam uporabljenih pojmov}
+\thispagestyle{empty}
+
 \begin{table}[ht]
   \centering
   \small
   \setlength{\tabcolsep}{6pt} % malo manjši razmik med stolpci
-  \begin{tabularx}{\textwidth}{l|X}
-    \textbf{pojem} & \textbf{razlaga} \\ \hline
-    \textbf{časovni žig}   & Zaporedje znakov, ki zagotavlja podpis dokumenta z veljavnim digitalnim potrdilom v določenem časovnem trenutku s povezovanjem datuma, časa podpisa in podatkov na kriptografsko varen način. \\
-    \textbf{zgoščevalna funkcija} & matematična funkcija, ki vzame vhodne podatke poljubne velikosti in jih preslika v izhodne podatke fiksne velikosti. \\
+  \begin{tabularx}{1\textwidth} { 
+  >{\raggedright\arraybackslash}p{0.25\textwidth}|
+  >{\raggedright\arraybackslash}X}
+    \textbf{pojem} & \textbf{razlaga} \\ \hline \hline
+    \textbf{Časovni žig}   & Zaporedje znakov, ki zagotavlja podpis dokumenta z veljavnim digitalnim potrdilom v določenem časovnem trenutku s povezovanjem datuma, časa podpisa in podatkov na kriptografsko varen način. \\ \hline
+    \textbf{Digitalni podpis} &
+    Matematična shema za preverjanje pristnosti digitalnih dokumentov. Vsebuje tri algoritme: generiranje javnih in zasebnih ključev, podpisni algoritem in algoritem preverjanja podpisa. \\ \hline
+    \textbf{Digitalno potrdilo} &
+    Strukturiran in kriptografsko podpisan zapis, ki javni ključ poveže z identiteto določenega subjekta izdan s strani zaupanja vrednega izdajatelja. Prejemniku omogoča preverjanje, komu pripada dani javni ključ. \\ \hline
+    \textbf{Javni ključ} &
+    Del para javnega in zasebnega ključa v asimetrični kriptografiji, namenjen deljenju z drugimi, ki ga uporabljajo za preverjanje digitalnih podpisov imetnika ali za šifriranje sporočil, ki jih lahko dešifrira le ustrezni zasebni ključ. \\ \hline
+    \textbf{Proof of Stake} &
+    Konsenzni mehanizem, kjer vpliv udeleženca na predlaganje in potrjevanje blokov temelji na količini vloženih (z zaklenitvijo zavarovanih) sredstev v omrežju, pri čemer ekonomski vložek deluje kot spodbuda za pošteno vedenje in varovalka pred napadi. \\
+
+  \end{tabularx}
+\end{table}
+
+\newpage
+\markboth{}{}
+\begin{table}[ht]
+  \centering
+  \small
+  \setlength{\tabcolsep}{6pt} % malo manjši razmik med stolpci
+  \begin{tabularx}{1\textwidth} { 
+  >{\raggedright\arraybackslash}p{0.25\textwidth}|
+  >{\raggedright\arraybackslash}X}
+    \textbf{pojem} & \textbf{razlaga} \\ \hline \hline
+
+    \textbf{Proof of Work} &
+    Konsenzni mehanizem verig blokov, pri katerem mora vozlišče za predlaganje novega bloka izvesti računsko zahteven izračun. Otežuje ponarejanje blokov in napade z ustvarjanjem velikega števila lažnih blokov. \\ \hline
+
+    \textbf{Veriga blokov} &
+    Razpršena, kriptografsko povezana knjižnica digitalnih zapisov (blokov), ki vsebujejo podatke o transakcijah in se povezujejo z zgoščenimi povzetki prejšnjih blokov \\ \hline
+
+    \textbf{Zasebni ključ} &
+    Tajni del para javnega in zasebnega ključa, ki ga pozna le imetnik in se uporablja za ustvarjanje digitalnih podpisov ali šifriranje \\ \hline
+
+    \textbf{Zgoščena vrednost} &
+    Rezultat zgoščevalne funkcije. \\ \hline
+
+    \textbf{Zgoščevalna funkcija} &
+    Matematična funkcija, ki vzame vhodne podatke poljubne velikosti in jih preslika v zgoščeno vrednost fiksne velikosti, pri čemer že majhna sprememba vhodnih podatkov povzroči veliko spremembo zgoščene vrednosti. Pomembna lastnost zgoščevalne funkcije je, da iz izhodne zgoščene vrednosti v doglednem času ne moremo izračunati vhodnih podatkov. \\
+
   \end{tabularx}
 \end{table}
