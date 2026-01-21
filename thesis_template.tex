@@ -94,7 +94,7 @@
 
 Farmacevtske dobavne verige sodijo med najbolj regulirana in podatkovno zahtevna okolja v sodobni industriji. Zdravila, cepiva in drugi farmacevtski proizvodi potujejo med številnimi akterji, kot so proizvajalci, distributerji, transporterji, regulatorji in zdravstvene ustanove. Od vseh se pričakuje visoka stopnja zanesljivosti in skladnosti, vendar so tovrstne verige kljub temu izpostavljene številnim tveganjem. Pogosti so primeri ponarejenih zdravil, nepravilno ravnanje z izdelki, nepopolna poročila ter pomanjkanje transparentnosti \cite{world2024global}. V veliki meri ti problemi izhajajo iz nezmožnosti pravočasnega, jasnega in doslednega preverjanja zaupanja v posamezne akterje \cite{kayhan2022ensuring}.
 
-Obstoječi sistemi za upravljanje zaupanja pogosto temeljijo na delno centraliziranih podatkovnih virih, ročnih revizijah ali statičnih ocenah \cite{us2013dscsa, uddin2021blockchain}. Te pa dejanskega obnašanja akterjev ne odražajo dovolj hitro. Takšni pristopi omejujejo sposobnost regulatorjev in podjetij, da prepoznajo tveganja, ki izhajajo iz sprememb v kakovosti ali skladnosti delovanja. V literaturi so predlagani različni koncepti, ki vključujejo semantično modeliranje, decentralizirane sisteme, kriptografsko preverjanje ter obdelavo telemetrij \cite{uddin2021blockchain}, manjka pa splošna zasnova modela, ki bi te elemente povezala v enoten in razširljiv okvir za dinamično ocenjevanje zaupanja.
+Obstoječi sistemi za upravljanje zaupanja v farmacevtskih dobavnih verigah pogosto temeljijo na delno centraliziranih podatkovnih virih, ročnih revizijah ali statičnih ocenah \cite{eu-161-2016, eueu-62-2011, us2013dscsa}. V literaturi so bili predlagani različni pristopi za izboljšanje teh mehanizmov, vključno z reputacijskimi modeli zaupanja \cite{josang2002beta}, semantičnim modeliranjem \cite{artz2007survey}, uporabo verige blokov za zagotavljanje sledljivosti \cite{kochovski2024drug} ter integracijo podatkov iz senzorjev in zunanjih virov \cite{uddin2021blockchain}. Kljub temu večina obstoječih rešitev obravnava posamezne vidike problema ločeno in ne ponuja splošne zasnove, ki bi te elemente povezala v enoten, razširljiv in razložljiv okvir za dinamično ocenjevanje zaupanja.
 
 V magistrski nalogi se zato osredotočamo na vprašanje, kako v farmacevtski dobavni verigi oblikovati model in mehanizem, ki omogoča transparentno, preverljivo in razširljivo upravljanje zaupanja med akterji, ne da bi bilo treba razkrivati občutljive operativne ali poslovne podatke.
 
@@ -108,7 +108,9 @@ Cilj naloge je razviti konceptualni in arhitekturni okvir ter na njegovi podlagi
 
 Hipoteza naloge je, da je mogoče tak prototip zasnovati tako, da demonstrira izvedljivost decentraliziranega sistema za izračun zaupanja ter hkrati ohrani lastnosti, ki so ključne za regulativno okolje: razložljivost postopkov, razširljivost arhitekture, odpornost na posamične okvare ter minimizacijo razkritja podatkov.
 
-V nadaljevanju naloge najprej predstavimo teoretično ozadje upravljanja zaupanja v razpršenih sistemih ter izzive, značilne za farmacevtske dobavne verige. Nadaljujemo z opisom konceptualnega modela zaupanja in arhitekture sistema, ki omogoča izračun in usklajevanje ocene zaupanja. Sledi poglavje implementacije, kjer opišemo celotno zasnovo sistema. V poglavju evalvacije opišemo eksperimentalne scenarije, ki prikazujejo praktično delovanje sistema in z modelom groženj predstavimo ključne varnostne lastnosti sistema. V zaključku povzamemo ugotovitve in predstavimo smernice za nadaljnjo nadgradnjo rešitve.
+Predlagani sistem temelji na kombinaciji semantičnega modeliranja, decentralizirane infrastrukture in preverljivih dokazil. Akterji v dobavni verigi so formalno opisani z uporabo ontologije, ki omogoča predstavitev njihovih lastnosti. Zaupanje se ocenjuje na podlagi več neodvisnih virov z uporabo orakljev, ki izračune izvajajo zunaj verige blokov, končni rezultati pa se zapisujejo v verigo blokov.
+
+V nadaljevanju naloge najprej predstavimo teoretično ozadje upravljanja zaupanja v razpršenih sistemih ter obstoječe pristope, uporabljene v farmacevtskih dobavnih verigah. Nato opišemo konceptualni model zaupanja in arhitekturo predlaganega sistema, vključno z vlogo ontologije, orakljev in verige blokov. Sledi poglavje implementacije, kjer podrobno predstavimo zasnovo in delovanje prototipa. V poglavju evalvacije prikažemo eksperimentalne scenarije, ki demonstrirajo praktično delovanje sistema, ter analiziramo njegove varnostne lastnosti z uporabo modela groženj. V zaključku povzamemo ključne ugotovitve in predlagamo možnosti za nadaljnji razvoj rešitve.
 
 \chapter{Pregled literature in ozadje}
 \label{ch:background}
@@ -379,15 +381,15 @@ Tehnologija veriženja blokov in pametne pogodbe ponujajo nov način upravljanja
 Na tej točki se pokaže osrednja vrzel. Obstoječe rešitve za sledljivost zdravil se osredotočajo na varnost in integriteto podatkov, upravljanje zaupanja med organizacijami pa je običajno implicitno. Temelji na statičnih pravicah dostopa, pogodbah in ročnih pregledih partnerjev. Po drugi strani številni modeli zaupanja ne upoštevajo posebnosti farmacevtske domene in niso povezani z verigo blokov. Manj je pristopov, kjer bi lahko vsak akter izrecno zapisal svojo politiko zaupanja, jo vezal na skupni semantični model ter rezultate ocenjevanja delil na način, ki ga lahko drugi akterji neodvisno preverijo.
 
 V tabeli~\ref{tab:primerjava-pristopov} povzamemo ključne kategorije pristopov, ki se pojavljajo v literaturi in industrijskih rešitvah. Primerjava poudari razlike med centraliziranimi metodami, reputacijskimi sistemi, semantičnimi modeli in rešitvami na osnovi verige blokov. V zadnjem stolpcu je prikazano, kako sistem, predstavljen v tem delu, združuje elemente teh pristopov in uvaja nove mehanizme, kot so več neodvisnih orakljev, kriptografsko podpisana poročila ter kombinacija dokaznih in telemetrijskih kriterijev.
-
 \begin{landscape}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \begin{table}[ht]
 \centering
 \caption{Primerjava obstoječih pristopov k upravljanju zaupanja in novosti razvitega prototipa.}
 \label{tab:primerjava-pristopov}
 \small
 \renewcommand{\arraystretch}{1.25}
-\begin{tabularx}{\linewidth}{|X|X|X|X|X|}
+\begin{tabularx}{\linewidth}{|Y|Y|Y|Y|Y|}
 \hline
 \textbf{Pristop} &
 \textbf{Vir zaupanja} &
@@ -396,45 +398,44 @@ V tabeli~\ref{tab:primerjava-pristopov} povzamemo ključne kategorije pristopov,
 \textbf{Omejitve} \\
 \hline
 
-Centralizirani sistemi kakovosti (GDP/GMP) &
-ročne revizije, digitalna potrdila, agencije &
+Centralizirani sistemi kakovosti (GDP \cite{ema2013gmp}/GMP \cite{who2010good}) &
+ročne revizije, digitalna potrdila, regulatorji &
 nizka; periodične revizije &
-delna; opis revizij &
-centralizacija, počasen odziv, ni kriptografske sledljivosti \\
+delna; opis revizijskih postopkov &
+centralizacija, počasen odziv, pomanjkanje kriptografske sledljivosti \\
 \hline
 
-Reputacijski modeli (ocene partnerjev) &
+Reputacijski modeli (ocene partnerjev) \cite{josang2002beta, resnick2000reputation} &
 mnenja, zgodovina interakcij &
 srednja; po vsaki interakciji &
 nizka–srednja; pogosto neformalna &
 možnost manipulacij, subjektivnost, neprenosljivost ocen \\
 \hline
 
-Semantični modeli zaupanja &
+Semantični modeli zaupanja \cite{artz2007survey} &
 ontologije, formalna pravila, sklepanje &
-srednja; ob posodobitvi virov &
-visoka; formalna razlaga &
-ni mehanizma za integriteto na verigi  \\
+srednja; ob posodobitvi virov znanja &
+visoka; formalna in sledljiva razlaga &
+ni vgrajenega mehanizma za integriteto podatkov na verigi  \\
 \hline
 
-Rešitve z uporabo verige blokov (blockchain) &
+Rešitve z uporabo verige blokov (blockchain) \cite{kokochovski2019trust, uddin2021blockchain} &
 transakcije, digitalna potrdila &
 visoka; dogodki v realnem času &
-srednja; podatki preverljivi, razlaga ne &
-ne rešujejo izračuna zaupanja; brez večnivojskih kriterijev \\
+srednja; preverljivost podatkov, omejena razlaga &
+ne obravnavajo izračuna zaupanja; brez večnivojskih kriterijev \\
 \hline
 
 \textbf{Predstavljen sistem} &
 VC, ontologija, DON &
 visoka; vsak izračun sproži nove ocene &
-zelo visoka; deterministični + verjetnostni del + zastavice &
-odprta vprašanja upravljanja identitet, cena implementacije \\
+zelo visoka; deterministični in verjetnostni del z razlagami &
+odprta vprašanja upravljanja identitet, strošek implementacije \\
 \hline
 \end{tabularx}
 \end{table}
-
-  
 \end{landscape}
+
 
 
 Prispevek te naloge je predlog sistema, ki omenjene elemente poveže v enoten okvir. Ontologija farmacevtske dobavne verige predstavlja skupno semantično plast, v kateri so akterji in njihove lastnosti opisani na strukturiran in razširljiv način. Vsak akter lahko nad temi podatki definira lastna pravila zaupanja in tako določi, katera merila so zanj pomembna. Mehanizem za sklepanje iz ontologije prebere lastnosti akterjev, uporabi lokalna pravila in za vsak par udeležencev izračuna rezultat zaupanja. Decentralizirani oraklji nato te rezultate prenesejo v pametno pogodbo, ki na verigi blokov hrani register relacij zaupanja. Sistem povezuje tudi decentralizirane identitete (DID) in preverljiva dokazila VC, kadar akterji želijo izvor podatkov podpreti z digitalnimi certifikati.
@@ -521,9 +522,15 @@ Vse komponente sistema so zajete v vsebnikih Docker. To nam je omogočilo hitro 
 Vsak orakelj, strežnik Fuseki in lokalna veriga Ethereum se izvajajo v ločenih vsebnikih.
 Docker je uporabljen izključno za potrebe testiranja med razvojem.
 
-\subsection{Kriptografski mehanizmi v implementaciji}
+\subsection{Podpisovanje in preverjanje poročil orakljev}
 
-Pomembne funkcije, ki jih uporabljamo v našem sistemu, temlejijo na kriptografskih mehanizmih za zagotavljanje integriteto in preverljivost podatkov. Spodaj sta opisani dve glavni funkciji: digitalno podpisovanje poročil in preverjanje teh podpisov.
+Pomembne funkcije, ki jih uporabljamo v našem sistemu, temlejijo na kriptografskih mehanizmih za zagotavljanje integriteto in preverljivost podatkov. V nadaljevanju opišemo funkciji, ki ju uporabljamo za digitalno podpisovanje poročil (\texttt{sign\_message}) in preverjanje pristnosti podpisnika le teh (\texttt{recover\_message}). Obe funkciji v Ethereumovem okolju uporabljata algoritem digitalnega podpisa ECDSA.
+
+ECDSA predstavlja naprednejšo različico algoritma DSA, ki za svoje delovanje uporablja matematične lastnosti eliptičnih krivulj. Glavna prednost uporabe tega pristopa namesto DSA je, da zagotavlja enako raven varnosti pri bistveno krajših dolžinah ključev. To omogoča hitrejše generiranje podpisov in manjšo porabo prostora, kar je pomembno za učinkovitost transakcij v omrežjih veriženja blokov. Ethereum uporablja eliptično krivuljo imenovano \texttt{secp256k1} \cite{secp256k1}.
+
+Proces podpisovanja se začne z ustvarjanjem zgoščene vrednosti sporočila. Podpisnik nato uporabi svoj zasebni ključ, ki ga algoritem s pomočjo operacij na eliptični krivulji pretvori v digitalni podpis. Rezultat tega postopka je podpis, sestavljen iz trojke $(v, r, s)$, ki tvori končni podpis. Funkcija \texttt{sign\_message} v našem sistemu sprejme zgoščeno vrednost sporočila in zasebni ključ podpisnika ter vrne podpis, vrednosti $(v, r, s)$ in podpisano sporočilo.
+
+Podpis preverjamo s funkcijo \texttt{recover\_message}. Ta na podlagi podpisa in zgoščene vrednosti sporočila obnovi naslov podpisnika. Če se izračunani naslov ujema z znanim naslovom pošiljatelja, je pristnost sporočila potrjena.
 
 \section{Arhitektura sistema}
 \label{sec:arhitektura-sistema}
@@ -1541,9 +1548,9 @@ Funkcije pametne pogodbe, ki sprejemajo rezultate, so zaščitene z vlogo ozirom
 
 Na verigo se nikoli ne pošiljajo surovi vhodni podatki. Zapisujejo se le zgoščene vrednosti (povzetki politike, povzetki preverljivih dokazil in podatki iz ontologije), agregirana ocena ter opozorilne zastavice. Pametna pogodba tako deluje kot kriptografsko zavarovana osrednja plast, ki zagotavlja integriteto rezultatov, ne da bi hranila osebne ali poslovno občutljive podatke.
 
-Oraklji spremljajo dogodke \texttt{TrustOracleRequested}, pridobijo vhodne podatke iz plasti znanja ter izračunajo svojo oceno zaupanja. Ko je izračun opravljen, orakelj pripravi podpisano poročilo \texttt{SignedOracleReport} in ga posreduje agregatorju prek klica HTTP \texttt{/reports}. Vsak orakelj ima lasten par javnega in zasebnega ključa, ki ga uporablja za digitalno podpisovanje poročil s shemo ECDSA \texttt{secp256k1}. Pred podpisom se celotno poročilo pretvori v JSON predstavitev, kjer sta vrstni red ključev in oblika serializacije vnaprej določena. Ta pristop zagotavlja, da ima identičen podatkovni objekt vedno enako binarno predstavitev in s tem tudi enoličen kriptografski podpis, kar je bistveno za preverljivost.
+Oraklji spremljajo dogodke \texttt{TrustOracleRequested}, pridobijo vhodne podatke iz plasti znanja ter izračunajo svojo oceno zaupanja. Ko je izračun opravljen, orakelj pripravi podpisano poročilo \texttt{SignedOracleReport} in ga posreduje agregatorju prek klica HTTP \texttt{/reports}. Vsak orakelj ima lasten par javnega in zasebnega ključa, ki ga uporablja za digitalno podpisovanje poročil z digitalnim podpisom ECDSA, ki uporablja eliptično krivuljo imenovano \texttt{secp256k1}. Pred podpisom se celotno poročilo pretvori v JSON predstavitev, kjer sta vrstni red ključev in oblika serializacije vnaprej določena. Ta pristop zagotavlja, da ima identičen podatkovni objekt vedno enako binarno predstavitev in s tem tudi enoličen kriptografski podpis, kar je bistveno za preverjanje podpisnika poročila.
 
-Agregator ob prejemu poročila najprej izvede matematično obnovo javnega ključa iz podpisa (t. i.\ ECDSA \emph{public key recovery}) in iz njega izpelje naslov Ethereum pošiljatelja. Na ta način preveri, ali podpis res ustreza podatkom v poročilu in ali naslov pripada oraklju, ki je na seznamu dovoljenih vozlišč. Če se podpis ne ujema ali če naslov ni dovoljen, agregator poročilo zavrne. Tako sistem ne temelji na zaupanju v omrežno povezavo, temveč na kriptografski verifikaciji vsake posamične oddaje.
+Agregator ob prejemu poročila obnovi javni ključ iz podpisa (ECDSA \emph{public key recovery}) in iz njega izpelje naslov Ethereum pošiljatelja. Na ta način preveri, ali podpis res ustreza podatkom v poročilu in ali naslov pripada oraklju, ki je na seznamu dovoljenih vozlišč. Če se podpis ne ujema ali če naslov ni dovoljen, agregator poročilo zavrne. Tako sistem ne temelji na zaupanju v omrežno povezavo, temveč na kriptografski verifikaciji vsake posamične oddaje.
 
 Pri branju iz verige blokov pametna pogodba ponuja standardne funkcije tipa \texttt{view} in \texttt{pure}. Prek njih lahko katerikoli odjemalec brez plačila za izvajanje (\texttt{gas}) dostopa do trenutnih in zgodovinskih rezultatov ocenjevanja. Dodatni podatki so na voljo tudi prek dnevnikov dogodkov, ki jih objavi pogodba ob zapisovanju posamičnih prispevkov in končnih agregiranih rezultatov. Ker se na verigi hranijo le zgoščene vrednosti in psevdonimni identifikatorji, branje podatkov ne razkriva nobenih surovih informacij o subjektih ali njihovih lastnostih.
 
