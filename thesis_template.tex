@@ -159,12 +159,6 @@ Zaradi heterogenosti sodobnih omrežij enodimenzionalni modeli pogosto ne zadoš
 
 Modeli se razlikujejo tudi po načinu ocenjevanja zaupanja, ki neposredno vpliva na zmožnost sistema za odločanje. Vrednosti se lahko merijo na številski lestvici, na primer kot verjetnost med 0 in 1, ali pa na diskretni lestvici z opisnimi stopnjami zaupanja. Izbira ustreznih metril in modela zahteva iskanje ravnovesja med natančnostjo ocene in računsko zahtevnostjo, kar je posebej pomembno pri implementaciji v realnem času na napravah z omejenimi viri \cite{cho2015survey}.
 
-% \subsection{Matematični pristopi k zaupanju}
-
-% Gambetta zaupanje definira kot verjetnost, da bo drugi akter izvedel določeno dejanje v kontekstu, ki vpliva na njegovo lastno ravnanje \cite{gambetta1988trust}. Iz interpretacije zaupanja kot verjetnosti so se razvili številni matematični modeli, ki poskušajo iz pozitivnih in negativnih izkušenj izpeljati napoved obnašanja. Preglede teh pristopov podajajo Yan in Holtmanns v članku \textit{Trust modeling and management: from social trust to digital trust} \cite{yan2008trust}, Wang in Singh v članku \textit{Evidence-based trust: A mathematical model geared for multiagent systems} \cite{wang2010evidence} ter Kochovski in sodelavci  v članku \textit{Trust management in a blockchain based fog computing platform with trustless smart oracles} \cite{kochovski2019trust}. Ker je pristopov veliko, v nadaljevanju povzemamo le tiste, ki so najbolj pomembni za zasnovo sistema v tej nalogi.
-
-% Jøsang in Ismail v članku \emph{The Beta Reputation System} predstavita pristop, ki zaupanje razume kot statistični model nad binarnimi izidi transakcij (uspeh ali neuspeh) \cite{josang2002beta}. Sistem temelji na verjetnostni porazdelitvi beta, ki opisuje verjetnost, da se bo subjekt v prihodnje vedel pošteno. Parametra  porazdelitve beta sta neposredno povezana s količino zbranih povratnih informacij: $r$ predstavlja vsoto pozitivnih izkušenj, $s$ pa vsoto negativnih izkušenj, pričakovana vrednost porazdelitve $E[p] = (r+1)/(r+s+2)$ pa služi kot ocena zaupanja. Pomemben del modela je zmanjšanje teže povratnih informacij glede na zanesljivost ocenjevalca, pri čemer se avtorja opirata na Jøsangovo subjektivno logiko, ki zaupanje opiše s trojico $(b,d,u)$, kjer $b$ predstavlja prepričanje, $d$ dvom in $u$ negotovost \cite{josang1999algebra}. Poleg tega uvedeta še mehanizem postopnega pozabljanja starih povratnih informacij s faktorjem $\lambda$, ki omogoča, da ima novejše vedenje večji vpliv na oceno zaupanja. Avtorja predpostavljata zbiranje povratnih informacij, kjer uporabniki podajajo preproste ocene. Te se pretvorijo v parametre porazdelitve beta, kar poveže matematično podlago s praktično rabo v spletnih trgovinah.
-
 \section{Upravljanje zaupanja v razpršenih sistemih}
 \label{sec:trust-management-distributed-systems}
 Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, kot tudi dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \textit{peer-to-peer networks}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in usklajene informacije o zaupanju med akterji v omrežju. V naslednjih podpoglavjih povzemamo različne pristope k upravljanju zaupanja, ki so jih avtorji predstavili v svojem pregledu literature.
@@ -189,17 +183,15 @@ Ločita med:
   \item \emph{vrednostjo priporočiteljevega zaupanja} $\mbox{tv}(R_i)$, ki opisuje, koliko agent zaupa $i$-temu priporočitelju na poti in
   \item \emph{priporočeno vrednostjo zaupanja} $\mbox{rtv}(T)$, ki jo o ciljni entiteti $T$ poda zadnji priporočitelj v verigi.
 \end{itemize}
-
-Naj bo $p$ indeks konkretne poti priporočil, $n$ število priporočiteljev na tej poti, $R_1, R_2, \dots, R_n$ pa zaporedni priporočitelji na poti od izvornega priporočitelja do tistega, ki priporočilo zahteva.
+Naj bo $n$ število priporočiteljev, $R_1, R_2, \dots, R_n$ pa zaporedni priporočitelji na poti od izvornega priporočitelja do tistega, ki priporočilo zahteva.
 Zaupanje v ciljno entiteto $T$ po poti $p$ označimo z $\mbox{tv}_p(T)$.
 Avtorja predlagata naslednjo formulo za izračun zaupanja po poti $p$ \cite{abdul1998distributed}:
 \begin{equation}
-  \mbox{tv}_p(T) = \left( \prod_{i=1}^{n} \frac{\mbox{tv}(R_i)}{4} \right) \cdot \mbox{rtv}(T)
+  \mbox{tv}_p(T) = \left( \prod_{i=1}^{n} \frac{\mbox{tv}(R_i)}{4} \right) \cdot \mbox{rtv}(T).
   \label{eq:abdulrahman-path}
 \end{equation}
-
-Ker lahko agent za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $p$ število teh poti, označenih z $i = 1, \dots, p$. Abdul-Rahman in Hailes predlagata, da se vse delne ocene zaupanja $\mbox{tv}_1(T), \dots, \mbox{tv}_p(T)$ povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
-$\mbox{tv}(T) = \frac{1}{p} \sum_{i=1}^{p} \mbox{tv}_i(T)$ \cite{abdul1998distributed}.
+Ker lahko agent za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $r$ število teh poti, označenih z $i = 1, \dots, r$. Vse delne ocene zaupanja $\mbox{tv}_1(T), \dots, \mbox{tv}_r(T)$ se povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
+$\mbox{tv}(T) = \frac{1}{r} \sum_{i=1}^{r} \mbox{tv}_i(T)$ \cite{abdul1998distributed}.
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
 
@@ -211,19 +203,17 @@ Naj bo $P$ množica vseh vozlišč v omrežju, $u \in P$ opazovani akter, $v \in
   \item $S(u,v,t)$ je število interakcij vozlišča $v$ z akterjem $u$ do transakcije $t$, kjer ni prišlo do pritožb, 
   \item $\mbox{Cr}(v,t) \in [0,1]$ je faktor uravnoteženja zaupanja, ki zmanjšuje tveganje neverodostojnih povratnih informacij iz vozlišča $v$.
 \end{itemize}
-
 Ocena zaupanja v akterja $u$ do časa $t$ je nato definirana kot \cite{xiong2002building}
 \begin{equation}
-  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}
+  T(u,t) = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)}{\sum_{v \in P, v \neq u} I(u,v,t)}.
   \label{eq:xiong-peertrust}
 \end{equation}
-
 Vrednost $T(u,t)$ leži v intervalu $[0,1]$ in predstavlja globalno reputacijsko oceno akterja $u$ na podlagi skupnega, uteženega zadovoljstva vseh vozlišč, ki so z njim sodelovala. 
 
 \paragraph{$Dokaz.$} Dokažimo, da velja $T(u,t) \in [0,1]$.\\
 V skladu z definicijo funkcij privzemimo, da za vse $v \in P, v \neq u$ in dani $t$ velja
 $0 \leq S(u,v,t) \leq I(u,v,t)$ ter $0 \leq \mbox{Cr}(v,t) \leq 1$, poleg tega pa ima akter $u$ vsaj eno interakcijo, torej velja $\sum_{v \in P, v \neq u} I(u,v,t) > 0$.
-
+\\
 Ker je $S(u,v,t) \ge 0$ in $\mbox{Cr}(v,t) \in [0,1]$, sledi
 $0 \leq S(u,v,t)\,\mbox{Cr}(v,t) \leq S(u,v,t)$.
 Zaradi $S(u,v,t) \leq I(u,v,t)$ dobimo
@@ -234,7 +224,7 @@ za vse $v \in P, v \neq u$.
   0 \leq \sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)
       \leq \sum_{v \in P, v \neq u} I(u,v,t).
 \]
-
+\\
 Ker je imenovalec strogo pozitiven, velja
 \[
   0 \leq
@@ -1019,7 +1009,7 @@ Deterministični del temelji na politikah, ki so zapisane v konfiguracijskih dat
     \item \texttt{hasAuditScore} $\geq 0{,}90$,
     \item \texttt{hasGDPVC} $=$ \texttt{true}.
 \end{itemize}
-Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \emph{PASS}, sicer \emph{FAIL}. Ta del je najboljši približek \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
+Če subjekt za vse zahtevane kriterije zadošča pogojem, deterministični del vrne odločitev \texttt{PASS}, sicer \texttt{FAIL}. Ta del je najboljši približek \emph{dokaznim modelom zaupanja}, kjer se odločitve sprejemajo na podlagi preverljivih dokazov in jasno določenih pragov.
 
 \paragraph{Verjetnostni del.}
 Verjetnostni del iste kriterije pretvori v številsko verjetnostno oceno v intervalu $[0,1]$, ki jo orakelj kasneje pretvori v osnovne točke med 0 in 10000. Za vsak kriterij se vodi aposteriorni spremenljivki ($\alpha$ in $\beta$) porazdelitve beta $B(\alpha, \beta)$, ki modelira zaupanje za izpolnitev tega kriterija.
@@ -1029,28 +1019,28 @@ Aposteriorna porazdelitev pomeni, da se parametra $\alpha$ in $\beta$ ne obravna
 
 Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednosti $x$ in normalizirane zaželenosti $s_0 \in [0,1]$ (višja vrednost pomeni bolj zaželen izid). Parametra porazdelitve beta sta:
 \begin{equation}
-    \alpha = 1 + s_0 \cdot \textit{obs\_scale}, \qquad
+    \alpha = 1 + s_0 \cdot \texttt{obs\_scale}, \qquad
 \end{equation}
 \begin{equation}
-    \beta = 1 + (1 - s_0) \cdot \textit{obs\_scale},
+    \beta = 1 + (1 - s_0) \cdot \texttt{obs\_scale},
 \end{equation}
-kjer je v implementaciji uporabljena utežni faktor $\textit{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost porazdelitve beta $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko zaupanje.
+kjer je v implementaciji uporabljena utežni faktor $\texttt{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost porazdelitve beta $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko zaupanje.
 
 Pri novih opazovanjih (interakcijah) se aposterior posodobi po principu eksponentno uteženega drsečega povprečja (EWMA) s faktorjem $\gamma \approx 0{,}2$. Če opazovanje prinese zaželenost $s$, se nova parametra $\alpha'$ in $\beta'$ izračunata kot:
 \begin{equation}
-    \alpha' = (1 - \gamma) \cdot \alpha + \gamma \cdot (1 + s \cdot \textit{obs\_scale}),
+    \alpha' = (1 - \gamma) \cdot \alpha + \gamma \cdot (1 + s \cdot \texttt{obs\_scale}),
 \end{equation}
 \begin{equation}
-    \beta' = (1 - \gamma) \cdot \beta + \gamma \cdot (1 + (1 - s) \cdot \textit{obs\_scale}).
+    \beta' = (1 - \gamma) \cdot \beta + \gamma \cdot (1 + (1 - s) \cdot \texttt{obs\_scale}).
 \end{equation}
 S tem pristopom nove informacije hitreje vplivajo na verjetnostno oceno, starejše pa postopoma izgubljajo težo. To je konceptualno skladno z modeli dinamičnega posodabljanja zaupanja z amortizacijskimi faktorji, kjer novejše interakcije prevladajo nad starimi.
 
 \paragraph{Kombinirana odločitev.}
-Za posameznega akterja se končna verjetnostna ocena $\textit{prob\_score}$ izračuna kot uteženo povprečje srednjih vrednosti beta aposteriorjev ($\frac{\alpha}{\alpha+\beta}$) vseh aktivnih kriterijev. Uteži $w_i$, zapisane v pravilih ocenjevalca (v našem primeru oraklja), so normalizirane tako, da velja $\sum w_i = 1$.
+Za posameznega akterja se končna verjetnostna ocena $\texttt{prob\_score}$ izračuna kot uteženo povprečje srednjih vrednosti beta aposteriorjev ($\frac{\alpha}{\alpha+\beta}$) vseh aktivnih kriterijev. Uteži $w_i$, zapisane v pravilih ocenjevalca (v našem primeru oraklja), so normalizirane tako, da velja $\sum w_i = 1$.
 
-Kombinirana odločitev združuje trda pravila z mehko oceno. Če orakelj uporablja prag $\textit{prob\_threshold}$, je odločitev:
+Kombinirana odločitev združuje trda pravila z mehko oceno. Če orakelj uporablja prag $\texttt{prob\_threshold}$, je odločitev:
 \[
-    \textit{combined} = \textit{deterministic} \;\lor\; \left(\textit{prob\_score} \geq \textit{prob\_threshold}\right).
+    \texttt{combined} = \texttt{deterministic} \;\lor\; \left(\texttt{prob\_score} \geq \texttt{prob\_threshold}\right).
 \]
 Na ta način se trda pragovna pravila (dokazni pogled) kombinirajo z mehko, številsko oceno, ki je bližje priporočilnim in porazdeljenim modelom zaupanja.
 
@@ -1061,7 +1051,7 @@ V nadaljevanju opišemo konkretne konfiguracije in primere za omenjene oraklje, 
 
 Orakelj A uporablja hibridni pogled, ki združuje regulatorne kriterije, kakovost delovanja in informacije iz preverljivih poverilnic. S tem v praksi kombinira dokazni model (digitalna dokazila, licence) z dinamičnim ocenjevanjem in uteženjem kriterijev preko Beta posteriorjev. Njegov prag za verjetnostno oceno je nastavljen na:
 \[
-    \textit{prob\_threshold}^{(\text{A})} = 0{,}75.
+    \texttt{prob\_threshold}^{(\text{A})} = 0{,}75.
 \]
 
 \paragraph{Kriteriji in uteži.}
@@ -1084,26 +1074,26 @@ Za posamezne tipe subjektov uporablja naslednje kriterije in uteži:
 \end{itemize}
 
 \paragraph{Primer: MedLogix (distributer)}
-Za distributerja MedLogix v trenutni ontologiji velja \texttt{license=true} in \texttt{GDPVC=true}. Deterministični del zato vrne \emph{PASS}. Oba kriterija imata visoko zaželenost, zato se Beta posteriorja inicializirata s srednjo vrednostjo približno $0{,}91$. Po normalizaciji uteži (približno $0{,}44$ in $0{,}56$) dobimo verjetnostno oceno:
+Za distributerja MedLogix v trenutni ontologiji velja \texttt{license=true} in \texttt{GDPVC=true}. Deterministični del zato vrne \texttt{PASS}. Oba kriterija imata visoko zaželenost, zato se Beta posteriorja inicializirata s srednjo vrednostjo približno $0{,}91$. Po normalizaciji uteži (približno $0{,}44$ in $0{,}56$) dobimo verjetnostno oceno:
 \[
-    \textit{prob\_score} \approx 0{,}91 \geq 0{,}75.
+    \texttt{prob\_score} \approx 0{,}91 \geq 0{,}75.
 \]
 Kombinirana odločitev je:
 \[
-    \textit{combined}^{(\text{A}, \text{MedLogix})} = \textit{PASS}.
+    \texttt{combined}^{(\text{A}, \text{MedLogix})} = \texttt{PASS}.
 \]
 
 \paragraph{Primer: SkyFreight (transporter)}
-Za transporterja SkyFreight sta zabeleženi vrednosti \texttt{punctuality} $= 0{,}90$ in \texttt{tempViolationRate} $= 0{,}08$. Deterministični pogoji niso izpolnjeni, ker $0{,}90 < 0{,}99$ in $0{,}08 > 0{,}05$, zato deterministični del vrne \emph{FAIL}. Tudi normalizirana zaželenost $s_0$ za oba kriterija je nizka, kar vodi v nizko srednjo vrednost Beta posteriorja in verjetnostno oceno $\textit{prob\_score} < 0{,}75$. Končna odločitev oraklja je:
+Za transporterja SkyFreight sta zabeleženi vrednosti \texttt{punctuality} $= 0{,}90$ in \texttt{tempViolationRate} $= 0{,}08$. Deterministični pogoji niso izpolnjeni, ker $0{,}90 < 0{,}99$ in $0{,}08 > 0{,}05$, zato deterministični del vrne \texttt{FAIL}. Tudi normalizirana zaželenost $s_0$ za oba kriterija je nizka, kar vodi v nizko srednjo vrednost Beta posteriorja in verjetnostno oceno $\texttt{prob\_score} < 0{,}75$. Končna odločitev oraklja je:
 \[
-    \textit{combined}^{(\text{A}, \text{SkyFreight})} = \textit{FAIL}.
+    \texttt{combined}^{(\text{A}, \text{SkyFreight})} = \texttt{FAIL}.
 \]
 
 \subsubsection*{Orakelj B (dokazni model)}
 
 Orakelj B je zasnovan tako, da v ospredje postavlja preverljive poverilnice. Konceptualno je najbližje dokaznim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer imata veriga potrdil in kriptografska dokazila ključno vlogo pri inicializaciji zaupanja. Njegov prag za verjetnostno oceno je strožji:
 \[
-    \textit{prob\_threshold}^{(\text{B})} = 0{,}8.
+    \texttt{prob\_threshold}^{(\text{B})} = 0{,}8.
 \]
 
 \paragraph{Kriteriji in uteži.}
@@ -1125,34 +1115,34 @@ Glavne kombinacije kriterijev so:
     \end{itemize}
 \end{itemize}
 
-Ključna značilnost je, da brez ustreznih preverljivih poverilnic odločitev nagiba k \emph{FAIL}, tudi če so druga operativna merila razmeroma dobra. To odraža močan poudarek na formalnih dokazih in skladnosti.
+Ključna značilnost je, da brez ustreznih preverljivih poverilnic odločitev nagiba k \texttt{FAIL}, tudi če so druga operativna merila razmeroma dobra. To odraža močan poudarek na formalnih dokazih in skladnosti.
 
 \paragraph{Primer: MedLogix (distributer)}
-Ker ima MedLogix veljavne poverilnice in licenco, deterministični del vrne \emph{PASS}. Za oba kriterija dobimo srednjo vrednost Beta posteriorja približno $0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
+Ker ima MedLogix veljavne poverilnice in licenco, deterministični del vrne \texttt{PASS}. Za oba kriterija dobimo srednjo vrednost Beta posteriorja približno $0{,}91$, uteži so po normalizaciji $0{,}67$ in $0{,}33$, zato:
 \[
-    \textit{prob\_score} \approx 0{,}91 \geq 0{,}8,
+    \texttt{prob\_score} \approx 0{,}91 \geq 0{,}8,
 \]
 in kombinirana odločitev ostane:
 \[
-    \textit{combined}^{(\text{B}, \text{MedLogix})} = \textit{PASS}.
+    \texttt{combined}^{(\text{B}, \text{MedLogix})} = \texttt{PASS}.
 \]
 
 \paragraph{Primer: HealthChain (transporter)}
-Za transporterja HealthChain je v bazi znanja zabeležen \texttt{recallRate} $= 0{,}015$, kar deterministično zadošča pogoju \texttt{hasRecallRate} $\leq 0{,}02$ in daje \emph{PASS}. Pri verjetnostnem delu pa je zaželenost pri vrednosti blizu zgornje meje nizka (npr.\ $s_0 \approx 0{,}25$), kar vodi v srednjo vrednost Beta posteriorja približno $0{,}30$ in:
+Za transporterja HealthChain je v bazi znanja zabeležen \texttt{recallRate} $= 0{,}015$, kar deterministično zadošča pogoju \texttt{hasRecallRate} $\leq 0{,}02$ in daje \texttt{PASS}. Pri verjetnostnem delu pa je zaželenost pri vrednosti blizu zgornje meje nizka (npr.\ $s_0 \approx 0{,}25$), kar vodi v srednjo vrednost Beta posteriorja približno $0{,}30$ in:
 \[
-    \textit{prob\_score} \approx 0{,}30 < 0{,}8.
+    \texttt{prob\_score} \approx 0{,}30 < 0{,}8.
 \]
 Kombinirana odločitev je zato:
 \[
-    \textit{combined}^{(\text{B}, \text{HealthChain})} = \textit{FAIL},
+    \texttt{combined}^{(\text{B}, \text{HealthChain})} = \texttt{FAIL},
 \]
-kar ilustrira strožji, dokazni pristop: deterministični \emph{PASS} sam po sebi ni zadosten brez visoke verjetnostne ocene.
+kar ilustrira strožji, dokazni pristop: deterministični \texttt{PASS} sam po sebi ni zadosten brez visoke verjetnostne ocene.
 
 \subsubsection*{Orakelj C (telemetrijski pogled)}
 
 Orakelj C uporablja telemetrijske podatke med prevozi zdravil (npr. temperatura, vlaga) kot primarni vir informacij. Konceptualno se približa porazdeljenim in dinamičnim modelom zaupanja iz poglavja~\ref{sec:trust-management-distributed-systems}, kjer se zaupanje gradi na osnovi kumulativnih izkušenj in se sproti prilagaja novim dogodkom. Njegov prag za verjetnostno oceno je:
 \[
-    \textit{prob\_threshold}^{(\text{C})} = 0{,}7.
+    \texttt{prob\_threshold}^{(\text{C})} = 0{,}7.
 \]
 
 \paragraph{Kriteriji in uteži}
@@ -1172,19 +1162,19 @@ Za proizvajalce in distributerje uporablja naslednje kriterije:
 Pri transporterjih ta orakelj v trenutni konfiguraciji ne izračunava ocene, saj zanje ni definiranih kriterijev; v takem primeru subjekt v tem pogledu ni ocenjen.
 
 \paragraph{Primer: BioPharm (proizvajalec)}
-Za proizvajalca BioPharm sta zabeležena \texttt{tempDev} $= 0{,}08$ in \texttt{GDPVC=true}. Oba pogoja sta deterministično izpolnjena (\emph{PASS}), zaželenost je visoka in oba kriterija dobita srednjo vrednost posteriorja beta približno $0{,}91$. Verjetnostna ocena je zato:
+Za proizvajalca BioPharm sta zabeležena \texttt{tempDev} $= 0{,}08$ in \texttt{GDPVC=true}. Oba pogoja sta deterministično izpolnjena (\texttt{PASS}), zaželenost je visoka in oba kriterija dobita srednjo vrednost posteriorja beta približno $0{,}91$. Verjetnostna ocena je zato:
 \[
-    \textit{prob\_score} \approx 0{,}91 \geq 0{,}7,
+    \texttt{prob\_score} \approx 0{,}91 \geq 0{,}7,
 \]
 kombinirana odločitev pa:
 \[
-    \textit{combined}^{(\text{C}, \text{BioPharm})} = \textit{PASS}.
+    \texttt{combined}^{(\text{C}, \text{BioPharm})} = \texttt{PASS}.
 \]
 
 \paragraph{Primer: CanaryLabs (proizvajalec)}
-Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \texttt{GDPVC=false}. Deterministični del zato vrne \emph{FAIL}. Ker je temperaturno odstopanje prevelike in ni poverilnice o skladnosti, je tudi verjetnostna ocena nizka ($\textit{prob\_score} \ll 0{,}7$). Kombinirana odločitev je:
+Za proizvajalca CanaryLabs sta zabeležena \texttt{tempDev} $= 0{,}12$ in \texttt{GDPVC=false}. Deterministični del zato vrne \texttt{FAIL}. Ker je temperaturno odstopanje prevelike in ni poverilnice o skladnosti, je tudi verjetnostna ocena nizka ($\texttt{prob\_score} \ll 0{,}7$). Kombinirana odločitev je:
 \[
-    \textit{combined}^{(\text{C}, \text{CanaryLabs})} = \textit{FAIL}.
+    \texttt{combined}^{(\text{C}, \text{CanaryLabs})} = \texttt{FAIL}.
 \]
 
 \medskip
@@ -1218,8 +1208,8 @@ Agregator uporabi preprosto večinsko pravilo:
 \[
   \text{odločitev} =
   \begin{cases}
-    \text{true}, & \text{če vsaj dva od treh orakljev poročata \text{true}},\\
-    \text{false}, & \text{sicer}.
+    \texttt{true}, & \text{če vsaj dva od treh orakljev poročata \texttt{true}},\\
+    \texttt{false}, & \text{sicer}.
   \end{cases}
 \]
 V scenarijih to pomeni, da bo subjekt označen kot zaupanja vreden, če se vsaj dva od treh pogledov (hibridni, dokazni, telemetrijski) strinjata, da so pogoji izpolnjeni.
@@ -1342,10 +1332,10 @@ osnovnih točkah (0--10000).
     \hline
     Vir & Tip algoritma & Odločitev & Številčna ocena & Zastavice \\
     \hline
-    Orakelj A & hibridni      & \emph{FAIL} & 2382 & 0x00 \\
-    Orakelj B & dokazni (VC)  & \emph{PASS} & 9500 & 0x00 \\
-    Orakelj C & telemetrija   & \emph{PASS} & 8879 & 0x00 \\
-    Agregator & agregirano    & \emph{PASS} & 6920 & 0x00 \\
+    Orakelj A & hibridni      & \texttt{FAIL} & 2382 & 0x00 \\
+    Orakelj B & dokazni (VC)  & \texttt{PASS} & 9500 & 0x00 \\
+    Orakelj C & telemetrija   & \texttt{PASS} & 8879 & 0x00 \\
+    Agregator & agregirano    & \texttt{PASS} & 6920 & 0x00 \\
     \hline
   \end{tabularx}
 \end{table}
@@ -1353,16 +1343,16 @@ osnovnih točkah (0--10000).
 Interpretacija posameznih poročil:
 
 \begin{itemize}
-  \item \textbf{Orakelj A} vrne negativno odločitev (\emph{FAIL}) z nizko
+  \item \textbf{Orakelj A} vrne negativno odločitev (\texttt{FAIL}) z nizko
         oceno $2382$ in brez zastavic (\texttt{0x00}). Hibridni pogled na
         podlagi politik in semantičnih podatkov subjekt ocenjuje previdno,
         vendar iz same vrednosti ne izpelje dodatnega opozorila.
-  \item \textbf{Orakelj B} vrne pozitivno odločitev (\emph{PASS}) z zelo
+  \item \textbf{Orakelj B} vrne pozitivno odločitev (\texttt{PASS}) z zelo
         visoko oceno $9500$ in brez zastavic (\texttt{0x00}). Ker ima
         \texttt{DHL} veljavno preverljivo poverilnico v skupnem repozitoriju
         VC, VC-centričen algoritem oceni, da so formalni pogoji za zaupanje
         izpolnjeni.
-  \item \textbf{Orakelj C} vrne pozitivno odločitev (\emph{PASS}) z visoko
+  \item \textbf{Orakelj C} vrne pozitivno odločitev (\texttt{PASS}) z visoko
         oceno $8879$ in brez zastavic. Telemetrijski podatki (pravočasne
         dostave, stabilna temperatura) kažejo dobro operativno delovanje, zato
         telemetrijsko usmerjen pogled subjekt oceni kot zaupanja vreden.
@@ -1372,8 +1362,8 @@ Agregator iz teh treh poročil izvede:
 
 \begin{itemize}
   \item \textbf{Diskretna odločitev.} Dva od treh orakljev (B in C) poročata
-        \emph{PASS}, eden (A) poroča \emph{FAIL}. Po večinskem pravilu je
-        končna odločitev \emph{PASS} – subjekt \texttt{DHL} je v agregiranem
+        \texttt{PASS}, eden (A) poroča \texttt{FAIL}. Po večinskem pravilu je
+        končna odločitev \texttt{PASS} – subjekt \texttt{DHL} je v agregiranem
         pogledu ocenjen kot zaupanja vreden.
   \item \textbf{Številčna ocena.} Ocene treh orakljev so $2382$, $8879$ in
         $9500$. Aritmetična sredina teh treh vrednosti je približno $6920$,
@@ -1390,7 +1380,7 @@ Agregator iz teh treh poročil izvede:
 
 Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
 poizvedbi nad \texttt{TrustGraph.sol} za subjekt \texttt{DHL} dobijo informacijo,
-da je transporter trenutno označen kot zaupanja vreden (\emph{PASS}) z
+da je transporter trenutno označen kot zaupanja vreden (\texttt{PASS}) z
 agregirano številčno oceno zaupanja približno $6920/10000$ in brez globalnih
 opozoril. Če želijo razumeti razloge za razhajanje med pogledi, lahko pregledajo
 posamične zapise orakljev A, B in C na verigi ter vidijo, da hibridni pogled
@@ -1447,10 +1437,10 @@ in pripravijo nova podpisana poročila. Rezultati so predstavljeni v tabeli \ref
     \hline
     Vir & Tip algoritma & Odločitev & Številčna ocena & Zastavice \\
     \hline
-    Orakelj A & hibridni      & \emph{FAIL} & 2382 & 0x02 \\
-    Orakelj B & dokazni (VC)  & \emph{PASS} & 9500 & 0x00 \\
-    Orakelj C & telemetrija   & \emph{FAIL} & 6920 & 0x02 \\
-    Agregator & agregirano    & \emph{FAIL} & 6267 & 0x02 \\
+    Orakelj A & hibridni      & \texttt{FAIL} & 2382 & 0x02 \\
+    Orakelj B & dokazni (VC)  & \texttt{PASS} & 9500 & 0x00 \\
+    Orakelj C & telemetrija   & \texttt{FAIL} & 6920 & 0x02 \\
+    Agregator & agregirano    & \texttt{FAIL} & 6267 & 0x02 \\
     \hline
   \end{tabularx}
 \end{table}
@@ -1458,7 +1448,7 @@ in pripravijo nova podpisana poročila. Rezultati so predstavljeni v tabeli \ref
 Interpretacija posameznih poročil:
 
 \begin{itemize}
-  \item \textbf{Orakelj A} (hibridni model) ostane negativen (\emph{FAIL}) z
+  \item \textbf{Orakelj A} (hibridni model) ostane negativen (\texttt{FAIL}) z
         nizko oceno $2382$. Zastavica \texttt{0x02} označuje, da je ocena
         pod notranjim pragom (\emph{nizka ocena}). V realnem okolju bi ta
         orakelj poleg ontologije in VC bral tudi izbran nabor zunanjih
@@ -1466,7 +1456,7 @@ Interpretacija posameznih poročil:
         merila kakovosti) in jih semantično povezal v končno oceno.
   \item \textbf{Orakelj B} (dokazni, VC model) se opira predvsem na
         preverljivo poverilnico, ki je še vedno veljavna. Odločitev ostane
-        pozitivna (\emph{PASS}) z zelo visoko oceno $9500$ in brez
+        pozitivna (\texttt{PASS}) z zelo visoko oceno $9500$ in brez
         zastavic (\texttt{0x00}). V realnem scenariju bi ta orakelj tipično
         bral samo iz infrastrukture za digitalna dokazila in ne bi bil neposredno
         povezan z operativno telemetrijo.
@@ -1477,12 +1467,12 @@ Interpretacija posameznih poročil:
         $0{,}88$, število alarmov pa se poveča na $2$. Po vgrajeni formuli
         za oceno
         \[
-          \text{base\_score} =
+          \texttt{base\_score} =
            0{,}6 \cdot 0{,}88 + 0{,}3 \cdot 0{,}88 - 0{,}05 \cdot 2 \approx 0{,}692,
         \]
         dobimo številčno oceno $6920/10000$. Ker je ocena
         pod pragom in je število alarmov $\geq 2$, orakelj C spremeni
-        odločitev v \emph{FAIL} in nastavi zastavico \texttt{0x02}
+        odločitev v \texttt{FAIL} in nastavi zastavico \texttt{0x02}
         (nizka ocena). V realnem sistemu bi ta orakelj poslušal neposredno tokove telemetrije in iz njih sproti gradil
         oceno zaupanja.
 \end{itemize}
@@ -1495,8 +1485,8 @@ odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
 
 \begin{itemize}
   \item \textbf{Diskretna odločitev.} Orakelj A in C poročata
-        \emph{FAIL}, Orakelj B poroča \emph{PASS}. Dva od treh orakljev sta
-        negativna, zato je agregirana odločitev \emph{FAIL}. Z vidika
+        \texttt{FAIL}, Orakelj B poroča \texttt{PASS}. Dva od treh orakljev sta
+        negativna, zato je agregirana odločitev \texttt{FAIL}. Z vidika
         sistema je \texttt{DHL} po incidentih označen kot nezaupanja vreden.
   \item \textbf{Številčna ocena.} Ocene treh orakljev so $2382$, $9500$ in
         $6920$. Aritmetična sredina je približno $6267$, kar je nova
@@ -1513,13 +1503,13 @@ odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
         zapis tako ne le označi subjekt kot nezaupanja vreden, temveč
         tudi razloži razlog: nizka številčna ocena, pod pragom sprejemljive
         ravni.
-  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgoščeno vrednost poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \emph{PASS} (scenarij 1) v \emph{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih meril in zunanjih podatkov, ne pa spremembe formalnih dokazil.
+  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgoščeno vrednost poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \texttt{PASS} (scenarij 1) v \texttt{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih meril in zunanjih podatkov, ne pa spremembe formalnih dokazil.
 \end{itemize}
 
 Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
 poizvedbi nad \texttt{TrustGraph.sol} za subjekt \texttt{DHL} dobijo informacijo,
 da je transporter po novih incidentih označen kot nezaupanja vreden
-(\emph{FAIL}) z agregirano številčno oceno zaupanja približno $6267/10000$ in z zastavico \texttt{0x02}, ki označuje nizko oceno. Primerjava scenarijev~\ref{subsec:scenarij-1} in~\ref{subsec:scenarij-2} jasno pokaže, da je sistem dinamično prilagodil oceno zaupanja na podlagi novih podatkov, pri čemer so semantični in telemetrijski signali pretehtali formalna dokazila, ki jih je predstavljala preverljiva poverilnica.
+(\texttt{FAIL}) z agregirano številčno oceno zaupanja približno $6267/10000$ in z zastavico \texttt{0x02}, ki označuje nizko oceno. Primerjava scenarijev~\ref{subsec:scenarij-1} in~\ref{subsec:scenarij-2} jasno pokaže, da je sistem dinamično prilagodil oceno zaupanja na podlagi novih podatkov, pri čemer so semantični in telemetrijski signali pretehtali formalna dokazila, ki jih je predstavljala preverljiva poverilnica.
 
 \section{Varnostna analiza sistema}
 \label{sec:varnostna-analiza}
@@ -1741,7 +1731,7 @@ Zanimiva smer nadaljnjega razvoja je tudi preizkus zasnove v drugih sektorjih. P
 % SLO: bibliografija
 % ENG: bibliography
 %----------------------------------------------------------------
-\bibliographystyle{acm}
+\bibliographystyle{plainnat}
 
 %----------------------------------------------------------------
 % SLO: odkomentiraj za uporabo zunanje datoteke .bib (ne pozabi je potem prevesti!)
