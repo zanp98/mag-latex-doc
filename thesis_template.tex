@@ -161,7 +161,7 @@ Modeli se razlikujejo tudi po načinu ocenjevanja zaupanja, ki neposredno vpliva
 
 \section{Upravljanje zaupanja v razpršenih sistemih}
 \label{sec:trust-management-distributed-systems}
-Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, kot tudi dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \textit{peer-to-peer networks}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in usklajene informacije o zaupanju med akterji v omrežju. V naslednjih podpoglavjih povzemamo različne pristope k upravljanju zaupanja, ki so jih avtorji predstavili v svojem pregledu literature.
+Huaizhi Li in Mukesh Singhal v članku \textit{Trust Management in Distributed Systems} \cite{li2007survey} opredelita upravljanje zaupanja kot proces zbiranja informacij, potrebnih za vzpostavitev zaupanja med entitetami, kot tudi dinamičnega spremljanja in prilagajanja obstoječih razmerij zaupanja. Avtorja poudarjata, da v razpršenih okoljih kot so internet, sistemi enakovrednih entitet (angl. \textit{peer-to-peer networks}) in mobilna omrežja ad hoc pogosto sodelujejo entitete, ki se med seboj ne poznajo. Zato zaupanje postane ključni mehanizem za zmanjšanje tveganja in zagotavljanje sodelovanja. Namen sistema za upravljanje zaupanja je ohranjati ažurne in usklajene informacije o zaupanju med akterji v omrežju. V naslednjih podpoglavjih povzemamo različne pristope k upravljanju zaupanja, ki so jih avtorji predstavili v svojem pregledu literature. V sistemu, razvitem v sklopu magistrske naloge ti pristopi in enačbe niso predpisani. Služijo kot možne izbire za izračunavanje zaupanja za posamezne akterje.
 
 \subsection{Dokazni modeli zaupanja}
 \label{sub:evidence-trust-models}
@@ -210,38 +210,13 @@ Ocena zaupanja v akterja $u$ do časa $t$ je nato definirana kot \cite{xiong2002
 \end{equation}
 Vrednost $T(u,t)$ leži v intervalu $[0,1]$ in predstavlja globalno reputacijsko oceno akterja $u$ na podlagi skupnega, uteženega zadovoljstva vseh vozlišč, ki so z njim sodelovala. 
 
-\paragraph{$Dokaz.$} Dokažimo, da velja $T(u,t) \in [0,1]$.\\
-V skladu z definicijo funkcij privzemimo, da za vse $v \in P, v \neq u$ in dani $t$ velja
-$0 \leq S(u,v,t) \leq I(u,v,t)$ ter $0 \leq \mbox{Cr}(v,t) \leq 1$, poleg tega pa ima akter $u$ vsaj eno interakcijo, torej velja $\sum_{v \in P, v \neq u} I(u,v,t) > 0$.
-\\
-Ker je $S(u,v,t) \ge 0$ in $\mbox{Cr}(v,t) \in [0,1]$, sledi
-$0 \leq S(u,v,t)\,\mbox{Cr}(v,t) \leq S(u,v,t)$.
-Zaradi $S(u,v,t) \leq I(u,v,t)$ dobimo
-$0 \leq S(u,v,t)\,\mbox{Cr}(v,t) \leq I(u,v,t)$
-za vse $v \in P, v \neq u$.
-Če to neenakost seštejemo po vseh takih $v$, dobimo
-\[
-  0 \leq \sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)
-      \leq \sum_{v \in P, v \neq u} I(u,v,t).
-\]
-\\
-Ker je imenovalec strogo pozitiven, velja
-\[
-  0 \leq
-  T(u,t)
-  = \frac{\sum_{v \in P, v \neq u} S(u,v,t)\,\mbox{Cr}(v,t)}
-         {\sum_{v \in P, v \neq u} I(u,v,t)}
-  \leq 1.
-\]
-Torej je $T(u,t) \in [0,1]$.
-
 Za odločanje, ali je akter zaupanja vreden, avtorja uvedeta pragova $c_1$ in $c_2$. Prag $c_1$ določa minimalno število skupnih interakcij, ki jih mora imeti akter, da lahko opazovalec sprejme informirano odločitev. Prag $c_2$ pa izraža, kako visoko vrednost zaupanja je opazovalec pripravljen sprejeti kot še dovolj dobro: bolj toleranten akter lahko izbere nižji $c_2$, manj toleranten pa višjega. Akter $u$ se obravnava kot zaupanja vreden, če hkrati velja $I(u,t) > c_1$ in $T(u,t) > c_2$ \cite{xiong2002building}.
 
 \subsection{Dinamično posodabljanje zaupanja}
 
 Ker se vedenje akterjev sčasoma spreminja, se mora zaupanje prilagajati novim informacijam.
 Posodobitev vrednosti se pogosto izvede z amortizacijskimi faktorji, ki dajejo večjo težo nedavnim interakcijam.
-Primer takpšnega modela predstavijo Lin in sodelavci v članku \textit{A Reputation and Trust Management Broker Framework for Web Applications} \cite{lin2005reputation}. 
+Primer takšnega modela predstavijo Lin in sodelavci v članku \textit{A Reputation and Trust Management Broker Framework for Web Applications} \cite{lin2005reputation}. 
 
 Avtorji predlagajo porazdeljen sistem posrednikov zaupanja, kjer vsak posrednik vzdržuje bazo podatkov o ugledu storitev na podlagi povratnih informacij uporabnikov po opravljenih transakcijah. Ko uporabnik posreduje novo oceno $r$ za določeno storitev, posrednik posodobi shranjeno vrednost ugleda $T_{old}$ v novo vrednost $T_{new}$. Pri tem upošteva število preteklih transakcij $N$, časovno razliko ${\Delta}t$ med novo oceno in zadnjo shranjeno oceno ter parameter časovnega zastaranja $\beta$, ki določa, kako hitro starejše ocene postanejo manj pomembne. Formula za posodobitev ugleda je podana kot \cite{lin2005reputation}:
 \begin{equation}
@@ -252,7 +227,9 @@ T_{\text{new}}
 kjer je $e^{-\beta \Delta t}$ amortizacijski faktor, ki zmanjšuje vpliv starejših ocen glede na časovno razliko ${\Delta}t$. Tako se zagotovi, da novejše ocene bolj vplivajo na ugled, kar omogoča dinamično prilagajanje zaupanja glede na trenutno vedenje akterjev.
 
 \subsection{Povezava z našo rešitvijo}
-Predstavljeni modeli zaupanja predstavljajo osnovo za delovanje razvitega sistema. Vsak akter v dobavni verigi lahko uporabi svoj način izračuna zaupanja, ki temelji na dokazih, priporočilih ali dinamičnih merilih. Sistem ne vsiljuje enotnega algoritma, temveč omogoča, da akter sam oblikuje pravila na podlagi podatkov iz ontologije. Rezultati teh izračunov se shranjujejo v verigo blokov, ki deluje kot skupen in trajen zapis ocen. S tem smo združili različne pristope v enoten sistem, kjer je zaupanje merljivo in preverljivo.
+Predstavljeni modeli in enačbe v tem poglavju služijo kot pregled možnih pristopov k izračunu zaupanja v razpršenih okoljih. V okviru te naloge jih obravnavamo kot primere, ki jih je mogoče uporabiti pri implementaciji izračuna v orakljih, vendar njihova uporaba ni predpisana.
+
+Osrednji poudarek naloge je na zasnovi in implementaciji sistema, ki omogoča, da različni akterji izvedejo izračun zaupanja po lastnih pravilih in z uporabo lastnih algoritmov. Sistem zato ne vsiljuje enotnega modela, temveč zagotavlja skupen mehanizem za pridobivanje vhodnih podatkov ter za preverljiv in trajen zapis rezultatov v verigo blokov, neodvisno od izbrane metode izračuna.
 
 \section{Farmacevtske dobavne verige}
 
@@ -291,7 +268,7 @@ V zadnjem desetletju se pojavljajo projekti, ki preučujejo uporabo tehnologije 
 Kljub temu večina rešitev ostaja usmerjena v zaupanje v podatke, medtem ko je upravljanje zaupanja med posameznimi organizacijami pogosto implicitno, vezano na statične pravice dostopa ali vnaprej dogovorjene pogodbeno–pravne odnose. Manj je pristopov, kjer bi lahko vsak akter izrecno definiral svoje kriterije zaupanja in iz njih izpeljal odločitve o sodelovanju. Prav to vrzel bo zapolnil sistem, predstavljen v tej nalogi, saj kombinira semantični model dobavne verige, subjektivne politike zaupanja in zapis rezultatov v verigo blokov.
 
 \section{Tehnologija veriženja blokov}
-Tehnologija veriženja blokov je bila prvič predstavljena leta 2008 v sklopu kriptovalute Bitcoin \cite{nakamoto2008bitcoin}. Osnovna ideja je zasnova podatkovne strukture, ki povezuje zapise v verigo blokov. Vsak blok vsebuje podatke, zgoščeno vrednost prejšnjega bloka in časovni žig. Takšna vezava med bloki preprečuje naknadne spremembe zapisanih podatkov, saj bi vsaka sprememba v enem izmed starejših blokov spremenila njegovo zgoščeno vrednost. Posledično pa se zgoščena vrednost ne bi več ujemala z vrednostjo, shranjeno v naslednjem bloku \cite{crosby2016blockchain}.
+Tehnologija veriženja blokov je bila prvič predstavljena leta 2008 v sklopu kriptovalute Bitcoin \cite{nakamoto2008bitcoin}. Osnovna ideja je zasnova podatkovne strukture, ki povezuje zapise v verigo blokov. Vsak blok vsebuje podatke, zgostitev prejšnjega bloka in časovni žig. Takšna vezava med bloki preprečuje naknadne spremembe zapisanih podatkov, saj bi vsaka sprememba v enem izmed starejših blokov spremenila njegovo zgostitev. Posledično pa se zgostitev ne bi več ujemala z vrednostjo, shranjeno v naslednjem bloku \cite{crosby2016blockchain}.
 
 Veriga blokov deluje v porazdeljenem omrežju, kjer vsako vozlišče hrani kopijo celotne verige. Soglasje o pravilnem zaporedju blokov se doseže s konsenznim mehanizmom. V javnih verigah se pogosto uporabljata t. i. Proof of Work ali Proof of Stake, medtem ko zasebna omrežja uporabljajo lažje mehanizme, ki temeljijo na znanih udeležencih. Zaradi porazdeljene narave sistem ne potrebuje centralne avtoritete, kar omogoča zanesljivo beleženje podatkov v okolju z različnimi deležniki.
 
@@ -441,7 +418,7 @@ V nadaljevanju naloge bomo opisali, kako je tak sistem konkretno implementiran i
 \label{cht:implementation}
 
 
-V tem poglavju preidemo od konceptualnega modela k dejanski implementaciji prototipa. Na začetku opišemo tehnologije, ki smo jih uporabili. V nadaljevanju bolj podrobno orišemo arhitekturo ter njene ključne komponente. Na koncu predstavimo delovanje sistema skozi tokove podatkov in razložimo, kako so različni deli povezani v celoto.  
+V tem poglavju preidemo od konceptualnega modela k dejanski implementaciji prototipa. Na začetku opišemo tehnologije, ki smo jih uporabili. V nadaljevanju bolj podrobno orišemo arhitekturo ter njene ključne komponente. Na koncu predstavimo delovanje sistema skozi tokove podatkov in razložimo, kako so različni deli povezani v celoto. Izvorna koda prototipa, konfiguracijske datoteke in navodila za zagon so dostopni v javnem repozitoriju \cite{pizmoht2025repo}.
 
 \newpage
 Na sliki~\ref{fig:architecture-concept} je prikazan koncept ciljne arhitekture sistema. Diagram ponazarja glavne gradnike: uporabnike (akterje dobavne verige), uporabniški vmesnik, plast znanja (ontologija in shramba preverljivih poverilnic), decentralizirano omrežje orakljev (DON) ter verigo blokov s pametno pogodbo, ki služi kot skupni register zaupanja. Ciljni koncept delovanja sistema je bil, da lahko uporabniki preko uporabniškega vmesnika komunicirajo s sistemom zaupanja na verigi blokov, ki črpa znanje iz ontologije in shrambe preverljivih poverilnic. Prototip, ki ga opišemo v nadaljevanju, realizira to zasnovo v testnem okolju in omogoča izvajanje ponovljivih scenarijev.
@@ -518,9 +495,9 @@ Pomembne funkcije, ki jih uporabljamo v našem sistemu, temlejijo na kriptografs
 
 ECDSA predstavlja naprednejšo različico algoritma DSA, ki za svoje delovanje uporablja matematične lastnosti eliptičnih krivulj. Glavna prednost uporabe tega pristopa namesto DSA je, da zagotavlja enako raven varnosti pri bistveno krajših dolžinah ključev. To omogoča hitrejše generiranje podpisov in manjšo porabo prostora, kar je pomembno za učinkovitost transakcij v omrežjih veriženja blokov. Ethereum uporablja eliptično krivuljo imenovano \texttt{secp256k1} \cite{secp256k1}.
 
-Proces podpisovanja se začne z ustvarjanjem zgoščene vrednosti sporočila. Podpisnik nato uporabi svoj zasebni ključ, ki ga algoritem s pomočjo operacij na eliptični krivulji pretvori v digitalni podpis. Rezultat tega postopka je podpis, sestavljen iz trojke $(v, r, s)$, ki tvori končni podpis. Funkcija \texttt{sign\_message} v našem sistemu sprejme zgoščeno vrednost sporočila in zasebni ključ podpisnika ter vrne podpis, vrednosti $(v, r, s)$ in podpisano sporočilo.
+Proces podpisovanja se začne z ustvarjanjem zgostitve sporočila. Podpisnik nato uporabi svoj zasebni ključ, ki ga algoritem s pomočjo operacij na eliptični krivulji pretvori v digitalni podpis. Rezultat tega postopka je podpis, sestavljen iz trojke $(v, r, s)$, ki tvori končni podpis. Funkcija \texttt{sign\_message} v našem sistemu sprejme zgostitev sporočila in zasebni ključ podpisnika ter vrne podpis, vrednosti $(v, r, s)$ in podpisano sporočilo.
 
-Podpis preverjamo s funkcijo \texttt{recover\_message}. Ta na podlagi podpisa in zgoščene vrednosti sporočila obnovi naslov podpisnika. Če se izračunani naslov ujema z znanim naslovom pošiljatelja, je pristnost sporočila potrjena.
+Podpis preverjamo s funkcijo \texttt{recover\_message}. Ta na podlagi podpisa in zgostitve sporočila obnovi naslov podpisnika. Če se izračunani naslov ujema z znanim naslovom pošiljatelja, je pristnost sporočila potrjena.
 
 \section{Arhitektura sistema}
 \label{sec:arhitektura-sistema}
@@ -720,8 +697,8 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
     Ko ima orakelj na voljo vse relevantne podatke, izvede izračun zaupanja. Pri tem uporabi pravila, ki si jih bomo v nadaljevanju pogledali na testnih scenarijih. Rezultat tega koraka je numerična ocena in binarna odločitev, ali akter izpolnjuje zahtevane pogoje. Poleg tega orakelj pripravi tudi metapodatke, kot so:
     \begin{itemize}
       \item čas izračuna (\texttt{asOf}),
-      \item zgoščena vrednost pravil (\texttt{policyHash}),
-      \item zgoščena vrednost uporabljenega VC (\texttt{credentialHash}).
+      \item zgostitev pravil (\texttt{policyHash}),
+      \item zgostitev uporabljenega VC (\texttt{credentialHash}).
     \end{itemize}
 
   \item \textbf{Orakelj ustvari poročilo in ga podpiše}\newline
@@ -732,7 +709,7 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
     \begin{itemize}
       \item ali podpis pripada dovoljenemu oraklju,
       \item ali poročilo ni podvojeno,
-      \item ali se zgoščene vrednosti pravil in dokazil ujemajo z lokalnimi podatki.
+      \item ali se zgostitve pravil in dokazil ujemajo z lokalnimi podatki.
     \end{itemize}
     Vsako veljavno poročilo agregator takoj zapiše v pametno pogodbo z uporabo funkcije:
     \begin{quote}\texttt{recordOracleSubmission(requestId, evaluatorHash,\break report, credentialHash)}\end{quote}
@@ -776,7 +753,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
     Orakelj izvede hibridni algoritem ocenjevanja, ki združuje preverjanje pravil ter statističnih meril.
     V tej fazi orakelj pripravi tudi oba ključna povzetka:
     \begin{itemize}
-      \item \texttt{policy\_hash}, ki predstavlja zgoščeno vrednost pravil akterja,
+      \item \texttt{policy\_hash}, ki predstavlja zgostitev pravil akterja,
       \item \texttt{credential\_hash}, ki označuje VC dokazilo uporabljeno oceni.
     \end{itemize}
 
@@ -792,7 +769,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
 
     Struktura \texttt{OracleReport} mora vsebovati naslednja polja:
     \begin{itemize}
-      \item \texttt{subject} – 32-bajtni identifikator subjekta oz. zgoščena vrednost DID,
+      \item \texttt{subject} – 32-bajtni identifikator subjekta oz. zgostitev DID,
       \item \texttt{decision} – končna odločitev (bool),
       \item \texttt{score} – številčna ocena zaupanja v odstotkih,
       \item \texttt{flags} – bitna opozorilna polja,
@@ -809,7 +786,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
     \begin{itemize}
       \item ali podpis pripada dovoljenemu oraklju,
       \item ali je poročilo unikatno glede na kombinacijo vrednosti \texttt{request\_id} in \texttt{node\_id},
-      \item ali se zgoščene vrednosti pravil in dokazil ujemajo z njegovimi lokalnimi podatki.
+      \item ali se zgostitve pravil in dokazil ujemajo z njegovimi lokalnimi podatki.
     \end{itemize}
     Veljavna poročila agregator takoj zapiše v pametno pogodbo s funkcijo \texttt{recordOracleSubmission}.
 
@@ -866,7 +843,7 @@ Rezultat vključuje:
   \item numerično oceno,
   \item zastavice (flags),
   \item čas izračuna,
-  \item zgoščene vrednosti pravil in dokazil,
+  \item zgostitve pravil in dokazil,
   \item naslov Ethereum oraklja.
 \end{itemize}
 
@@ -1503,7 +1480,7 @@ odločitev, povprečje za številčno oceno ter večinsko pravilo za zastavice.
         zapis tako ne le označi subjekt kot nezaupanja vreden, temveč
         tudi razloži razlog: nizka številčna ocena, pod pragom sprejemljive
         ravni.
-  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgoščeno vrednost poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \texttt{PASS} (scenarij 1) v \texttt{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih meril in zunanjih podatkov, ne pa spremembe formalnih dokazil.
+  \item \textbf{Politike in poverilnice} Vsa tri poročila uporabljajo enako zgostitev poverilnic \texttt{credential\_hash}, kar pomeni, da se še vedno sklicujejo na isto veljavno preverljivo poverilnico. Agregator pri tem preveri, da poverilnica ni označena kot preklicana. To pomeni, da je sprememba ocene iz \texttt{PASS} (scenarij 1) v \texttt{FAIL} (scenarij 2) posledica izključno poslabšanja operativnih meril in zunanjih podatkov, ne pa spremembe formalnih dokazil.
 \end{itemize}
 
 Za ostale akterje v dobavni verigi je rezultat scenarija naslednji: ob
@@ -1539,13 +1516,13 @@ Za potrebe varnostne analize na kratko povzamemo del arhitekture, ki je ključen
 
 Funkcije pametne pogodbe, ki sprejemajo rezultate, so zaščitene z vlogo oziroma modifikatorjem \texttt{onlyEvaluator}, kar pomeni, da jih lahko kliče le z zasebnim ključem, katerega lastnik je agregator. Klici z drugih naslovov povzročijo zavrnitev transakcije (v pametnih pogodbah se kliče funkcija \texttt{revert}). Za spremembe nastavitev, kot so menjava agregatorja ali dodeljevanje novih vlog, je predvideno upravljanje z vlogami in potrjevanjem z več podpisi(angl.\ \emph{multi-sig}). To preprečuje, da bi en sam zasebni ključ samovoljno spremenil pravila delovanja sistema. 
 
-Na verigo se nikoli ne pošiljajo surovi vhodni podatki. Zapisujejo se le zgoščene vrednosti (povzetki politike, povzetki preverljivih dokazil in podatki iz ontologije), agregirana ocena ter opozorilne zastavice. Pametna pogodba tako deluje kot kriptografsko zavarovana osrednja plast, ki zagotavlja integriteto rezultatov, ne da bi hranila osebne ali poslovno občutljive podatke.
+Na verigo se nikoli ne pošiljajo surovi vhodni podatki. Zapisujejo se le zgostitve (povzetki politike, povzetki preverljivih dokazil in podatki iz ontologije), agregirana ocena ter opozorilne zastavice. Pametna pogodba tako deluje kot kriptografsko zavarovana osrednja plast, ki zagotavlja integriteto rezultatov, ne da bi hranila osebne ali poslovno občutljive podatke.
 
 Oraklji spremljajo dogodke \texttt{TrustOracleRequested}, pridobijo vhodne podatke iz plasti znanja ter izračunajo svojo oceno zaupanja. Ko je izračun opravljen, orakelj pripravi podpisano poročilo \texttt{SignedOracleReport} in ga posreduje agregatorju prek klica HTTP \texttt{/reports}. Vsak orakelj ima lasten par javnega in zasebnega ključa, ki ga uporablja za digitalno podpisovanje poročil z digitalnim podpisom ECDSA, ki uporablja eliptično krivuljo imenovano \texttt{secp256k1}. Pred podpisom se celotno poročilo pretvori v JSON predstavitev, kjer sta vrstni red ključev in oblika serializacije vnaprej določena. Ta pristop zagotavlja, da ima identičen podatkovni objekt vedno enako binarno predstavitev in s tem tudi enoličen kriptografski podpis, kar je bistveno za preverjanje podpisnika poročila.
 
 Agregator ob prejemu poročila obnovi javni ključ iz podpisa (ECDSA \emph{public key recovery}) in iz njega izpelje naslov Ethereum pošiljatelja. Na ta način preveri, ali podpis res ustreza podatkom v poročilu in ali naslov pripada oraklju, ki je na seznamu dovoljenih vozlišč. Če se podpis ne ujema ali če naslov ni dovoljen, agregator poročilo zavrne. Tako sistem ne temelji na zaupanju v omrežno povezavo, temveč na kriptografski verifikaciji vsake posamične oddaje.
 
-Pri branju iz verige blokov pametna pogodba ponuja standardne funkcije tipa \texttt{view} in \texttt{pure}. Prek njih lahko katerikoli odjemalec brez plačila za izvajanje (\texttt{gas}) dostopa do trenutnih in zgodovinskih rezultatov ocenjevanja. Dodatni podatki so na voljo tudi prek dnevnikov dogodkov, ki jih objavi pogodba ob zapisovanju posamičnih prispevkov in končnih agregiranih rezultatov. Ker se na verigi hranijo le zgoščene vrednosti in psevdonimni identifikatorji, branje podatkov ne razkriva nobenih surovih informacij o subjektih ali njihovih lastnostih.
+Pri branju iz verige blokov pametna pogodba ponuja standardne funkcije tipa \texttt{view} in \texttt{pure}. Prek njih lahko katerikoli odjemalec brez plačila za izvajanje (\texttt{gas}) dostopa do trenutnih in zgodovinskih rezultatov ocenjevanja. Dodatni podatki so na voljo tudi prek dnevnikov dogodkov, ki jih objavi pogodba ob zapisovanju posamičnih prispevkov in končnih agregiranih rezultatov. Ker se na verigi hranijo le zgostitve in psevdonimni identifikatorji, branje podatkov ne razkriva nobenih surovih informacij o subjektih ali njihovih lastnostih.
 
 Takšen podatkovni tok določa glavne meje zaupanja in razkriva ključne točke, kjer je sistem potencialno ranljiv: pri klicih pametne pogodbe (kdo lahko sproži izračun in kdo lahko objavi rezultat), na povezavi med pametno pogodbo in oraklji (pravilna interpretacija identitete in politike) ter na povezavi med oraklji in agregatorjem (preverjanje pristnosti pošiljateljev, zaščita pred ponarejenimi podpisi, preverjanje preverljivih dokazil ter zaščita pred napadi ponovnega predvajanja). V nadaljevanju zato ločeno obravnavamo grožnje za pametno pogodbo \texttt{TrustGraph.sol} in grožnje za decentralizirano omrežje orakljev, ter pokažemo, kateri mehanizmi so že implementirani in kje bi bilo treba zasnovo dodatno utrditi pri prehodu v produkcijsko okolje.
 
@@ -1560,7 +1537,7 @@ Pri analizi ne razčlenjujemo le posameznih komponent, temveč tudi meje med nji
 
 Pri določanju tipa napadalca predpostavimo več ravni zmogljivosti. Prvi scenarij predstavlja zunanjega napadalca, ki ima enaka dovoljenja kot tipični uporabniki verige blokov: lahko kliče javne funkcije pametne pogodbe, spremlja dogodke in poskuša  sprožiti izračune ali preobremeniti pogodbo. Drugi scenarij obravnava orakelj, ki želi škodovati sistemu. Tak orakelj lahko odda napačno poročilo, manipulira z vhodnimi podatki ali poskuša ponarediti podpis. Ker uporabljamo digitalne podpise ECDSA nad deterministično JSON predstavitvijo, tak napadalec ne more ponarediti avtentičnosti, lahko pa poskuša vplivati na izračun s prirejenimi podatki iz ontologije ali preverljivih dokazil. Tretji scenarij predvideva napadalca, ki cilja na spremembo agregiranja. Ta bi lahko poskušal sprejeti lažna poročila, zlorabiti svoj položaj pri zapisovanju rezultatov ali poskušal reproducirati stare podpise. Ker agregator rekonstruira naslov pošiljatelja iz digitalnega podpisa in preverja časovni žig ter identifikator izvajanja, je zaščiten pred ponarejenimi sporočili in ponavljanjem že obdelanih poročil. Zadnja kategorija so napadi zavrnitve storitve, kjer napadalec poskuša preobremeniti oraklje ali agregator z velikim številom zahtev in tako zmanjšati razpoložljivost izračunov.
 
-Tak model napadalca nam omogoča, da jasno opredelimo, katere komponente se morajo zanašati na kriptografske zaščite (podpisi, zgoščene vrednosti, preverjanje naslovov), katere so zaščitene z logiko pametne pogodbe (vloge, omejitve klicev) ter kje sistem zahteva dodatne arhitekturne ukrepe za produkcijsko okolje, kot so redundančni agregatorji, nadzor nad ključi ter mehanizmi zaščite pred preobremenitvijo. STRIDE tako ponuja ogrodje, ki ga v nadaljevanju uporabimo za razvrščanje groženj in vrednotenje implementiranih protiukrepov.
+Tak model napadalca nam omogoča, da jasno opredelimo, katere komponente se morajo zanašati na kriptografske zaščite (podpisi, zgostitve, preverjanje naslovov), katere so zaščitene z logiko pametne pogodbe (vloge, omejitve klicev) ter kje sistem zahteva dodatne arhitekturne ukrepe za produkcijsko okolje, kot so redundančni agregatorji, nadzor nad ključi ter mehanizmi zaščite pred preobremenitvijo. STRIDE tako ponuja ogrodje, ki ga v nadaljevanju uporabimo za razvrščanje groženj in vrednotenje implementiranih protiukrepov.
 
 \subsection{Analiza groženj za pametno pogodbo}
 \label{subsec:groznje-contract}
@@ -1592,7 +1569,7 @@ Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na
 
 Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja. Tovrstne napade imenujemo slepljenje ali zavajanje (angl. spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski testi implementirani v jeziku Solidity simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne s funkcijo \texttt{revert}.
 
-Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl.\ tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje nekonsistentne podatke. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom ali ko nova odločitev dobi časovni žig, ki je kronološko starejši od časovnega žiga že obstoječe odločitve za istega subjekta. V tem primeru “računanje časovnega žiga v preteklost” pomeni, da se nova odločitev zabeleži prej kot njej predhodna, saj je njen pripisani časovni žig manjši (starejši). V našem primeru časovni žig nastopa kot kriptografsko zaščiten podatek o času, ki se vključi v zgoščeno vrednost in podpis poročila ter se zapiše v verigo blokov skupaj z ostalimi parametri. Takšno stanje je semantično nelogično.
+Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl.\ tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje nekonsistentne podatke. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom ali ko nova odločitev dobi časovni žig, ki je kronološko starejši od časovnega žiga že obstoječe odločitve za istega subjekta. V tem primeru “računanje časovnega žiga v preteklost” pomeni, da se nova odločitev zabeleži prej kot njej predhodna, saj je njen pripisani časovni žig manjši (starejši). V našem primeru časovni žig nastopa kot kriptografsko zaščiten podatek o času, ki se vključi v zgostitev in podpis poročila ter se zapiše v verigo blokov skupaj z ostalimi parametri. Takšno stanje je semantično nelogično.
 Zato so v implementaciji funkcij uvedeni preverjevalni mehanizmi, ki zagotavljajo ohranjanje osnovnih stanjskih invariant (angl.\ state invariants). Med njih spadajo: (i) zahteva, da se vsak novi zapis nanaša na isti identifikator subjekta kot začetni zahtevek, (ii) da je časovni žig (\texttt{asOf}) monoton in nikoli ne nazaduje v preteklost ter (iii) da so meje dovoljenih vrednosti (npr.\ razpon ocene) ustrezno nadzorovane.
 Za dodatno zagotovitev pravilnosti smo izvedli kombinacijo enotskih in regresijskih testov. Enotski testi preverjajo posamezne robne primere na ravni funkcij. Regresijski testi pa odkrivajo nove napake v kodi, ki nastanejo z dodajanjem novih funkcij. T. i. testi \textit{fuzz\-ing} avtomatsko generirajo veliko število naključnih kombinacij parametrov (različni \texttt{requestId}, časovni žigi, zastavice in ocene). S tem preverimo, ali bi katera od kombinacij lahko pripeljala pogodbo v nelogično stanje ali sprožila neželene stranske učinke. Regresijski testi pa zagotavljajo, da popravki logike ne uvajajo novih nepravilnosti in da se znane invariante v kasnejših posodobitvah ohranijo.
 
@@ -1624,15 +1601,15 @@ Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odg
       & Integracijski test, ki na \texttt{/reports} pošlje napačno podpisan zahtevek ali zahtevek z neznanega naslova in pričakuje napako \\
     \hline
     Spreminjanje vsebine poročil med prenosom ali v agregatorju 
-      & Podpis predstavitve JSON, preverjanje zgoščenih vrednosti in zavrnitev pri neskladju
-      & Enotski testi serializacije ter preverjanja podpisov in zgoščenih vrednosti \\
+      & Podpis predstavitve JSON, preverjanje zgostitev in zavrnitev pri neskladju
+      & Enotski testi serializacije ter preverjanja podpisov in zgostitev \\
     \hline
     Orakelj zanika, da je oddal določeno poročilo 
-      & Shranjevanje zgoščenih vrednosti podpisanih poročil in obnova naslova iz podpisa 
+      & Shranjevanje zgostitev podpisanih poročil in obnova naslova iz podpisa 
       & Testi obnove naslova iz podpisa in ujemanja z zapisanim \texttt{node\_id} ter revizijske sledi \\
     \hline
     Prekomerno evidentiranje identitet subjektov ali poverilnic 
-      & Zgoščene vrednosti identifikatorjev v dnevnikih 
+      & Zgostitve identifikatorjev v dnevnikih 
       & Enotski testi nad vzorčnimi logi, ki preverjajo, da se občutljivi podatki ne pojavijo v izpisu \\
     \hline
     Preobremenitev orakljev ali agregatorja z zahtevki 
@@ -1650,13 +1627,13 @@ Mreža orakljev in agregator skupaj tvorita decentralizirano omrežje, ki je odg
 
 Prva skupina groženj za DON je povezana z istovetnostjo orakljev (spoofing). Agregator pri prejemu poročila kriptografsko obnovi naslov iz podpisa in ga preveri s seznamom dovoljenih vozlišč. Poročila z neznanih naslovov ali napačnimi podpisi zavrne. Ker podpis vključuje tudi \texttt{nonce} oziroma \texttt{run-id} in časovni žig, lahko agregator zazna in zavrne ponovno predvajanje starega sporočila in s tem prepreči napade ponovitve. Integracijski testi za HTTP vmesnik preverijo, da so spremenjena ali napačno podpisana poročila zavrnjena z ustrezno napako.
 
-Pri napadih s spreminjanjem podatkov ščitimo predvsem integriteto vsebine poročil. Ker je podpisan JSON celotnega poročila, agregator zazna vsako spremembo vsebine med prenosom ali vmesnim shranjevanjem. Za produkcijsko okolje je smiselno dodati revizijsko sled (na primer zapis zgoščenih vrednosti sprejetih poročil), kar omogoča naknadno preverjanje skladnosti med prejetimi poročili in zapisi na verigi. Enotski testi pri tem preverijo, da serializacija poročila v kanonično obliko vedno vrne enak rezultat in da vsaka sprememba vsebine povzroči neuspeh preverjanja podpisa.
+Pri napadih s spreminjanjem podatkov ščitimo predvsem integriteto vsebine poročil. Ker je podpisan JSON celotnega poročila, agregator zazna vsako spremembo vsebine med prenosom ali vmesnim shranjevanjem. Za produkcijsko okolje je smiselno dodati revizijsko sled (na primer zapis zgostitev sprejetih poročil), kar omogoča naknadno preverjanje skladnosti med prejetimi poročili in zapisi na verigi. Enotski testi pri tem preverijo, da serializacija poročila v kanonično obliko vedno vrne enak rezultat in da vsaka sprememba vsebine povzroči neuspeh preverjanja podpisa.
 
 Grožnja z zanikanjem sodelovanja je pomembna z vidika transparentnosti: orakelj bi lahko poskušal zanikati, da je oddal poročilo za določenega partnerja. Ker imamo digitalni podpis poročila in, ker lahko iz verige blokov ponovno oblikujemo poročilo oraklja v kanonično obliko JSON, lahko s klicem funkcije \texttt{recover\_message} iz knjižnice \texttt{web3.py} dobimo naslov oraklja, ki je poročilo podpisal. S tem lahko kadarkoli neodvisno preverimo ali je orakelj res oddal določeno poročilo.
 
 Del zasnove DON je tudi preverjanje preverljivih poverilnic (VC), ki spremljajo poročila. Vsak orakelj poleg ocene zaupanja priloži VC, ki dokazuje njegovo pooblastilo ali lastnosti subjekta. Agregator pred sprejemom poročila preveri podpis VC, status preklica, časovno veljavnost in skladnost sheme z vnaprej definirano politiko. Poročila z neveljavnimi ali preklicanimi poverilnicami so zavrnjena in se nikoli ne zapišejo na verigo. To zmanjša tveganje, da bi se na grafe zaupanja zapisali ponarejeni ali zastareli dokazi.
 
-Informacijsko razkritje v omrežju orakljev se najpogosteje zgodi prek dnevniških zapisov. V prototipu oraklji in agregator že uporabljajo zgoščene identifikatorje subjektov, saj se DID pred zapisom v dnevnik pretvori v vrednost \texttt{bytes32}. Kljub temu je pri nadaljnjem razvoju treba paziti, da v dnevnikih ne ostanejo neposredni naslovi URI ali vsebine poverilnic. Priporočljivo je dosledno uvesti preverjanje dnevnikov (npr. izpis le skrajšanih zgoščenih vrednosti in anonimnih oznak namesto poslovnih imen) ter z enotnimi testi preverjati, da dnevniki ne vsebujejo občutljivih podatkov.
+Informacijsko razkritje v omrežju orakljev se najpogosteje zgodi prek dnevniških zapisov. V prototipu oraklji in agregator že uporabljajo zgoščene identifikatorje subjektov, saj se DID pred zapisom v dnevnik pretvori v vrednost \texttt{bytes32}. Kljub temu je pri nadaljnjem razvoju treba paziti, da v dnevnikih ne ostanejo neposredni naslovi URI ali vsebine poverilnic. Priporočljivo je dosledno uvesti preverjanje dnevnikov (npr. izpis le skrajšanih zgostitev in anonimnih oznak namesto poslovnih imen) ter z enotnimi testi preverjati, da dnevniki ne vsebujejo občutljivih podatkov.
 
 Napadi zavrnitve storitve (DoS) ciljajo na razpoložljivost omrežja. Ker v prototipu omejevanje hitrosti ni povsod implementirano, so oraklji in agregator teoretično dovzetni za preobremenitev z veliko količino zahtev. V produkcijski rabi bi morali definirati omejitev dostopa na nivoju omrežja in zagotoviti redundanco vozlišč, tako da izpad posameznega oraklja ali agregatorja ne poruši sistema in da se promet enakomerno porazdeli.
 
