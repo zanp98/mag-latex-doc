@@ -121,13 +121,13 @@ To poglavje raziskuje koncepte, na katerih temelji sistem, razvit v okviru magis
 Pojem zaupanja je temeljni gradnik pri zasnovi našega sistema za farmacevtsko dobavno verigo. Zaupanje je kompleksen, večdimenzionalen in interdisciplinaren koncept, ki ga obravnavajo različne vede. Obravnava se v sociologiji, psihologiji, ekonomiji, računalništvu in še ostalih vedah. Prav zaradi te raznolikosti v literaturi ne obstaja enotna definicija, temveč več pristopov, ki poudarjajo različne vidike \cite{yan2008trust,grandison2000survey}.
 
 \subsection{Definicije zaupanja}
-V družboslovnem kontekstu je zaupanje pogosto opredeljeno kot stanje pozitivnih pričakovanj glede dejanj druge osebe v okoliščinah, kjer obstaja določena stopnja tveganja \cite{boon1991interpersonal}. Gambetta \cite{gambetta1988trust} zaupanje definira kot subjektivno verjetnost, da bo agent opravil določeno dejanje, še preden je to mogoče preveriti. Mayer, Davis in Schoorman \cite{mayer1995integrative} pa ga opredelijo kot pripravljenost ene stranke, da se izpostavi ranljivosti glede na dejanja druge stranke, ob pričakovanju, da bo ta delovala v skladu s pričakovanji.
+V družboslovnem kontekstu je zaupanje pogosto opredeljeno kot stanje pozitivnih pričakovanj glede dejanj druge osebe v okoliščinah, kjer obstaja določena stopnja tveganja \cite{boon1991interpersonal}. Gambetta \cite{gambetta1988trust} zaupanje definira kot subjektivno verjetnost, da bo akter opravil določeno dejanje, še preden je to mogoče preveriti. Mayer, Davis in Schoorman \cite{mayer1995integrative} pa ga opredelijo kot pripravljenost ene stranke, da se izpostavi ranljivosti glede na dejanja druge stranke, ob pričakovanju, da bo ta delovala v skladu s pričakovanji.
 
 V digitalnem okolju se koncept zaupanja prenaša iz družbenega v tehnični kontekst. Denning \cite{denning1993trust} trdi, da je zaupanje v sistem lastnost, ki jo je mogoče formalno določiti in jo modelirati. Sistem je torej zaupanja vreden, če mu njegovi uporabniki zaupajo glede na opaženo skladnost z vnaprej določenimi standardi. Grandison in Sloman \cite{grandison2000survey} zaupanje obravnavata kot kvalificirano prepričanje zaupnika o kompetentnosti, integriteti, varnosti in zanesljivosti zaupanja vrednega subjekta.
 
 \subsection{Lastnosti zaupanja}
 
-Zaupanje je po svoji naravi večdimenzionalen pojem, ki ga ni mogoče zajeti z eno samo definicijo. V literaturi se ponavlja, da zaupanje vključuje čustvene in vedenjske komponente, ki se med seboj prepletajo in vplivajo na odločanje posameznika ali sistema \cite{mcknight2001trust, karthik2017ontology}. V družbenem kontekstu gre za pripravljenost posameznika, da se izpostavi tveganju na podlagi prepričanja, da bo druga stran delovala predvidljivo in skladno s pričakovanji. V informacijskih sistemih pa to pomeni sposobnost sistema, da sprejema odločitve o sodelovanju na podlagi preteklih izkušenj in ocenjene zanesljivosti entitet.
+Zaupanje je po svoji naravi večdimenzionalen pojem, ki ga ni mogoče zajeti z eno samo definicijo. V literaturi se ponavlja, da zaupanje vključuje čustvene in vedenjske komponente, ki se med seboj prepletajo in vplivajo na odločanje posameznika ali sistema \cite{mcknight2001trust, karthik2017ontology}. V družbenem kontekstu gre za pripravljenost posameznika, da se izpostavi tveganju na podlagi prepričanja, da bo druga stran delovala predvidljivo in skladno s pričakovanji. V informacijskih sistemih pa to pomeni sposobnost sistema, da sprejema odločitve o sodelovanju na podlagi preteklih izkušenj in ocenjene zanesljivosti entitet. V tej nalogi izraz \emph{entiteta} uporabljamo kot splošni pojem za udeležene subjekte v sistemu, pri čemer so v obravnavanem kontekstu to praviloma \emph{akterji} dobavne verige.
 
 Zaupanje obstaja le v razmerju med dvema ali več entitetami, kjer ena zaupa drugi v določeni situaciji ali kontekstu. Takšno razmerje je dinamično, saj se lahko stopnja zaupanja s časom povečuje ali zmanjšuje. Poleg tega je zaupanje asimetrično: dejstvo, da entiteta A zaupa entiteti B, še ne pomeni, da bo tudi B zaupala A \cite{mayer1995integrative}.
 
@@ -153,9 +153,9 @@ Predstavljeni atributi ne predstavljajo univerzalne množice meril, temveč zbir
 
 Modeliranje zaupanja v računalniških sistemih presega zgolj definicije in atribute, saj zahteva preslikavo subjektivnih konceptov v algoritme, ki morajo avtonomno odločati o tem, ali subjektu zaupajo ali ne. Modeli zaupanja določajo mehanizme za zbiranje, agregacijo in uporabo lastnosti ter atributov zaupanja pri izračunu končne vrednosti. Osnovni cilj modeliranja je podpora pri odločanju v pogojih negotovosti, kjer se ocenjevalec odloča o interakciji z drugo entiteto.
 
-Cho in sodelavci v članku \textit{A Survey on Trust Modeling} \cite{cho2015survey} proces ocenjevanja zaupanja opisujejo kot dinamično in ponavljajočo se zanko, ki se začne z zbiranjem dokazov o preteklem vedenju, priporočil drugih ali neposrednih interakcijah. Temu sledi faza analize, kjer algoritem izračuna stopnjo zaupanja in oceni tveganje glede na ranljivost sistema ter potencialni vpliv negativnega izida. Na podlagi te ocene in določenega praga tolerance se agent odloči ali se strinja s sodelovanjem. Po končani interakciji sistem zabeleži izid, ki služi kot povratna informacija in nov dokaz za posodobitev ocene zaupanja v prihodnjih ciklih.
+Cho in sodelavci v članku \textit{A Survey on Trust Modeling} \cite{cho2015survey} proces ocenjevanja zaupanja opisujejo kot dinamično in ponavljajočo se zanko, ki se začne z zbiranjem dokazov o preteklem vedenju, priporočil drugih ali neposrednih interakcijah. Temu sledi faza analize, kjer algoritem izračuna stopnjo zaupanja in oceni tveganje glede na ranljivost sistema ter potencialni vpliv negativnega izida. Na podlagi te ocene in določenega praga tolerance se akter odloči ali se strinja s sodelovanjem. Po končani interakciji sistem zabeleži izid, ki služi kot povratna informacija in nov dokaz za posodobitev ocene zaupanja v prihodnjih ciklih.
 
-Zaradi heterogenosti sodobnih omrežij enodimenzionalni modeli pogosto ne zadoščajo, avtorji predlagajo koncept sestavljenega zaupanja. Ta pristop združuje štiri medsebojno povezane dimenzije: (i) komunikacijsko zaupanje, ki se nanaša na zanesljivost omrežja in kakovost storitve; (ii) informacijsko zaupanje, ki ocenjuje verodostojnost in celovitost podatkov; (iii) družbeno zaupanje, ki izhaja iz odnosov in ugleda v socialni strukturi; ter (iv) kognitivno zaupanje, ki modelira subjektivna pričakovanja in nagnjenost agenta k tveganju.
+Zaradi heterogenosti sodobnih omrežij enodimenzionalni modeli pogosto ne zadoščajo, avtorji predlagajo koncept sestavljenega zaupanja. Ta pristop združuje štiri medsebojno povezane dimenzije: (i) komunikacijsko zaupanje, ki se nanaša na zanesljivost omrežja in kakovost storitve; (ii) informacijsko zaupanje, ki ocenjuje verodostojnost in celovitost podatkov; (iii) družbeno zaupanje, ki izhaja iz odnosov in ugleda v socialni strukturi; ter (iv) kognitivno zaupanje, ki modelira subjektivna pričakovanja in nagnjenost akterja k tveganju.
 
 Modeli se razlikujejo tudi po načinu ocenjevanja zaupanja, ki neposredno vpliva na zmožnost sistema za odločanje. Vrednosti se lahko merijo na številski lestvici, na primer kot verjetnost med 0 in 1, ali pa na diskretni lestvici z opisnimi stopnjami zaupanja. Izbira ustreznih metril in modela zahteva iskanje ravnovesja med natančnostjo ocene in računsko zahtevnostjo, kar je posebej pomembno pri implementaciji v realnem času na napravah z omejenimi viri \cite{cho2015survey}.
 
@@ -176,11 +176,11 @@ Priporočilni modeli gradijo zaupanje na osnovi izkušenj in posredovanih ocen d
 Vsaka entiteta ocenjuje druge glede na pretekle interakcije, te ocene pa se lahko prenašajo naprej kot priporočila.
 Model uporablja pogojno tranzitivnost zaupanja – entiteta $A$ lahko zaupa entiteti $C$, če zaupa entiteti $B$ kot priporočitelju in lahko ovrednoti kakovost njegovih priporočil.
 
-Abdul-Rahman in Hailes predlagata porazdeljeni model zaupanja, ki temelji na izračunu zaupanja iz verig priporočil med agenti \cite{abdul1998distributed}.
-Vsak agent hrani diskretne vrednosti zaupanja na lestvici od $-1$ do $4$, kjer $-1$ pomeni popolno nezaupanje, $0$ nevednost (agent si ne upa podati ocene), vrednosti $1$ do $3$ označujejo naraščajoče stopnje zaupanja, $4$ pa predstavlja popolno zaupanje.
+Abdul-Rahman in Hailes predlagata porazdeljeni model zaupanja, ki temelji na izračunu zaupanja iz verig priporočil med akterji \cite{abdul1998distributed}.
+Vsak akter hrani diskretne vrednosti zaupanja na lestvici od $-1$ do $4$, kjer $-1$ pomeni popolno nezaupanje, $0$ nevednost (akter si ne upa podati ocene), vrednosti $1$ do $3$ označujejo naraščajoče stopnje zaupanja, $4$ pa predstavlja popolno zaupanje.
 Ločita med:
 \begin{itemize}
-  \item \emph{vrednostjo priporočiteljevega zaupanja} $\mbox{tv}(R_i)$, ki opisuje, koliko agent zaupa $i$-temu priporočitelju na poti in
+  \item \emph{vrednostjo priporočiteljevega zaupanja} $\mbox{tv}(R_i)$, ki opisuje, koliko akter zaupa $i$-temu priporočitelju na poti in
   \item \emph{priporočeno vrednostjo zaupanja} $\mbox{rtv}(T)$, ki jo o ciljni entiteti $T$ poda zadnji priporočitelj v verigi.
 \end{itemize}
 Naj bo $n$ število priporočiteljev, $R_1, R_2, \dots, R_n$ pa zaporedni priporočitelji na poti od izvornega priporočitelja do tistega, ki priporočilo zahteva.
@@ -190,7 +190,7 @@ Avtorja predlagata naslednjo formulo za izračun zaupanja po poti $p$ \cite{abdu
   \mbox{tv}_p(T) = \left( \prod_{i=1}^{n} \frac{\mbox{tv}(R_i)}{4} \right) \cdot \mbox{rtv}(T).
   \label{eq:abdulrahman-path}
 \end{equation}
-Ker lahko agent za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $r$ število teh poti, označenih z $i = 1, \dots, r$. Vse delne ocene zaupanja $\mbox{tv}_1(T), \dots, \mbox{tv}_r(T)$ se povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
+Ker lahko akter za isto ciljno entiteto $T$ prejme več priporočil po različnih poteh, naj bo $r$ število teh poti, označenih z $i = 1, \dots, r$. Vse delne ocene zaupanja $\mbox{tv}_1(T), \dots, \mbox{tv}_r(T)$ se povprečijo, tako da se končna priporočilna ocena zaupanja v entiteto $T$ izračuna kot
 $\mbox{tv}(T) = \frac{1}{r} \sum_{i=1}^{r} \mbox{tv}_i(T)$ \cite{abdul1998distributed}.
 
 \subsection{Porazdeljeno ocenjevanje zaupanja}
