@@ -108,7 +108,7 @@ Cilj naloge je razviti konceptualni in arhitekturni okvir ter na njegovi podlagi
 
 Hipoteza naloge je, da je mogoče tak prototip zasnovati tako, da demonstrira izvedljivost decentraliziranega sistema za izračun zaupanja ter hkrati ohrani lastnosti, ki so ključne za regulativno okolje: razložljivost postopkov, razširljivost arhitekture, odpornost na posamične okvare ter minimizacijo razkritja podatkov.
 
-Predlagani sistem temelji na kombinaciji semantičnega modeliranja, decentralizirane infrastrukture in preverljivih poverilnic. Akterji v dobavni verigi so formalno opisani z uporabo ontologije, ki omogoča predstavitev njihovih lastnosti. Zaupanje se ocenjuje na podlagi več neodvisnih virov z uporabo orakljev, ki izračune izvajajo zunaj verige blokov, končni rezultati pa se zapisujejo v verigo blokov.
+Predlagani sistem temelji na kombinaciji semantičnega modeliranja, decentralizirane infrastrukture in preverljivih poverilnic. Akterji v dobavni verigi so formalno opisani z uporabo ontologije, ki omogoča predstavitev njihovih lastnosti. Zaupanje se ocenjuje na podlagi več neodvisnih virov z uporabo orakljev, ki izračune izvajajo zunaj verige blokov, končni rezultati pa se zapisujejo na verigo blokov.
 
 V nadaljevanju naloge najprej predstavimo teoretično ozadje upravljanja zaupanja v porazdeljenih sistemih ter obstoječe pristope, uporabljene v farmacevtskih dobavnih verigah. Nato opišemo konceptualni model zaupanja in arhitekturo predlaganega sistema, vključno z vlogo ontologije, orakljev in verige blokov. Sledi poglavje implementacije, kjer podrobno predstavimo zasnovo in delovanje prototipa. V poglavju evalvacije prikažemo eksperimentalne scenarije, ki demonstrirajo praktično delovanje sistema, ter analiziramo njegove varnostne lastnosti z uporabo modela groženj. V zaključku povzamemo ključne ugotovitve in predlagamo možnosti za nadaljnji razvoj rešitve.
 
@@ -121,9 +121,9 @@ To poglavje raziskuje koncepte, na katerih temelji sistem, razvit v okviru magis
 Pojem zaupanja je temeljni gradnik pri zasnovi našega sistema za farmacevtsko dobavno verigo. Zaupanje je kompleksen, večdimenzionalen in interdisciplinaren koncept, ki ga obravnavajo različne vede. Obravnava se v sociologiji, psihologiji, ekonomiji, računalništvu in še ostalih vedah. Prav zaradi te raznolikosti v literaturi ne obstaja enotna definicija, temveč več pristopov, ki poudarjajo različne vidike \cite{yan2008trust,grandison2000survey}.
 
 \subsection{Definicije zaupanja}
-V družboslovnem kontekstu je zaupanje pogosto opredeljeno kot stanje pozitivnih pričakovanj glede dejanj druge osebe v okoliščinah, kjer obstaja določena stopnja tveganja \cite{boon1991interpersonal}. Gambetta \cite{gambetta1988trust} zaupanje definira kot subjektivno verjetnost, da bo akter opravil določeno dejanje, še preden je to mogoče preveriti. Mayer, Davis in Schoorman \cite{mayer1995integrative} pa ga opredelijo kot pripravljenost ene stranke, da se izpostavi ranljivosti glede na dejanja druge stranke, ob pričakovanju, da bo ta delovala v skladu s pričakovanji.
+V družboslovnem kontekstu je zaupanje pogosto opredeljeno kot stanje pozitivnih pričakovanj glede dejanj druge osebe v okoliščinah, kjer obstaja določena stopnja tveganja \cite{boon1991interpersonal}. Gambetta zaupanje definira kot subjektivno verjetnost, da bo akter opravil določeno dejanje, še preden je to mogoče preveriti \cite{gambetta1988trust}. Mayer, Davis in Schoorman pa ga opredelijo kot pripravljenost ene stranke, da se izpostavi ranljivosti glede na dejanja druge stranke, ob pričakovanju, da bo ta delovala v skladu s pričakovanji \cite{mayer1995integrative}.
 
-V digitalnem okolju se koncept zaupanja prenaša iz družbenega v tehnični kontekst. Denning \cite{denning1993trust} trdi, da je zaupanje v sistem lastnost, ki jo je mogoče formalno določiti in jo modelirati. Sistem je torej zaupanja vreden, če mu njegovi uporabniki zaupajo glede na opaženo skladnost z vnaprej določenimi standardi. Grandison in Sloman \cite{grandison2000survey} zaupanje obravnavata kot kvalificirano prepričanje zaupnika o kompetentnosti, integriteti, varnosti in zanesljivosti zaupanja vrednega subjekta.
+V digitalnem okolju se koncept zaupanja prenaša iz družbenega v tehnični kontekst. Denning trdi, da je zaupanje v sistem lastnost, ki jo je mogoče formalno določiti in jo modelirati \cite{denning1993trust}. Sistem je torej zaupanja vreden, če mu njegovi uporabniki zaupajo glede na opaženo skladnost z vnaprej določenimi standardi. Grandison in Sloman zaupanje obravnavata kot kvalificirano prepričanje zaupnika o kompetentnosti, integriteti, varnosti in zanesljivosti zaupanja vrednega subjekta \cite{grandison2000survey}.
 
 \subsection{Lastnosti zaupanja}
 
@@ -141,7 +141,7 @@ Da bi bilo zaupanje uporabno v digitalnem okolju, ga je potrebno izraziti z merl
 Klasični modeli, kot sta predstavljena v delih avtorjev Mayer, Davis in Schoorman \cite{mayer1995integrative} ter McKnight in Chervany \cite{mcknight2001trust}, opredeljujejo tri temeljne dimenzije zaupanja, ki jih slednja avtorja klasificirata kot prepričanja o lastnostih partnerja: kompetentnost, dobrohotnost in integriteta.
 Kompetentnost (angl. \textit{Competence}) poleg usposobljenosti opraviti nekaj, pomeni zlasti prepričanje, da ima entiteta zmožnosti in vire za učinkovito izvedbo nalog, ki so zanjo pričakovane. Dobrohotnost (angl. \textit{Benevolence}) izraža prepričanje, da druga stran pri svojem delovanju upošteva interese uporabnika in ne deluje oportunistično. Integriteta (angl. \textit{Integrity}) oziroma načelnost pa se nanaša na zaznano moralno držo subjekta, ki vključuje spoštovanje dogovorov in dosledno izpolnjevanje obljub. Tem trem dimenzijam se v številnih delih pridružuje še predvidljivost (angl. \textit{Predictability}), ki temelji na konsistentnosti preteklih ravnanj in omogoča sklepanje o prihodnjem vedenju entitete v podobnih okoliščinah.
 
-V digitalnih in porazdeljenih okoljih so se pojavili dodatni atributi, ki izhajajo iz tehničnih vidikov zaupanja. Grandison in Sloman \cite{grandison2000survey} zaupanje opišeta kot prepričanje o pristojnosti, varnosti in verodostojnosti drugega subjekta. Denning \cite{denning1993trust} poudarja, da je zaupanje sistema mogoče ocenjevati tudi z vidika varnosti, skladnosti s pravili ter preverljivostjo delovanja. Ti atributi omogočajo formalno ocenjevanje zaupanja med akterji.
+V digitalnih in porazdeljenih okoljih so se pojavili dodatni atributi, ki izhajajo iz tehničnih vidikov zaupanja. Grandison in Sloman zaupanje opišeta kot prepričanje o pristojnosti, varnosti in verodostojnosti drugega subjekta \cite{grandison2000survey}. Denning poudarja, da je zaupanje sistema mogoče ocenjevati tudi z vidika varnosti, skladnosti s pravili ter preverljivostjo delovanja \cite{denning1993trust}. Ti atributi omogočajo formalno ocenjevanje zaupanja med akterji.
 
 V kontekstu farmacevtskih dobavnih verig imajo atributi zaupanja izrazito regulatorno in sledilno komponento. Uddin in sodelavci \cite{uddin2021blockchain} poudarjajo, da so pri zagotavljanju zaupanja ključni kazalniki sledljivost, pristnost in celovitost podatkov.
 Kayhan in sodelavci \cite{kayhan2022ensuring} izpostavljajo še pomen transparentnosti, nespremenljivosti in izvorne sledljivosti (angl. provenance), ki jih omogoča tehnologija veriženja blokov.
@@ -211,7 +211,7 @@ Ocena zaupanja v akterja $u$ do časa $t$ je nato definirana kot \cite{xiong2002
 \end{equation}
 Vrednost $T(u,t)$ leži v intervalu $[0,1]$ in predstavlja globalno reputacijsko oceno akterja $u$ na podlagi skupnega, uteženega zadovoljstva vseh vozlišč, ki so z njim sodelovala. 
 
-Za odločanje, ali je akter zaupanja vreden, avtorja uvedeta pragova $c_1$ in $c_2$. Prag $c_1$ določa minimalno število skupnih interakcij, ki jih mora imeti akter, da lahko opazovalec sprejme informirano odločitev. Prag $c_2$ pa izraža, kako visoko vrednost zaupanja je opazovalec pripravljen sprejeti kot še dovolj dobro: bolj toleranten akter lahko izbere nižji $c_2$, manj toleranten pa višjega. Akter $u$ se obravnava kot zaupanja vreden, če hkrati velja $I(u,t) > c_1$ in $T(u,t) > c_2$ \cite{xiong2002building}.
+Za odločanje, ali je akter zaupanja vreden, avtorja uvedeta pragova $c_1$ in $c_2$. Prag $c_1$ določa minimalno število skupnih interakcij, ki jih mora imeti akter, da lahko opazovalec sprejme informirano odločitev. Prag $c_2$ pa izraža, kako visoko vrednost zaupanja je opazovalec pripravljen sprejeti kot še dovolj dobro: bolj toleranten akter lahko izbere nižji $c_2$, manj toleranten pa višjega. Akter $u$ se obravnava kot zaupanja vreden, če hkrati velja $I(u, v, t) > c_1$ in $T(u,t) > c_2$ \cite{xiong2002building}.
 
 \subsection{Dinamično posodabljanje zaupanja}
 
@@ -230,7 +230,7 @@ kjer je $e^{-\beta \Delta t}$ amortizacijski faktor, ki zmanjšuje vpliv starej�
 \subsection{Povezava z našo rešitvijo}
 Predstavljeni modeli in enačbe v tem poglavju služijo kot pregled možnih pristopov k izračunu zaupanja v porazdeljenih okoljih. V okviru te naloge jih obravnavamo kot primere, ki jih je mogoče uporabiti pri implementaciji izračuna v orakljih, vendar njihova uporaba ni predpisana.
 
-Osrednji poudarek naloge je na zasnovi in implementaciji sistema, ki omogoča, da različni akterji izvedejo izračun zaupanja po lastnih pravilih in z uporabo lastnih algoritmov. Sistem zato ne vsiljuje enotnega modela, temveč zagotavlja skupen mehanizem za pridobivanje vhodnih podatkov ter za preverljiv in trajen zapis rezultatov v verigo blokov, neodvisno od izbrane metode izračuna.
+Osrednji poudarek naloge je na zasnovi in implementaciji sistema, ki omogoča, da različni akterji izvedejo izračun zaupanja po lastnih pravilih in z uporabo lastnih algoritmov. Sistem zato ne vsiljuje enotnega modela, temveč zagotavlja skupen mehanizem za pridobivanje vhodnih podatkov ter za preverljiv in trajen zapis rezultatov na verigo blokov, neodvisno od izbrane metode izračuna.
 
 \section{Farmacevtske dobavne verige}
 
@@ -242,7 +242,7 @@ Sledenje zdravilom omogoča identifikacijo posamezne serije skozi celoten življ
 
 Za zagotavljanje sledljivosti so regulatorji uvedli stroge predpise. Evropska unija je sprejela Direktivo o ponarejenih zdravilih (2011/62/EU) \cite{eu-62-2011} in Delegirano uredbo (EU) 2016/161 \cite{eu-161-2016}, ki zahtevata enolično označevanje embalaže z dvodimenzionalno kodo in uporabo evropskega sistema EMVS (European Medicines Verification System). V ZDA podobno vlogo opravlja zakon DSCSA, ki uvaja popolnoma digitalno sledenje zdravil do leta 2025 \cite{us2013dscsa}.
 
-Ti ukrepi predstavljajo pomembne korake k večji sledljivosti, vendar še vedno temeljijo na centraliziranih bazah podatkov, kjer posamezni akterji nimajo popolnega vpogleda v celotno verigo.
+Ti ukrepi predstavljajo pomembne korake k večji sledljivosti, vendar še vedno temeljijo na centraliziranih bazah podatkov, kjer posamezni akterji nimajo popolnega vpogleda v celotno dobavno verigo.
 
 \subsection{Izzivi in tveganja}
 
@@ -266,10 +266,10 @@ Za izpolnjevanje regulativnih zahtev podjetja uporabljajo različne informacijsk
 
 V zadnjem desetletju se pojavljajo projekti, ki preučujejo uporabo tehnologije veriženja blokov v farmacevtskih dobavnih verigah. Projekta MediLedger v ZDA in PharmaLedger v Evropi uporabljata porazdeljene zapise za izboljšanje integritete in sledljivosti podatkov \cite{uddin2021blockchain}. Takšni pristopi dokazujejo, da veriga blokov omogoča nespremenljivost zapisov in enostavnejše preverjanje informacij, vendar večinoma rešujejo le problem integritete podatkov.
 
-Kljub temu večina rešitev ostaja usmerjena v zaupanje v podatke, medtem ko je upravljanje zaupanja med posameznimi organizacijami pogosto implicitno, vezano na statične pravice dostopa ali vnaprej dogovorjene pogodbeno–pravne odnose. Manj je pristopov, kjer bi lahko vsak akter izrecno definiral svoje kriterije zaupanja in iz njih izpeljal odločitve o sodelovanju. Prav to vrzel bo zapolnil sistem, predstavljen v tej nalogi, saj kombinira semantični model dobavne verige, subjektivne politike zaupanja in zapis rezultatov v verigo blokov.
+Kljub temu večina rešitev ostaja usmerjena v zaupanje v podatke, medtem ko je upravljanje zaupanja med posameznimi organizacijami pogosto implicitno, vezano na statične pravice dostopa ali vnaprej dogovorjene pogodbeno–pravne odnose. Manj je pristopov, kjer bi lahko vsak akter izrecno definiral svoje kriterije zaupanja in iz njih izpeljal odločitve o sodelovanju. Prav to vrzel bo zapolnil sistem, predstavljen v tej nalogi, saj kombinira semantični model dobavne verige, subjektivne politike zaupanja in zapis rezultatov na verigo blokov.
 
 \section{Tehnologija veriženja blokov}
-Tehnologija veriženja blokov je bila prvič predstavljena leta 2008 v sklopu kriptovalute Bitcoin \cite{nakamoto2008bitcoin}. Osnovna ideja je zasnova podatkovne strukture, ki povezuje zapise v verigo blokov. Vsak blok vsebuje podatke, zgostitev prejšnjega bloka in časovni žig. Takšna vezava med bloki preprečuje naknadne spremembe zapisanih podatkov, saj bi vsaka sprememba v enem izmed starejših blokov spremenila njegovo zgostitev. Posledično pa se zgostitev ne bi več ujemala z vrednostjo, shranjeno v naslednjem bloku \cite{crosby2016blockchain}.
+Tehnologija veriženja blokov je bila prvič predstavljena leta 2008 v sklopu kriptovalute Bitcoin \cite{nakamoto2008bitcoin}. Osnovna ideja je zasnova podatkovne strukture, ki povezuje zapise na verigi blokov. Vsak blok vsebuje podatke, zgostitev prejšnjega bloka in časovni žig. Takšna vezava med bloki preprečuje naknadne spremembe zapisanih podatkov, saj bi vsaka sprememba v enem izmed starejših blokov spremenila njegovo zgostitev. Posledično pa se zgostitev ne bi več ujemala z vrednostjo, shranjeno v naslednjem bloku \cite{crosby2016blockchain}.
 
 Veriga blokov deluje v porazdeljenem omrežju, kjer vsako vozlišče hrani kopijo celotne verige. Soglasje o pravilnem zaporedju blokov se doseže s konsenznim mehanizmom. V javnih verigah se pogosto uporabljata t. i. Proof of Work ali Proof of Stake, medtem ko zasebna omrežja uporabljajo lažje mehanizme, ki temeljijo na znanih udeležencih. Zaradi porazdeljene narave sistem ne potrebuje centralne avtoritete, kar omogoča zanesljivo beleženje podatkov v okolju z različnimi deležniki.
 
@@ -309,8 +309,8 @@ V praksi se pojavlja več arhitektur, ki omogočajo delovanje orakljev.
 Najpreprostejši so centralizirani oraklji, kjer ena organizacija zbira podatke in jih pošilja pametnim pogodbam.
 Tak pristop je enostaven za implementacijo, vendar ponovno uvaja enotno točko zaupanja in napake.
 Sledijo jim porazdeljeni oziroma decentralizirani oraklji, kjer več neodvisnih vozlišč pridobiva in združuje podatke in tako zmanjšuje tveganje za manipulacijo podatkov.
-Primer takšne zasnove je sistem ASTRAEA, predlagan s strani Adlerja in sodelavcev, ki uporabi glasovalno igro z vložki in ločene vloge udeležencev (oddajatelji trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}.
-Podobno pristopajo tudi druge rešitve, kjer se omrežja orakljev, kot je Chainlink, uporabljajo za zbiranje podatkov iz več API-jev in senzorjev ter za izračun dodatnih meril (npr. reputacije) še pred zapisom v verigo blokov. Tak pristop uporabijo Kochovski in sodelavci v članku \textit{Trust management in a blockchain based fog computing platform with trustless smart oracles} \cite{kochovski2019trust}.
+Primer takšne zasnove je sistem ASTRAEA, predlagan s strani Adlerja in sodelavcev, ki uporabi glasovalno igro z vložki in ločene vloge udeležencev (oddajalci trditev, glasovalci, certificiranci), da z ekonomsko motivacijo spodbudi udeležence k poštenemu poročanju o resničnosti trditev \cite{adler2018astraea}.
+Podobno pristopajo tudi druge rešitve, kjer se omrežja orakljev, kot je Chainlink, uporabljajo za zbiranje podatkov iz več API-jev in senzorjev ter za izračun dodatnih meril (npr. reputacije) še pred zapisom na verigo blokov. Tak pristop uporabijo Kochovski in sodelavci v članku \textit{Trust management in a blockchain based fog computing platform with trustless smart oracles} \cite{kochovski2019trust}.
 
 V okviru te naloge oraklje obravnavamo kot ločeno plast med semantičnim delom sistema in verigo blokov.
 Podobno kot pri Chainlinku smo zasnovali decentralizirano omrežje pametnih orakljev, kjer se izvaja koda. Omrežje orakljev iz ontologije in pravil zaupanja prebere podatke, izvede izračun zaupanja ter rezultat posreduje pametni pogodbi.
@@ -325,7 +325,7 @@ Preverljive poverilnice (angl. Verifiable Credentials - VC) so standardizirana d
 
 V predstavljenem sistemu ima vsak akter v ontologiji lasten DID. Ta služi kot osnovni identifikator, na katerega se vežejo atributi in podatki v ontologiji. Na ta način sistem ohrani enotno identiteto akterjev med vsemi plastmi arhitekture.
 
-Preverljive poverilnice uporabljamo za opis lastnosti, ki so pomembne za ocenjevanje zaupanja. Regulator, kot je EMA, lahko na primer izda VC, ki potrjuje veljavnost licence, certifikat GMP ali rezultat presoje kakovosti. Poverilnice so digitalno podpisane in povezana z DID akterja. Orakelj lahko med izračunom zaupanja prebere VC, preveri podpis izdajatelja ter iz podatkov izlušči merila, katera akter uporablja v svoji politiki zaupanja. Če akter v svojih pravilih določi, da mora imeti partner veljavno licenco ali ustrezno oceno presoje kakovosti, lahko te kriterije pridobi neposredno iz VC.
+Preverljive poverilnice uporabljamo za opis lastnosti, ki so pomembne za ocenjevanje zaupanja. Regulator, kot je EMA, lahko na primer izda VC, ki potrjuje veljavnost licence, certifikat GMP ali rezultat presoje kakovosti. Poverilnice so digitalno podpisane in povezane z DID akterja. Orakelj lahko med izračunom zaupanja prebere VC, preveri podpis izdajatelja ter iz podatkov izlušči merila, katera akter uporablja v svoji politiki zaupanja. Če akter v svojih pravilih določi, da mora imeti partner veljavno licenco ali ustrezno oceno presoje kakovosti, lahko te kriterije pridobi neposredno iz VC.
 
 \newpage
 \section{Semantični splet in ontologije}
@@ -344,7 +344,7 @@ V tem poglavju smo predstavili ključne gradnike, ki so pomembni za razumevanje 
 
 V nadaljevanju smo predstavili posebnosti farmacevtskih dobavnih verig. Te verige so močno regulirane in vključujejo veliko različnih akterjev. Regulativa, kot sta evropska direktiva o ponarejenih zdravilih in zakon DSCSA v ZDA, uvaja sledljivost serij in elektronsko izmenjavo podatkov. Kljub temu ostajajo pomanjklivosti, ki jih je potrebno odpraviti. Obstoječi sistemi večinoma temeljijo na centraliziranih bazah podatkov, kjer posamezna podjetja nimajo celovitega vpogleda v verigo. Ponarejena ali neustrezna zdravila se še vedno pojavljajo, podatkovni tokovi pa so razdrobljeni in vezani na zaupanja vredne posrednike. Trenutne rešitve tako izboljšujejo sledljivost, ne rešujejo pa dovolj dobro vprašanja, komu lahko posamezna organizacija zaupa pri sodelovanju.
 
-Tehnologija veriženja blokov in pametne pogodbe ponujajo nov način upravljanja podatkov v takih okoljih. Verige blokov omogočajo nespremenljiv zapis dogodkov in enoten pogled na podatke v porazdeljenem omrežju. Pametne pogodbe omogočajo izvajanje skupnih pravil, ki veljajo za vse udeležence. Oraklji rešujejo problem povezave med verigo blokov in zunanjimi viri podatkov, vendar ponovno odpirajo vprašanje, komu zaupati pri posredovanju podatkov. Semantični splet in ontologije pa omogočajo formalno predstavitev znanja o akterjih in njihovih lastnostih ter avtomatsko sklepanje nad podatki. V literaturi se ti pristopi le redko združijo v enotno arhitekturo, kjer bi imeli akterji možnost, da na podlagi skupne ontologije definirajo svoje kriterije zaupanja, rezultat teh ocen pa se nato trajno zapiše v verigo blokov.
+Tehnologija veriženja blokov in pametne pogodbe ponujajo nov način upravljanja podatkov v takih okoljih. Verige blokov omogočajo nespremenljiv zapis dogodkov in enoten pogled na podatke v porazdeljenem omrežju. Pametne pogodbe omogočajo izvajanje skupnih pravil, ki veljajo za vse udeležence. Oraklji rešujejo problem povezave med verigo blokov in zunanjimi viri podatkov, vendar ponovno odpirajo vprašanje, komu zaupati pri posredovanju podatkov. Semantični splet in ontologije pa omogočajo formalno predstavitev znanja o akterjih in njihovih lastnostih ter avtomatsko sklepanje nad podatki. V literaturi se ti pristopi le redko združijo v enotno arhitekturo, kjer bi imeli akterji možnost, da na podlagi skupne ontologije definirajo svoje kriterije zaupanja, rezultat teh ocen pa se nato trajno zapiše na verigo blokov.
 
 Na tej točki se pokaže osrednja vrzel. Obstoječe rešitve za sledljivost zdravil se osredotočajo na varnost in integriteto podatkov, upravljanje zaupanja med organizacijami pa je običajno implicitno. Temelji na statičnih pravicah dostopa, pogodbah in ročnih pregledih partnerjev. Po drugi strani številni modeli zaupanja ne upoštevajo posebnosti farmacevtske domene in niso povezani z verigo blokov. Manj je pristopov, kjer bi lahko vsak akter izrecno zapisal svojo politiko zaupanja, jo vezal na skupni semantični model ter rezultate ocenjevanja delil na način, ki ga lahko drugi akterji neodvisno preverijo.
 
@@ -432,7 +432,7 @@ Na sliki~\ref{fig:architecture-concept} je prikazan koncept ciljne arhitekture s
 
 \section{Uporabljene tehnologije}
 
-Pri razvoju sistema smo uporabili različna orodja in platforme, ki skupaj omogočajo obdelavo semantičnih podatkov, izvajanje izračuna zaupanja ter zapis rezultatov v verigo blokov. V tem razdelku podajamo pregled najpomembnejših tehnologij in njihovih vlog v sistemu.
+Pri razvoju sistema smo uporabili različna orodja in platforme, ki skupaj omogočajo obdelavo semantičnih podatkov, izvajanje izračuna zaupanja ter zapis rezultatov na verigo blokov. V tem razdelku podajamo pregled najpomembnejših tehnologij in njihovih vlog v sistemu.
 
 \paragraph{Git in GitHub}
 Za upravljanje izvorne kode prototipa smo uporabili sistem za nadzor različic Git. Z zgodovino sprememb je mogoče pregledati razvoj projekta in povrniti prejšnja stanja. Repozitorij gostuje na platformi GitHub, ki služi kot osrednje mesto za distribucijo kode in dokumentacijo. Izvorna koda prototipa je dostopna na: \url{https://github.com/zanp98/trust-management} \cite{pizmoht2025repo}.
@@ -594,7 +594,7 @@ Ker je ontologija zgrajena v OWL, omogoča tudi uporabo sklepalnika (angl. reaso
 \newpage
 \paragraph{Preverljive poverilnice (VC)}
 
-Poleg podatkov iz ontologije sistem uporablja še preverljive poverilnice (VC), ki jih izdajajo regulatorji ali druge zaupanja vredne organizacije. Te vsebujejo trditve o akterjih, kot so veljavnost licence, GMP skladnost ali datum zadnje presoje kakovosti. Zapisane so v formatu JSON-LD in digitalno podpisane.
+Poleg podatkov iz ontologije sistem uporablja še preverljive poverilnice (VC), ki jih izdajajo regulatorji ali druge zaupanja vredne organizacije. Te vsebujejo trditve o akterjih, kot so veljavnost licence, skladnost z GMP ali datum zadnje presoje kakovosti. Zapisane so v formatu JSON-LD in digitalno podpisane.
 
 Primer poverilnice, ki ga izda regulator:
 
@@ -649,7 +649,7 @@ Plast registra zaupanja predstavlja končni sloj arhitekture, kjer se rezultati 
 
 Pametna pogodba je zasnovana tako, da sprejema rezultate evalvacij orakljev in jih zapisuje v podatkovne strukture na verigi. Podpisi orakljev, konsenz agregatorja in mehanizmi preverjanja identitet poskrbijo, da v register pridejo le preverjene in verodostojne informacije. Vsak zapis je povezan z identifikatorjem akterja, časom vnosa in dodatnimi metapodatki, kar omogoča transparenten zgodovinski vpogled v spremembe zaupanja skozi čas.
 
-Ko agregator prejme dovolj veljavnih poročil orakljev, izvede postopek združevanja in prek transakcije pokliče funkcijo v pametni pogodbi, ki zapiše tako posamične oddaje kot končni konsenzni rezultat. Pogodba sproži dogodke, ki služijo kot signal akterjem ali nadrejenim sistemom, da je za določen subjekt na voljo nova ocena zaupanja. Vsaka sprememba je trajno zapisana v verigo blokov, zato je mogoče rezultate neodvisno preveriti tudi za nazaj.
+Ko agregator prejme dovolj veljavnih poročil orakljev, izvede postopek združevanja in prek transakcije pokliče funkcijo v pametni pogodbi, ki zapiše tako posamične oddaje kot končni konsenzni rezultat. Pogodba sproži dogodke, ki služijo kot signal akterjem ali nadrejenim sistemom, da je za določen subjekt na voljo nova ocena zaupanja. Vsaka sprememba je trajno zapisana na verigo blokov, zato je mogoče rezultate neodvisno preveriti tudi za nazaj.
 
 Register zaupanja hrani dve vrsti podatkov. Prva vrsta so posamične oddaje orakljev, ki predstavljajo neobdelane rezultate izračuna. Druga vrsta so konsenzni rezultati, ki jih agregator izračuna na podlagi več oddaj in jih pogodba obravnava kot veljavno končno stanje zaupanja za posameznega akterja. Na ta način lahko sistem ohranja celovito sliko o tem, kako so se rezultati spreminjali in kako je bila sprejeta končna odločitev.
 
@@ -721,7 +721,7 @@ Na sliki~\ref{fig:seq-diagram-recalculation} je prikazan celoten proces izračun
   \item \textbf{Agregator izvede konsenz in zapiše končni rezultat}\newline
     Ko agregator prejme dovolj veljavnih poročil (dosežen kvorum), izvede konsenz nad rezultati. Pri tem kombinira odločitev, oceno in dodatne zastavice, nato pa pripravi končno poročilo. Končni rezultat se zapiše v pametno pogodbo z uporabo funkcije:
     \begin{quote}\texttt{fulfillTrustReport(requestId, report)}\end{quote}
-    Pametna pogodba preveri, ali je agregator pooblaščen, ali je \texttt{requestId} veljaven in ali zahteva ni pretekla. Če so vsi pogoji izpolnjeni, pogodba zapiše konsenzni rezultat v verigo blokov  in sproži dogodek \texttt{TrustOracleFulfilled}.
+    Pametna pogodba preveri, ali je agregator pooblaščen, ali je \texttt{requestId} veljaven in ali zahteva ni pretekla. Če so vsi pogoji izpolnjeni, pogodba zapiše konsenzni rezultat na verigo blokov  in sproži dogodek \texttt{TrustOracleFulfilled}.
     Pogodba preveri identiteto klica, ujemanje ID in iztek roka, preden zapiše končni rezultat v:
     \begin{quote} \texttt{subjectMetrics[subject]} \end{quote}
     in sprožen je dogodek \texttt{TrustOracleFulfilled}, ki zaključi postopek.
@@ -810,7 +810,7 @@ V nadaljevanju so opisani vsi ključni koraki, prikazani v diagramu.
 
 
   \item \textbf{Zapis konsenznega rezultata v pametno pogodbo}\newline
-    Končni agregirani rezultat se v verigo blokov zapiše s funkcijo:
+    Končni agregirani rezultat se na verigo blokov zapiše s funkcijo:
     \begin{quote}\texttt{fulfillTrustReport(requestId, report)}\end{quote}
     Pametna pogodba preveri identiteto klicatelja, veljavnost identifikatorja zahteve in rok izvedbe.  
     Ob uspešnem zapisu sproži dogodek \texttt{TrustOracleFulfilled}, ki drugim komponentam signalizira, da je nova ocena na voljo.
@@ -1004,7 +1004,7 @@ Pri prvem branju ontologije se kriterij inicializira na osnovi trenutne vrednost
 \begin{equation}
     \beta = 1 + (1 - s_0) \cdot \texttt{obs\_scale},
 \end{equation}
-kjer je v implementaciji uporabljena utežni faktor $\texttt{obs\_scale} = 9$. Za »popolno« izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost porazdelitve beta $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko zaupanje.
+kjer je v implementaciji uporabljena utežni faktor $\texttt{obs\_scale} = 9$. Za popolno izpolnjen pogoj ($s_0 \approx 1$) dobimo pričakovano vrednost porazdelitve beta $\mathbb{E}[X] \approx 0{,}91$, kar predstavlja visoko zaupanje.
 
 Pri novih opazovanjih (interakcijah) se aposterior posodobi po principu eksponentno uteženega drsečega povprečja (EWMA) s faktorjem $\gamma \approx 0{,}2$. Če opazovanje prinese zaželenost $s$, se nova parametra $\alpha'$ in $\beta'$ izračunata kot:
 \begin{equation}
@@ -1164,7 +1164,7 @@ Takšna predstavitev treh orakljev neposredno gradi na modelih iz poglavja~\ref{
 \subsection{Agregacija poročil orakljev}
 \label{subsec:agregator-scenariji}
 
-V scenarijih, predstavljenih v nadaljevanju, vedno nastopi enak vzorec: za določenega akterja (npr.\ transportno podjetje ali distributerja) pametna pogodba \texttt{TrustGraph.sol} sproži zahtevo po poročilu o zaupanju, oraklji A, B in C izračunajo lastne ocene in jih pošljejo agregatorju, ta pa iz treh poročil izpelje enotno odločitev, ki jo zapiše v verigo blokov.
+V scenarijih, predstavljenih v nadaljevanju, vedno nastopi enak vzorec: za določenega akterja (npr.\ transportno podjetje ali distributerja) pametna pogodba \texttt{TrustGraph.sol} sproži zahtevo po poročilu o zaupanju, oraklji A, B in C izračunajo lastne ocene in jih pošljejo agregatorju, ta pa iz treh poročil izpelje enotno odločitev, ki jo zapiše na verigo blokov.
 
 V opisu scenarijev bomo tabelarično pokazali, kako so posamezne ocene orakljev A, B in C videti pred agregacijo, ter kako je iz njih izpeljana enotna odločitev, ki je na voljo ostalim akterjem v dobavni verigi.
 
@@ -1571,7 +1571,7 @@ Pametna pogodba \texttt{TrustGraph.sol} predstavlja edini vir resnice sistema na
 
 Kot prikazuje tabela~\ref{tab:threat-contract}, je prvi sklop groženj povezan z nepooblaščenimi klici funkcij, ki spreminjajo stanje grafa zaupanja. Tovrstne napade imenujemo slepljenje ali zavajanje (angl. spoofing). V implementaciji funkcije za zapis rezultatov klice omejujemo z vlogo \texttt{EVALUATOR} oziroma modifikatorjem \texttt{onlyEvaluator}, tako da jih lahko kliče le agregator oziroma izrecno pooblaščeni naslovi. Enotski testi implementirani v jeziku Solidity simulirajo klice z drugih naslovov in preverjajo, da pogodba takšne poskuse zavrne s funkcijo \texttt{revert}.
 
-Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl.\ tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje nekonsistentne podatke. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom ali ko nova odločitev dobi časovni žig, ki je kronološko starejši od časovnega žiga že obstoječe odločitve za istega subjekta. V tem primeru “računanje časovnega žiga v preteklost” pomeni, da se nova odločitev zabeleži prej kot njej predhodna, saj je njen pripisani časovni žig manjši (starejši). V našem primeru časovni žig nastopa kot kriptografsko zaščiten podatek o času, ki se vključi v zgostitev in podpis poročila ter se zapiše v verigo blokov skupaj z ostalimi parametri. Takšno stanje je semantično nelogično.
+Drugi sklop groženj se nanaša na integriteto stanja pametne pogodbe (angl.\ tampering). Čeprav veriga blokov zagotavlja nespremenljivost zgodovine transakcij, to samo po sebi ne prepreči, da pametna pogodba zaradi neustrezno preverjenih parametrov ali pomanjkljivih logičnih pogojev vnese v svoje stanje nekonsistentne podatke. Do takšnih razmer lahko pride denimo takrat, ko se nov rezultat napačno poveže z drugim subjektom ali ko nova odločitev dobi časovni žig, ki je kronološko starejši od časovnega žiga že obstoječe odločitve za istega subjekta. V tem primeru “računanje časovnega žiga v preteklost” pomeni, da se nova odločitev zabeleži prej kot njej predhodna, saj je njen pripisani časovni žig manjši (starejši). V našem primeru časovni žig nastopa kot kriptografsko zaščiten podatek o času, ki se vključi v zgostitev in podpis poročila ter se zapiše na verigo blokov skupaj z ostalimi parametri. Takšno stanje je semantično nelogično.
 Zato so v implementaciji funkcij uvedeni preverjevalni mehanizmi, ki zagotavljajo ohranjanje osnovnih stanjskih invariant (angl.\ state invariants). Med njih spadajo: (i) zahteva, da se vsak novi zapis nanaša na isti identifikator subjekta kot začetni zahtevek, (ii) da je časovni žig (\texttt{asOf}) monoton in nikoli ne nazaduje v preteklost ter (iii) da so meje dovoljenih vrednosti (npr.\ razpon ocene) ustrezno nadzorovane.
 Za dodatno zagotovitev pravilnosti smo izvedli kombinacijo enotskih in regresijskih testov. Enotski testi preverjajo posamezne robne primere na ravni funkcij. Regresijski testi pa odkrivajo nove napake v kodi, ki nastanejo z dodajanjem novih funkcij. T. i. testi \textit{fuzz\-ing} avtomatsko generirajo veliko število naključnih kombinacij parametrov (različni \texttt{requestId}, časovni žigi, zastavice in ocene). S tem preverimo, ali bi katera od kombinacij lahko pripeljala pogodbo v nelogično stanje ali sprožila neželene stranske učinke. Regresijski testi pa zagotavljajo, da popravki logike ne uvajajo novih nepravilnosti in da se znane invariante v kasnejših posodobitvah ohranijo.
 
